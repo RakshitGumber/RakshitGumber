@@ -16,7 +16,8 @@ export type BlogFrontmatterInput = Partial<BlogFrontmatter> & {
 
 export type BlogSourceEntry = {
   filename: string;
-  source: string;
+  frontmatter: Partial<BlogFrontmatterInput>;
+  content: string;
 };
 
 export type BlogPost = BlogFrontmatter & {

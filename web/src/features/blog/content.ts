@@ -1,5 +1,5 @@
-import matter from "gray-matter";
 import type { ComponentType } from "react";
+import { blogEntries } from "virtual:blog-content";
 
 import type {
   BlogFrontmatter,
@@ -13,12 +13,6 @@ import type {
 
 const FALLBACK_TITLE = "Untitled post";
 const WORDS_PER_MINUTE = 220;
-
-const rawPostModules = import.meta.glob("../../../../content/blog/*.mdx", {
-  eager: true,
-  import: "default",
-  query: "?raw",
-}) as Record<string, string>;
 
 const DEFAULT_FRONTMATTER: BlogFrontmatter = {
   title: FALLBACK_TITLE,
@@ -141,18 +135,12 @@ export const formatBlogDate = (date: string, locale = "en-US") => {
 
 export const formatReadingTime = (minutes: number) => `${minutes} min read`;
 
-const normalizeSourceEntries = (): BlogSourceEntry[] =>
-  Object.entries(rawPostModules).map(([filename, source]) => ({
-    filename,
-    source,
-  }));
-
 export const buildBlogPost = ({
   filename,
-  source,
+  frontmatter: rawFrontmatter,
+  content,
 }: BlogSourceEntry): BlogPost => {
-  const parsed = matter(source);
-  const frontmatter = normalizeFrontmatter(parsed.data, filename);
+  const frontmatter = normalizeFrontmatter(rawFrontmatter, filename);
   const publishedAt = new Date(
     frontmatter.date.includes("T")
       ? frontmatter.date
@@ -164,10 +152,10 @@ export const buildBlogPost = ({
     slug: normalizeBlogSlug(filename),
     filename: baseName(filename),
     sourcePath: filename,
-    excerpt: createExcerpt(frontmatter.description, parsed.content),
-    content: parsed.content,
+    excerpt: createExcerpt(frontmatter.description, content),
+    content,
     publishedAt: Number.isNaN(publishedAt.getTime()) ? new Date(0) : publishedAt,
-    readingTimeMinutes: estimateReadingTime(parsed.content),
+    readingTimeMinutes: estimateReadingTime(content),
   };
 };
 
@@ -178,7 +166,13 @@ const summarizeBlogPost = (post: BlogPost): BlogPostSummary => {
   return summary;
 };
 
-const allBlogPosts = normalizeSourceEntries().map(buildBlogPost);
+const allBlogPosts: BlogPost[] = blogEntries.map((entry: BlogSourceEntry) =>
+  buildBlogPost({
+    filename: entry.filename,
+    frontmatter: entry.frontmatter,
+    content: entry.content,
+  }),
+);
 
 export const sortBlogPostsByDate = <T extends { publishedAt: Date }>(
   posts: readonly T[],
@@ -272,7 +266,9 @@ export const getRelatedBlogPosts = (
     .map((entry) => entry.post);
 };
 
-const allPostSummaries = sortBlogPostsByDate(allBlogPosts).map(summarizeBlogPost);
+const allPostSummaries: BlogPostSummary[] = sortBlogPostsByDate(allBlogPosts).map(
+  summarizeBlogPost,
+);
 
 export const buildBlogIndex = (entries: readonly BlogSourceEntry[]): BlogIndex => {
   const posts = sortBlogPostsByDate(entries.map(buildBlogPost)).map(
@@ -292,7 +288,9 @@ const blogIndex = {
   tags: getBlogTags(allPostSummaries),
 };
 
-const blogLookup = new Map(allBlogPosts.map((post) => [post.slug, post] as const));
+const blogLookup = new Map<string, BlogPost>(
+  allBlogPosts.map((post) => [post.slug, post] as const),
+);
 
 export const getBlogIndex = () => blogIndex;
 
@@ -343,11 +341,13 @@ export const getPostBySlug = async (slug: string) => {
       import("remark-gfm"),
     ]);
 
-  const module = await evaluate(post.content, {
+  const module = (await evaluate(post.content, {
     ...runtime,
     rehypePlugins: [rehypeSlug],
     remarkPlugins: [remarkGfm],
-  });
+  })) as {
+    default: ComponentType<Record<string, unknown>>;
+  };
 
   return {
     Content: module.default as ComponentType<Record<string, unknown>>,
