@@ -27,8 +27,8 @@ function NotFoundComponent() {
           <p className="section-kicker">404</p>
           <h1 className="section-heading mt-4">That page does not exist.</h1>
           <p className="section-copy mt-4">
-            The route is missing or the content has moved. Use the primary nav or
-            jump back into the portfolio.
+            The route is missing or the content has moved. Use the primary nav
+            or jump back into the portfolio.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
