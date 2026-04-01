@@ -4,9 +4,7 @@
 
 **Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries when AI breaks my code 🥲**
 
-<img src="https://skillicons.dev/icons?i=ts,python" width="80" />
-
-<br/>
+<img src="https://skillicons.dev/icons?i=ts,python" width="90" />
 
 <!-- I can add a subtext over here for improvements -->
 
@@ -31,9 +29,9 @@ Project: Portfolio Website
 
 ## What I'm doing
 
-- **Finding Interests**
-- **Learning Stuff**
-- **Finishing projects**
+- **Finding Interests:** You can find me working in multiple fields. I am just *Curious.*😁
+- **Learning Stuff:** A quick learner, aLways looking for things I don't know.
+- **Finishing projects:** Build and Deliver. Nothing else works.
 
 ## Connect with me
 
