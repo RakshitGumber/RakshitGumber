@@ -12,7 +12,7 @@ Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries 
 
 <!-- Focus on adding projects nothing else will improve this -->
 
-## 💻 Current Projects
+## Current Projects
 
 - 🦦 [Home Screen](./) - Replaces default browser Homescreen with a friendly otter.
 
@@ -22,13 +22,13 @@ Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries 
 
 <!-- meh section better the above section better this section I will rewrite this -->
 
-## 🧠 What I'm doing
+## What I'm doing
 
 - Finding Interests
 - Learning Stuff
 - Finishing projects
 
-## 🌐 Connect with me
+## Connect with me
 
 <!-- Perfect section don't touch -->
 
