@@ -12,7 +12,7 @@ export const Navbar = () => {
           <Link to="/blog">Blogs</Link>
         </li>
         <li className="px-4 min-w-24 h-full flex items-center justify-center border-l-2 border-border">
-          <Link to="/about">Projects</Link>
+          <Link to="/projects">Projects</Link>
         </li>
       </ul>
       <div className="flex h-full items-center">

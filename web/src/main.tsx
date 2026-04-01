@@ -8,7 +8,7 @@ import { routeTree } from "./routeTree.gen";
 
 const router = createRouter({ routeTree });
 
-import { lenis } from "@/libs/smoothScroll";
+import { lenis } from "@/libs/SmoothScroll";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
 function raf(time: any) {

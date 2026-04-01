@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/Navbar";
+import { Hero } from "@/components/Hero";
 
 export const Route = createFileRoute("/")({
   component: RouteComponent,
@@ -11,10 +12,6 @@ function RouteComponent() {
     // TODO: Light almost invisible borders
     // Slate gray light outlines
     // TODO: Gradient home screen starting from black to white
-    // TODO: navigation
-    // Three page and a power button:
-    // No name added on pages.
-    //  from Power button You can download Portfolio, change the theme
     // TODO: Hero Section:
     // Heading: I am Rakshit Gumber: sans and bold font- montserrat- white color
     // SubHeading: Always Curious: handwriting font: accent color
@@ -35,6 +32,7 @@ function RouteComponent() {
 
     <div className="flex">
       <Navbar />
+      <Hero />
     </div>
   );
 }
