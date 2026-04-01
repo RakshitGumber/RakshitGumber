@@ -9,6 +9,7 @@ import { routeTree } from "./routeTree.gen";
 const router = createRouter({ routeTree });
 
 import { lenis } from "@/libs/smoothScroll";
+import { ThemeProvider } from "./providers/ThemeProvider";
 
 function raf(time: any) {
   lenis.raf(time);
@@ -30,7 +31,9 @@ if (!rootElement.innerHTML) {
   const root = createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
+        <RouterProvider router={router} />
+      </ThemeProvider>
     </StrictMode>,
   );
 }
