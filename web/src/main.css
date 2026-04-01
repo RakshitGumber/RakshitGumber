@@ -14,13 +14,13 @@
     --bg-secondary: #F1F5F9;
 
     /* TEXT */
-    --text-color: #132134;
-    --text-muted: #52657D;
-    --text-invert: #EDF5FF;
+    --text-color: #0F172A;
+    --text-muted: #475569;
+    --text-invert: #E6EDF3;
 
     /* BORDERS */
-    --border-color: #D8E3F0;
-    --border-strong: #BFD0E3;
+    --border-color: #E2E8F0;
+    --border-strong: #CBD5E1;
 
     /* ACCENT */
     --accent: #E11D48;
@@ -49,12 +49,12 @@
     --bg-secondary: #0F172A;
 
     /* TEXT */
-    --text-color: #EDF5FF;
-    --text-muted: #9FB4CB;
+    --text-color: #E6EDF3;
+    --text-muted: #9FB3C8;
 
     /* BORDERS */
-    --border-color: #263449;
-    --border-strong: #384D68;
+    --border-color: #1F2937;
+    --border-strong: #374151;
 }
 
 @theme {
