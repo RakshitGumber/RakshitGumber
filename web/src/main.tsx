@@ -8,6 +8,16 @@ import { routeTree } from "./routeTree.gen";
 
 const router = createRouter({ routeTree });
 
+import { lenis } from "@/libs/smoothScroll";
+
+function raf(time: any) {
+  lenis.raf(time);
+
+  requestAnimationFrame(raf);
+}
+
+requestAnimationFrame(raf);
+
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
