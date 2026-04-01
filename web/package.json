@@ -10,10 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/mulish": "^5.2.8",
     "@iconify/react": "^6.0.2",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-router": "^1.168.10",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.38.0",
     "lenis": "^1.3.21",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
