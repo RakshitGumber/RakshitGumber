@@ -4,12 +4,9 @@
 
 **Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries when AI breaks my code 🥲**
 
-<br/>
-<p style="background-color: oklch(13% 0.028 261.692); border-radius: 12px; padding: 12px 24px; display: flex; align-items: center; gap: 16px; border: 2px solid oklch(27.8% 0.033 256.848);">
-    <img src="https://skillicons.dev/icons?i=ts" width="40" />
-    <img src="https://skillicons.dev/icons?i=python" width="40" />
-</p>
-<br/>
+<img src="https://skillicons.dev/icons?i=ts" width="40" />
+<img src="https://skillicons.dev/icons?i=python" width="40" />
+
 <br/>
 
 <!-- I can add a subtext over here for improvements -->
