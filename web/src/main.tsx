@@ -11,7 +11,7 @@ const router = createRouter({ routeTree });
 import { lenis } from "@/libs/SmoothScroll";
 import { ThemeProvider } from "./providers/ThemeProvider";
 
-function raf(time: any) {
+function raf(time: number) {
   lenis.raf(time);
 
   requestAnimationFrame(raf);
@@ -25,9 +25,9 @@ declare module "@tanstack/react-router" {
   }
 }
 
-// Render the app
-const rootElement = document.getElementById("root")!;
-if (!rootElement.innerHTML) {
+const rootElement = document.getElementById("root");
+
+if (rootElement && !rootElement.innerHTML) {
   const root = createRoot(rootElement);
   root.render(
     <StrictMode>

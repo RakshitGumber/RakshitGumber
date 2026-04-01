@@ -58,10 +58,11 @@ export const PowerButton = () => {
         type="button"
         aria-controls={menuId}
         aria-expanded={showActions}
+        aria-haspopup="dialog"
         aria-label={showActions ? "Close quick actions" : "Open quick actions"}
         onClick={() => setShowActions((current) => !current)}
         whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-        className="flex h-9 min-w-10 items-center justify-center border border-border bg-transparent text-[1.25rem] text-text-muted transition-colors duration-200 hover:bg-bg-secondary/50 hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border"
+        className="flex h-full min-w-12 items-center justify-center border-y border-r border-border bg-transparent px-3 text-[1.25rem] text-text-muted transition-colors duration-200 hover:bg-bg-secondary/50 hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border"
       >
         <motion.span
           animate={{
@@ -77,7 +78,7 @@ export const PowerButton = () => {
         {showActions ? (
           <motion.div
             id={menuId}
-            role="menu"
+            aria-label="Quick actions"
             initial={
               shouldReduceMotion
                 ? false
@@ -92,7 +93,6 @@ export const PowerButton = () => {
           >
             <button
               type="button"
-              role="menuitem"
               className="flex h-9 items-center justify-between border border-border px-3 text-left [font-family:var(--font-nav)] text-[0.68rem] font-bold uppercase tracking-[0.2em] text-text-muted transition-colors duration-200 hover:bg-bg-secondary/50 hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border"
               onClick={() => {
                 setTheme(theme === "dark" ? "light" : "dark");
@@ -107,7 +107,6 @@ export const PowerButton = () => {
             </button>
             <button
               type="button"
-              role="menuitem"
               disabled
               title="Resume download coming soon"
               className="flex h-9 items-center justify-between border border-border px-3 text-left [font-family:var(--font-nav)] text-[0.68rem] font-bold uppercase tracking-[0.2em] text-text-muted/60"
