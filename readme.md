@@ -4,8 +4,7 @@
 
 **Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries when AI breaks my code 🥲**
 
-<img src="https://skillicons.dev/icons?i=ts" width="40" />
-<img src="https://skillicons.dev/icons?i=python" width="40" />
+<img src="https://skillicons.dev/icons?i=ts,python" width="80" />
 
 <br/>
 
