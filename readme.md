@@ -1,20 +1,24 @@
-# Hello, I am Rakshit Gumber.👋🏻
+# Hello, I am [Rakshit Gumber](https://gumberrakshit.com).👋🏻
 
 <!-- Header and this section is good to go. I can tweak the md box -->
 
-```
-Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries when AI breaks my code 🥲
-```
+**Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries when AI breaks my code 🥲**
 
 <img src="https://skillicons.dev/icons?i=ts,python" width="80" />
 <!-- I can add a subtext over here for improvements -->
+
+```
+Status: Building
+Project: Portfolio Website
+```
+
 ---
 
 <!-- Focus on adding projects nothing else will improve this -->
 
 ## Current Projects
 
-- 🦦 [Home Screen](./) - Replaces default browser Homescreen with a friendly otter.
+- **🦦 [Home Screen](./)** - Replaces default browser Homescreen with a friendly otter.
 
 ---
 
@@ -24,9 +28,9 @@ Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries 
 
 ## What I'm doing
 
-- Finding Interests
-- Learning Stuff
-- Finishing projects
+- **Finding Interests**
+- **Learning Stuff**
+- **Finishing projects**
 
 ## Connect with me
 
