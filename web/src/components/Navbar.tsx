@@ -38,7 +38,7 @@ const matchesPath = (pathname: string, item: NavItem) => {
 };
 
 const desktopLinkClass =
-  "flex h-full min-w-[5.75rem] items-center justify-center px-4 [font-family:var(--font-nav)] text-[0.7rem] font-bold uppercase tracking-[0.24em] transition-colors duration-200";
+  "flex h-full min-w-[5.75rem] items-center justify-center px-4 [font-family:var(--font-nav)] text-[0.7rem] font-semibold uppercase tracking-[0.24em] transition-colors duration-200";
 const actionButtonClass =
   "flex h-full w-10 shrink-0 items-center justify-center p-0 text-[1.05rem] text-text-muted transition-colors duration-200 hover:bg-white/8 hover:text-text-invert focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20";
 const brandNameStyle = {
@@ -217,7 +217,7 @@ export const Navbar = () => {
                         className={clsx(
                           desktopLinkClass,
                           isActive
-                            ? "bg-white/10 text-text-invert"
+                            ? "font-bold text-text-invert underline decoration-current decoration-[1px] underline-offset-[0.2rem]"
                             : "bg-transparent text-text-invert/68 hover:bg-white/8 hover:text-text-invert",
                         )}
                       >
@@ -315,7 +315,7 @@ export const Navbar = () => {
                       className={clsx(
                         "flex items-center px-7 py-4 text-[0.82rem] font-semibold uppercase tracking-[0.18em] transition-colors",
                         isActive
-                          ? "bg-white/8 text-text-invert"
+                          ? "font-bold text-text-invert underline decoration-current decoration-[1px] underline-offset-[0.2rem]"
                           : "text-text-invert/72 hover:bg-white/6 hover:text-text-invert",
                       )}
                     >
