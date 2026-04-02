@@ -80,20 +80,10 @@ export const Navbar = () => {
         duration: shouldReduceMotion ? 0 : 0.28,
         ease: "easeOut",
       }}
-      className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-10"
+      className="fixed inset-x-0 top-0 z-50 sm:px-6 sm:pt-4 lg:px-10"
     >
-      <div className="page-shell w-full border border-border bg-bg/75 backdrop-blur-md">
-        <div className="flex min-h-14 items-stretch justify-between">
-          <Link
-            to="/"
-            className="flex items-center gap-3 border-r border-border px-4 text-sm font-semibold uppercase tracking-[0.18em] text-text transition-colors hover:bg-bg-secondary/60"
-          >
-            <span className="flex h-8 w-8 items-center justify-center border border-border bg-bg-card text-[0.72rem]">
-              RG
-            </span>
-            <span className="hidden text-[0.72rem] sm:inline">Always curious</span>
-          </Link>
-
+      <div className="w-full border border-border bg-bg/75 backdrop-blur-md sm:mx-auto sm:w-[min(100%-(var(--page-gutter)*2),var(--page-width))]">
+        <div className="flex min-h-[60px] items-stretch justify-end">
           <div className="flex items-stretch">
             <nav aria-label="Primary" className="hidden h-full md:block">
               <motion.ul
@@ -149,7 +139,7 @@ export const Navbar = () => {
                 type="button"
                 aria-expanded={isMenuOpen}
                 aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-                className="flex h-full min-w-12 items-center justify-center border-y border-r border-border px-3 text-lg text-text-muted transition-colors duration-200 hover:bg-bg-secondary/50 hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border md:hidden"
+                className="flex h-full w-[60px] shrink-0 items-center justify-center border-l border-border px-0 text-lg text-text-muted transition-colors duration-200 hover:bg-bg-secondary/50 hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border md:hidden"
                 onClick={() => setIsMenuOpen((current) => !current)}
               >
                 <Icon icon={isMenuOpen ? "fa6-solid:xmark" : "fa6-solid:bars"} />

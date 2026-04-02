@@ -62,7 +62,7 @@ export const PowerButton = () => {
         aria-label={showActions ? "Close quick actions" : "Open quick actions"}
         onClick={() => setShowActions((current) => !current)}
         whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
-        className="flex h-full min-w-12 items-center justify-center border-y border-r border-border bg-transparent px-3 text-[1.25rem] text-text-muted transition-colors duration-200 hover:bg-bg-secondary/50 hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border"
+        className="flex h-full w-[60px] shrink-0 items-center justify-center border-l border-border bg-transparent px-0 text-[1.25rem] text-text-muted transition-colors duration-200 hover:bg-bg-secondary/50 hover:text-text focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border md:min-w-12 md:w-auto md:border-y md:border-r md:border-l-0 md:px-3"
       >
         <motion.span
           animate={{
