@@ -102,75 +102,42 @@ export const Navbar = () => {
     >
       <div className="flex h-15 items-center justify-between px-4 sm:px-0">
         <div className="flex items-center px-3">
-          <span className="text-lg font-bold tracking-wider text-text font-heading">
+          <span className="text-lg font-bold tracking-wider text-text font-heading cursor-pointer">
             Rakshit Gumber
           </span>
         </div>
-        {/* 
-        <nav className="hidden h-full md:block">
-          <ul className="flex h-full items-stretch">
-            {navItems.map((item) => {
-              const isActive = Boolean(
-                matchRoute({
-                  to: item.to,
-                  fuzzy: !item.exact,
-                }),
-              );
 
-              return (
-                <li key={item.to} className="h-full">
-                  <Link
-                    preload="intent"
-                    to={item.to}
-                    className={clsx(
-                      "flex h-full min-w-23 items-center justify-center px-4 [font-family:var(--font-nav)] text-[0.7rem] font-semibold uppercase tracking-[0.24em] transition-colors duration-200",
-                      isActive
-                        ? "font-bold text-text-invert underline decoration-current decoration-1 underline-offset-[0.2rem]"
-                        : "bg-transparent text-text-invert/68 hover:bg-white/8 hover:text-text-invert",
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav> */}
+        <nav className="hidden h-full sm:flex items-center">
+          {navItems.map((item) => {
+            const isActive = Boolean(
+              matchRoute({
+                to: item.to,
+                fuzzy: !item.exact,
+              }),
+            );
 
-        <div className="flex">
-          {/* <button
-              type="button"
-              aria-label={
-                theme === "dark"
-                  ? "Switch to light theme"
-                  : "Switch to dark theme"
-              }
-              className="flex h-full w-10 shrink-0 items-center justify-center p-0 text-[1.05rem] text-text-muted transition-colors duration-200 hover:bg-white/8 hover:text-text-invert focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/20"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              <motion.span
-                animate={{
-                  rotate: theme === "dark" ? 0 : 180,
-                  scale: theme === "dark" ? 1 : 1.08,
-                }}
-                transition={{
-                  duration: 0.22,
-                  ease: "easeOut",
-                }}
-              >
-                <Icon
-                  icon={
-                    theme === "dark"
-                      ? "material-symbols:light-mode-outline-rounded"
-                      : "material-symbols:dark-mode-outline-rounded"
-                  }
-                />
-              </motion.span>
-            </button> */}
+            return (
+              <div key={item.to} className="">
+                <Link
+                  preload="intent"
+                  to={item.to}
+                  className={clsx(
+                    "flex min-w-23 justify-center px-4 text-sm font-semibold tracking-wide",
+                    isActive &&
+                      "font-bold underline decoration-1 underline-offset-3",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </div>
+            );
+          })}
+        </nav>
 
+        <div className="flex sm:hidden">
           <button
             type="button"
-            className="flex p-3 text-xl text-text-muted hover:text-text-invert md:hidden"
+            className="flex p-3 text-xl text-text-muted hover:text-text-invert "
             onClick={() => setIsMenuOpen((current) => !current)}
           >
             <motion.span
@@ -194,7 +161,6 @@ export const Navbar = () => {
           </button>
         </div>
       </div>
-
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -205,7 +171,7 @@ export const Navbar = () => {
               duration: 0.2,
               ease: "circIn",
             }}
-            className="overflow-hidden md:hidden"
+            className="overflow-hidden sm:hidden"
           >
             <nav className="flex flex-col">
               {navItems.map((item) => {
