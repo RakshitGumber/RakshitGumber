@@ -100,9 +100,9 @@ export const Navbar = () => {
         duration: 0.6,
       }}
     >
-      <div className="flex h-15 items-center justify-between px-4 sm:px-0">
+      <div className="flex h-16 items-center justify-between p-4 sm:p-6 md:p-8 lg:p-10">
         <div className="flex items-center px-3">
-          <span className="text-lg font-bold tracking-wider text-text font-heading cursor-pointer">
+          <span className="text-lg font-bold tracking-wider text-text font-heading cursor-pointer sm:text-xl lg:text-2xl">
             Rakshit Gumber
           </span>
         </div>
@@ -122,7 +122,7 @@ export const Navbar = () => {
                   preload="intent"
                   to={item.to}
                   className={clsx(
-                    "flex min-w-23 justify-center px-4 text-sm font-semibold tracking-wide",
+                    "flex min-w-23 justify-center px-4 text-sm font-semibold tracking-wide sm:px-3 sm:text-base md:px-4 lg:px-5 lg:text-lg",
                     isActive &&
                       "font-bold underline decoration-1 underline-offset-3",
                   )}
