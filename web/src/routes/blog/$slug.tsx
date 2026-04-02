@@ -26,11 +26,18 @@ export const Route = createFileRoute("/blog/$slug")({
 function BlogPostPage() {
   const { post, Content } = Route.useLoaderData();
   const relatedPosts = getRelatedPosts(post.slug, 2);
+  const heroRadialStyle = {
+    backgroundImage:
+      "radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 28%, transparent), transparent 42%), radial-gradient(circle at bottom right, color-mix(in srgb, var(--text-invert) 8%, transparent), transparent 34%)",
+  } as const;
 
   return (
-    <div className="page-shell space-y-8">
-      <article className="section-frame overflow-hidden">
-        <div className="hero-radial relative border-b border-border px-6 py-10 sm:px-8 sm:py-12">
+    <div className="mx-auto w-[min(100%-(var(--page-gutter)*2),var(--page-width))] space-y-8">
+      <article className="overflow-hidden border border-border bg-bg-card/70 shadow-[var(--shadow-sm)] backdrop-blur-sm">
+        <div
+          className="relative border-b border-border px-6 py-10 sm:px-8 sm:py-12"
+          style={heroRadialStyle}
+        >
           <div className="section-grid pointer-events-none absolute inset-0 opacity-30" />
           <div className="relative max-w-3xl">
             <Link
@@ -68,7 +75,7 @@ function BlogPostPage() {
 
           <aside className="space-y-4">
             {(post.projectName || post.projectSummary) && (
-              <section className="section-frame px-5 py-5">
+              <section className="border border-border bg-bg-card/70 px-5 py-5 shadow-[var(--shadow-sm)] backdrop-blur-sm">
                 <p className="section-kicker">Linked project</p>
                 {post.projectName ? (
                   <h2 className="mt-3 text-xl font-semibold text-text">
@@ -91,7 +98,7 @@ function BlogPostPage() {
               </section>
             )}
 
-            <section className="section-frame px-5 py-5">
+            <section className="border border-border bg-bg-card/70 px-5 py-5 shadow-[var(--shadow-sm)] backdrop-blur-sm">
               <p className="section-kicker">Reading context</p>
               <p className="mt-3 text-sm leading-7 text-text-muted">
                 Local MDX, typed frontmatter, and route-driven rendering. Add a new
@@ -103,7 +110,7 @@ function BlogPostPage() {
       </article>
 
       {relatedPosts.length ? (
-        <section className="section-frame px-6 py-6 sm:px-8">
+        <section className="border border-border bg-bg-card/70 px-6 py-6 shadow-[var(--shadow-sm)] backdrop-blur-sm sm:px-8">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="section-kicker">Continue reading</p>

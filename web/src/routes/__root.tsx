@@ -19,9 +19,17 @@ function RootComponent() {
 }
 
 function NotFoundComponent() {
+  const heroRadialStyle = {
+    backgroundImage:
+      "radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 28%, transparent), transparent 42%), radial-gradient(circle at bottom right, color-mix(in srgb, var(--text-invert) 8%, transparent), transparent 34%)",
+  } as const;
+
   return (
-    <div className="page-shell">
-      <section className="section-frame hero-radial relative overflow-hidden px-6 py-14 sm:px-10 sm:py-20">
+    <div className="mx-auto w-[min(100%-(var(--page-gutter)*2),var(--page-width))]">
+      <section
+        className="relative overflow-hidden border border-border bg-bg-card/70 px-6 py-14 shadow-[var(--shadow-sm)] backdrop-blur-sm sm:px-10 sm:py-20"
+        style={heroRadialStyle}
+      >
         <div className="section-grid pointer-events-none absolute inset-0 opacity-35" />
         <div className="relative max-w-2xl">
           <p className="section-kicker">404</p>

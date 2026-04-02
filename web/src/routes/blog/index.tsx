@@ -54,8 +54,8 @@ function BlogIndexPage() {
         tagCount={blogIndex.tags.length}
       />
 
-      <div className="page-shell space-y-6">
-        <section className="section-frame px-6 py-6 sm:px-8">
+      <div className="mx-auto w-[min(100%-(var(--page-gutter)*2),var(--page-width))] space-y-6">
+        <section className="border border-border bg-bg-card/70 px-6 py-6 shadow-[var(--shadow-sm)] backdrop-blur-sm sm:px-8">
           <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
             <div>
               <p className="section-kicker">Find a post</p>
@@ -101,7 +101,7 @@ function BlogIndexPage() {
             ))}
           </section>
         ) : (
-          <section className="section-frame px-6 py-10 text-center sm:px-8">
+          <section className="border border-border bg-bg-card/70 px-6 py-10 text-center shadow-[var(--shadow-sm)] backdrop-blur-sm sm:px-8">
             <p className="section-kicker">No matches</p>
             <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-text">
               Nothing matched that query yet.

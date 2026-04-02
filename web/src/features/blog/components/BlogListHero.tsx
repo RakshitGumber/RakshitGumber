@@ -24,19 +24,24 @@ export const BlogListHero = ({
   className,
 }: BlogListHeroProps) => {
   const shouldReduceMotion = useReducedMotion();
+  const heroRadialStyle = {
+    backgroundImage:
+      "radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 28%, transparent), transparent 42%), radial-gradient(circle at bottom right, color-mix(in srgb, var(--text-invert) 8%, transparent), transparent 34%)",
+  } as const;
 
   return (
     <motion.section
       initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       transition={{ duration: 0.38, ease: "easeOut" }}
+      style={heroRadialStyle}
       className={clsx(
-        "hero-radial relative overflow-hidden border-b border-border bg-bg-card/40",
+        "relative overflow-hidden border-b border-border bg-bg-card/40",
         className,
       )}
     >
       <div className="section-grid pointer-events-none absolute inset-0 opacity-35" />
-      <div className="page-shell relative py-16 lg:py-20">
+      <div className="relative mx-auto w-[min(100%-(var(--page-gutter)*2),var(--page-width))] py-16 lg:py-20">
         <div className="grid gap-10 lg:grid-cols-[1.45fr_0.95fr] lg:items-center">
           <div className="max-w-3xl">
             <p className="section-kicker inline-flex items-center gap-2 border border-border bg-bg-card/80 px-3 py-1 shadow-sm">
