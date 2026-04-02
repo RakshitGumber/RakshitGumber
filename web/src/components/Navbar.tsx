@@ -45,7 +45,7 @@ const brandNameStyle = {
   fontFamily: "\"Montserrat\", var(--font-body)",
 } as const;
 const navbarSurfaceStyle = {
-  backgroundColor: "color-mix(in srgb, var(--bg-dark) 74%, transparent)",
+  backgroundColor: "color-mix(in srgb, var(--bg-dark) 82%, transparent)",
 } as const;
 const mobileMenuSurfaceStyle = {
   backgroundColor: "color-mix(in srgb, var(--bg-dark) 82%, transparent)",
@@ -55,10 +55,12 @@ export const Navbar = () => {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
+  const isHomePage = normalizePathname(pathname) === "/";
   const { theme, setTheme } = useTheme();
   const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const [isHidden, setIsHidden] = useState(false);
+  const [showShadow, setShowShadow] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -109,6 +111,7 @@ export const Navbar = () => {
 
     if (isMenuOpen) {
       closeMenu();
+      setShowShadow(false);
       return;
     }
 
@@ -118,6 +121,7 @@ export const Navbar = () => {
 
     if (current <= 12) {
       setIsHidden(false);
+      setShowShadow(false);
       return;
     }
 
@@ -125,6 +129,13 @@ export const Navbar = () => {
       return;
     }
 
+    if (current < previous) {
+      setIsHidden(false);
+      setShowShadow(true);
+      return;
+    }
+
+    setShowShadow(false);
     setIsHidden(current > previous && current > 96);
   });
 
@@ -144,9 +155,12 @@ export const Navbar = () => {
       <div
         ref={containerRef}
         style={navbarSurfaceStyle}
-        className="w-full px-4 py-2 text-text-invert shadow-[0_18px_50px_rgba(4,8,15,0.24)] backdrop-blur-2xl sm:mx-auto sm:w-[min(100%-(var(--page-gutter)*2),var(--page-width))] sm:px-5"
+        className={clsx(
+          "w-full py-2 text-text-invert backdrop-blur-2xl sm:mx-auto sm:w-[min(100%-(var(--page-gutter)*2),var(--page-width))] sm:px-5",
+          showShadow ? "shadow-2xl" : "shadow-none",
+        )}
       >
-        <div className="relative flex min-h-[60px] items-stretch justify-between">
+        <div className="relative flex min-h-[60px] items-stretch justify-between px-4 sm:px-0">
           <div className="flex items-center px-3 md:px-0">
             <span
               style={brandNameStyle}
@@ -216,31 +230,33 @@ export const Navbar = () => {
             </nav>
 
             <div className="flex h-full items-stretch gap-[2px] p-[2px]">
-              <button
-                type="button"
-                aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-                className={actionButtonClass}
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                <motion.span
-                  animate={{
-                    rotate: theme === "dark" ? 0 : 180,
-                    scale: theme === "dark" ? 1 : 1.08,
-                  }}
-                  transition={{
-                    duration: shouldReduceMotion ? 0 : 0.22,
-                    ease: "easeOut",
-                  }}
+              {isHomePage ? null : (
+                <button
+                  type="button"
+                  aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+                  className={actionButtonClass}
+                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 >
-                  <Icon
-                    icon={
-                      theme === "dark"
-                        ? "material-symbols:light-mode-outline-rounded"
-                        : "material-symbols:dark-mode-outline-rounded"
-                    }
-                  />
-                </motion.span>
-              </button>
+                  <motion.span
+                    animate={{
+                      rotate: theme === "dark" ? 0 : 180,
+                      scale: theme === "dark" ? 1 : 1.08,
+                    }}
+                    transition={{
+                      duration: shouldReduceMotion ? 0 : 0.22,
+                      ease: "easeOut",
+                    }}
+                  >
+                    <Icon
+                      icon={
+                        theme === "dark"
+                          ? "material-symbols:light-mode-outline-rounded"
+                          : "material-symbols:dark-mode-outline-rounded"
+                      }
+                    />
+                  </motion.span>
+                </button>
+              )}
               <button
                 type="button"
                 aria-expanded={isMenuOpen}
@@ -297,17 +313,13 @@ export const Navbar = () => {
                         : {})}
                       onClick={() => setIsMenuOpen(false)}
                       className={clsx(
-                        "flex items-center justify-between px-4 py-4 text-sm font-semibold uppercase tracking-[0.2em] transition-colors",
+                        "flex items-center px-7 py-4 text-[0.82rem] font-semibold uppercase tracking-[0.18em] transition-colors",
                         isActive
                           ? "bg-white/8 text-text-invert"
                           : "text-text-invert/72 hover:bg-white/6 hover:text-text-invert",
                       )}
                     >
                       <span>{item.label}</span>
-                      <Icon
-                        icon="material-symbols:arrow-right-alt-rounded"
-                        className="text-[1.2rem]"
-                      />
                     </Link>
                   );
                 })}
