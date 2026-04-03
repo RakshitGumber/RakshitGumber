@@ -28,11 +28,8 @@ const navItems: readonly NavItem[] = [
 
 export const Navbar = () => {
   const matchRoute = useMatchRoute();
-  // const { theme, setTheme } = useTheme();
-  // Mobile menu state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Navbar Position
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [prevScroll, setPrevScroll] = useState(0);
@@ -98,7 +95,7 @@ export const Navbar = () => {
         duration: 0.6,
       }}
     >
-      <div className="flex h-24 items-center justify-between px-24">
+      <div className="flex sm:h-24 h-16 items-center justify-between lg:px-24 md:px-12 sm:px-8 px-2">
         <div className="flex items-center px-3">
           <span className="font-bold tracking-wider text-text font-heading cursor-pointer text-2xl">
             Rakshit Gumber
@@ -114,7 +111,7 @@ export const Navbar = () => {
             );
 
             return (
-              <div key={item.to} className="">
+              <div key={item.to}>
                 <Link
                   preload="intent"
                   to={item.to}
@@ -185,9 +182,10 @@ export const Navbar = () => {
                     to={item.to}
                     onClick={() => setIsMenuOpen(false)}
                     className={clsx(
-                      "flex items-center px-7 py-3 text-sm font-semibold tracking-wide",
+                      "flex items-center px-5 py-3 text-md font-semibold tracking-wide",
                       isActive &&
-                        "font-bold underline decoration-1 underline-offset-3",
+                        isActive &&
+                        "font-bold underline text-text decoration-[1.5px] underline-offset-4",
                     )}
                   >
                     <span>{item.label}</span>
