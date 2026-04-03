@@ -1,20 +1,41 @@
 import { motion, useReducedMotion } from "framer-motion";
 
+const mobileNameLineClasses =
+  "block text-[clamp(4.25rem,18vw,5.8rem)] font-bold leading-[0.8] tracking-[-0.09em] text-text-invert";
+
 export const Hero = () => {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative h-[500px] w-full overflow-hidden px-[28px] sm:px-[36px] md:px-[44px] lg:px-[52px]">
+    <section className="relative h-[600px] w-full overflow-hidden">
       <motion.div
         initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
         animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: 0.42, ease: "easeOut" }}
-        className="relative z-10 max-w-4xl pt-12 sm:pt-16 md:pt-[72px] lg:pt-20"
+        className="relative z-30 max-w-5xl px-[28px] pt-24 text-left sm:px-[36px] sm:pt-16 md:px-[44px] md:pt-[72px] lg:px-[52px] lg:pt-20"
       >
-        <h1 className="text-5xl font-bold leading-[0.9] tracking-[-0.06em] text-text-invert sm:text-6xl md:text-7xl lg:text-[5.75rem]">
-          I am Rakshit Gumber
-        </h1>
-        <p className="mt-7 max-w-3xl text-xl leading-8 text-[color-mix(in_srgb,var(--text-invert)_78%,white)] sm:text-2xl sm:leading-9 lg:text-[1.75rem] lg:leading-10">
+        <div className="max-w-[24rem] sm:max-w-none">
+          <p className="relative z-30 text-[0.72rem] font-semibold uppercase tracking-[0.34em] text-text-muted sm:text-sm">
+            I am
+          </p>
+
+          <div className="relative mt-2 sm:mt-3">
+            <div className="relative z-10">
+              <h1 className="[text-shadow:0_10px_32px_rgba(11,15,20,0.42)]">
+                <span className="hidden text-[5.4rem] font-bold leading-[0.82] tracking-[-0.09em] text-text-invert sm:block md:text-[6.3rem] lg:text-[7.4rem]">
+                  Rakshit Gumber
+                </span>
+
+                <span className="sm:hidden">
+                  <span className={mobileNameLineClasses}>Rakshit</span>
+                  <span className={mobileNameLineClasses}>Gumber</span>
+                </span>
+              </h1>
+            </div>
+          </div>
+        </div>
+
+        <p className="relative z-30 mt-6 max-w-[18rem] text-base leading-7 text-text-muted [text-shadow:0_8px_24px_rgba(11,15,20,0.32)] sm:mt-7 sm:max-w-3xl sm:text-[1.6rem] sm:leading-9 lg:text-[2rem] lg:leading-10">
           Driven by curiosity, building with passion.
         </p>
       </motion.div>
@@ -23,12 +44,12 @@ export const Hero = () => {
         initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }}
         animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut", delay: 0.06 }}
-        className="pointer-events-none absolute bottom-0 right-[28px] sm:right-[36px] md:right-[44px] lg:right-[52px]"
+        className="pointer-events-none absolute bottom-0 right-[-8px] z-10 sm:right-[20px] md:right-[28px] lg:right-[36px]"
       >
         <img
           src="/images/rakshit.png"
           alt="Rakshit Gumber portrait"
-          className="h-[380px] w-auto -scale-x-100 object-contain drop-shadow-[0_24px_48px_rgba(11,15,20,0.32)] sm:h-[460px] md:h-[560px] lg:h-[680px]"
+          className="h-[500px] w-auto -scale-x-100 object-contain drop-shadow-[0_32px_72px_rgba(11,15,20,0.48)] sm:h-[520px] md:h-[620px] lg:h-[740px]"
         />
       </motion.div>
     </section>
