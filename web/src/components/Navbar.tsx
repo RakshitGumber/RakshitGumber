@@ -9,8 +9,6 @@ import {
   useScroll,
 } from "framer-motion";
 
-// import { useTheme } from "@/providers/ThemeProvider";
-
 type NavItem = {
   label: string;
   to: string;
@@ -92,7 +90,7 @@ export const Navbar = () => {
 
   return (
     <motion.header
-      className="fixed top-0 z-50 w-full py-2 backdrop-blur-3xl bg-[color-mix(in_srgb,var(--bg-dark)_82%,transparent)]"
+      className="fixed top-0 z-50 w-full backdrop-blur-3xl bg-[color-mix(in_srgb,var(--bg-dark)_82%,transparent)]"
       animate={hidden ? "hidden" : "visible"}
       variants={parentVariants}
       transition={{
@@ -100,13 +98,12 @@ export const Navbar = () => {
         duration: 0.6,
       }}
     >
-      <div className="flex h-16 items-center justify-between p-4 sm:p-6 md:p-8 lg:p-10">
+      <div className="flex h-24 items-center justify-between px-24">
         <div className="flex items-center px-3">
-          <span className="text-lg font-bold tracking-wider text-text font-heading cursor-pointer sm:text-xl lg:text-2xl">
+          <span className="font-bold tracking-wider text-text font-heading cursor-pointer text-2xl">
             Rakshit Gumber
           </span>
         </div>
-
         <nav className="hidden h-full sm:flex items-center">
           {navItems.map((item) => {
             const isActive = Boolean(
@@ -122,9 +119,9 @@ export const Navbar = () => {
                   preload="intent"
                   to={item.to}
                   className={clsx(
-                    "flex min-w-23 justify-center px-4 text-sm font-semibold tracking-wide sm:px-3 sm:text-base md:px-4 lg:px-5 lg:text-lg",
+                    "flex min-w-23 justify-center text-muted px-4 font-semibold tracking-wide text-lg",
                     isActive &&
-                      "font-bold underline decoration-1 underline-offset-3",
+                      "font-bold underline text-text decoration-[1.5px] underline-offset-4",
                   )}
                 >
                   {item.label}
@@ -137,7 +134,7 @@ export const Navbar = () => {
         <div className="flex sm:hidden">
           <button
             type="button"
-            className="flex p-3 text-xl text-text-muted hover:text-text-invert "
+            className="flex p-3 text-xl text-muted hover:text-text-invert "
             onClick={() => setIsMenuOpen((current) => !current)}
           >
             <motion.span

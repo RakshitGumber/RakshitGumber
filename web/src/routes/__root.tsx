@@ -9,12 +9,12 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <div className="min-h-screen bg-bg text-text">
+    <>
       <Navbar />
-      <main className="pb-16 pt-24 sm:pt-28">
+      <div className="mt-24">
         <Outlet />
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
 

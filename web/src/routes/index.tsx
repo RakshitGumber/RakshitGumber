@@ -1,59 +1,19 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { Hero } from "@/components/Hero";
-import { BlogCard } from "@/features/blog/components/BlogCard";
-import { getLatestPosts } from "@/features/blog/content";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
 });
 
-const featuredProjects = [
-  {
-    name: "Home Screen",
-    summary:
-      "A browser homescreen experiment that swaps blank tabs for a friendlier workspace anchored in utility and personality.",
-    status: "Currently building",
-    stack: ["TypeScript", "UI systems", "Product iteration"],
-  },
-  {
-    name: "Portfolio Website",
-    summary:
-      "The site you are looking at: a local-first portfolio with responsive sections, route-driven navigation, and MDX-based writing.",
-    status: "Shipping now",
-    stack: ["React 19", "TanStack Router", "Tailwind 4"],
-  },
-];
-
-const contactLinks = [
-  { href: "https://github.com/RakshitGumber", label: "GitHub" },
-  {
-    href: "https://www.linkedin.com/in/gumber-rakshit",
-    label: "LinkedIn",
-  },
-  { href: "https://x.com/Gumber_Rakshit", label: "Twitter" },
-];
-
 function HomePage() {
-  const latestPosts = getLatestPosts(3);
-  const heroRadialStyle = {
-    backgroundImage:
-      "radial-gradient(circle at top left, color-mix(in srgb, var(--accent) 28%, transparent), transparent 42%), radial-gradient(circle at bottom right, color-mix(in srgb, var(--text-invert) 8%, transparent), transparent 34%)",
-  } as const;
-
   return (
-    <div className="space-y-8">
-      <div
-        className="w-full"
-        style={{
-          backgroundImage:
-            "linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-dark) 40%, var(--bg-light) 100%)",
-        }}
-      >
+    <>
+      <div className="sm:h-325 h-280 w-full flex flex-col relative bg-[linear-gradient(#0F0F15_0%,#15141D_50%,#74769D_80%,#D4DAE3_100%)]">
         <Hero />
-        <div className="h-[800px] w-full" />
+        <div className="flex-1">s</div>
       </div>
-      <div className="mx-auto w-[min(100%-(var(--page-gutter)*2),var(--page-width))] space-y-8">
+      {/* <div className="mx-auto w-[min(100%-(var(--page-gutter)*2),var(--page-width))] space-y-8">
         <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="border border-border bg-bg-card/70 px-6 py-6 shadow-[var(--shadow-sm)] backdrop-blur-sm sm:px-8">
             <p className="section-kicker">Currently working on</p>
@@ -218,7 +178,7 @@ function HomePage() {
             GitHub
           </a>
         </footer>
-      </div>
-    </div>
+      </div> */}
+    </>
   );
 }
