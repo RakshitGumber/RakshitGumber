@@ -1,12 +1,13 @@
 # Hello, I am [Rakshit Gumber](https://gumberrakshit.com).👋🏻
 
-**Earth 📍| Verified Human by Captcha 🤖| Can fix your printer 🖨️| Cries when AI breaks my code 🥲**
+**📍 Earth | 🤖 Verified Human by Captcha | 🖨️ Can fix your printer | 🥲 Cries when AI breaks my code**
 
 <img src="https://skillicons.dev/icons?i=ts,python" width="90" />
 
 ```
 Status: Building
 Project: Portfolio Website
+Motivation: 🚗 Driven by curiosity
 ```
 
 ---
