@@ -1,15 +1,14 @@
 import { defineCollection } from "astro:content";
 import { file, glob } from "astro/loaders";
 import { z } from "astro/zod";
-import { parse as parseToml } from "toml";
 
 /**
  * Loader and schema for the configuration collection.
- * It loads a TOML file from the `content/configuration.toml` path and defines the schema for the configuration data.
+ * It loads a JSON file from the `content/configuration.json` path and defines the schema for the configuration data.
  */
 const configuration = defineCollection({
-  loader: file("content/configuration.toml", {
-    parser: (text) => JSON.parse(JSON.stringify(parseToml(text))),
+  loader: file("content/configuration.json", {
+    parser: (text) => JSON.parse(text),
   }),
   schema: z.object({
     /**
@@ -241,10 +240,10 @@ const configuration = defineCollection({
 
 /**
  * Loader and schema for the blog collection.
- * It loads markdown files from the `content/blogs` directory and defines the schema for each blog post.
+ * It loads markdown files from the `content/blog` directory and defines the schema for each blog post.
  */
 const blog = defineCollection({
-  loader: glob({ pattern: "**/*.md", base: "./content/blogs" }),
+  loader: glob({ pattern: "**/*.md", base: "./content/blog" }),
   schema: z
     .object({
       /**
