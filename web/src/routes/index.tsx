@@ -11,7 +11,6 @@ function HomePage() {
     <>
       <div className="h-280 w-full flex flex-col relative bg-[linear-gradient(#0F0F15_0%,#15141D_60%,#74769D_85%,#D4DAE3_100%)]">
         <Hero />
-        <div className="flex-1">s</div>
       </div>
       {/* <div className="mx-auto w-[min(100%-(var(--page-gutter)*2),var(--page-width))] space-y-8">
         <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
