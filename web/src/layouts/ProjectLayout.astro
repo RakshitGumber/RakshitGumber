@@ -1,14 +1,14 @@
 ---
+import Anchor from "../components/common/Anchor.astro";
 import Section from "../components/common/Section.astro";
 import Prose from "../components/Prose.astro";
-import type { ArticleFrontmatter } from "../lib/types";
+import type { ProjectFrontmatter } from "../lib/types";
 import { getConfigurationCollection, processArticleDate } from "../lib/utils";
 import Layout from "./Layout.astro";
 
-type Props = { frontmatter: ArticleFrontmatter };
+type Props = { frontmatter: ProjectFrontmatter };
 
 const { frontmatter } = Astro.props;
-const articleDate = processArticleDate(frontmatter.timestamp);
 const { data: config } = await getConfigurationCollection();
 ---
 
@@ -36,7 +36,7 @@ const { data: config } = await getConfigurationCollection();
     }
     <meta
       property="og:url"
-      content={`${config.site.baseUrl}/blog/${frontmatter.slug}`}
+      content={`${config.site.baseUrl}/projects/${frontmatter.slug}`}
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
@@ -53,24 +53,44 @@ const { data: config } = await getConfigurationCollection();
     <meta name="language" content="English" />
     <link
       rel="canonical"
-      href={`${config.site.baseUrl}/blog/${frontmatter.slug}`}
+      href={`${config.site.baseUrl}/projects/${frontmatter.slug}`}
     />
   </Fragment>
-  <Section class="pt-8">
+  <Section class="mt-8">
     <div class="flex flex-col gap-4 mt-8 mb-16">
-      <h1
-        class="text-3xl sm:text-4xl leading-normal sm:leading-normal font-display"
-      >
+      <h1 class="text-3xl sm:text-4xl leading-tight font-display">
         {frontmatter.title}
       </h1>
-      <div class="flex justify-between">
-        <span>{articleDate}</span>
-        <span>{frontmatter.readTime} min</span>
+      <div class="flex flex-wrap text-sm gap-2">
+        {
+          frontmatter.tags
+            ? frontmatter.tags.map((tag) => (
+                <span class="-zag-text -zag-bg zag-transition font-semibold py-1 px-2">
+                  {tag}
+                </span>
+              ))
+            : null
+        }
+      </div>
+      <div class="flex gap-2">
+        {
+          frontmatter.githubUrl ? (
+            <Anchor url={frontmatter.githubUrl} class="text-base" external>
+              GitHub
+            </Anchor>
+          ) : null
+        }
+        {
+          frontmatter.liveDemoUrl ? (
+            <Anchor url={frontmatter.liveDemoUrl} class="text-base" external>
+              Demo
+            </Anchor>
+          ) : null
+        }
       </div>
     </div>
     <Prose>
       <slot />
     </Prose>
-    <p class="pt-8">~{config.personal.name}</p>
   </Section>
 </Layout>
