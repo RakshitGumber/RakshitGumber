@@ -97,7 +97,7 @@ export const Navbar = () => {
     >
       <div className="flex sm:h-24 h-16 items-center justify-between lg:px-24 md:px-12 sm:px-8 px-2">
         <div className="flex items-center px-3">
-          <span className="font-bold tracking-wider text-text font-heading cursor-pointer text-2xl">
+          <span className="font-bold tracking-wider text-text font-heading cursor-pointer sm:text-2xl text-xl">
             Rakshit Gumber
           </span>
         </div>

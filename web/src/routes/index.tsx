@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
 function HomePage() {
   return (
     <>
-      <div className="sm:h-325 h-280 w-full flex flex-col relative bg-[linear-gradient(#0F0F15_0%,#15141D_50%,#74769D_80%,#D4DAE3_100%)]">
+      <div className="h-280 w-full flex flex-col relative bg-[linear-gradient(#0F0F15_0%,#15141D_60%,#74769D_85%,#D4DAE3_100%)]">
         <Hero />
         <div className="flex-1">s</div>
       </div>
