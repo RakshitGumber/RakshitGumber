@@ -16,23 +16,6 @@ const { url, external, class: className } = Astro.props;
     className,
   ]}
   target={external ? "_blank" : "_self"}
-  aria-label={Astro.props["aria-label"]}
 >
   <slot />
-  {
-    external ? (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        class="w-6 h-6"
-        viewBox="0 0 512 512"
-      >
-        <title>External link</title>
-        <path
-          class="fill-title-color transition-colors duration-200"
-          fill-rule="evenodd"
-          d="M362.666 149.333V320H320l-.001-97.831l-154.51 154.51l-30.169-30.17L289.829 192h-97.83v-42.666z"
-        />
-      </svg>
-    ) : null
-  }
 </a>
