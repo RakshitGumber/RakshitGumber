@@ -1,7 +1,7 @@
 ---
-import Footer from "../components/Footer.astro";
-import Header from "../components/Header.astro";
-import "../styles/global.css";
+import Footer from "@components/Footer.astro";
+import Header from "@components/Header.astro";
+import "@/styles/global.css";
 ---
 
 <!doctype html>
@@ -9,13 +9,8 @@ import "../styles/global.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
-    <link rel="preconnect" href="https://fonts.bunny.net" />
-    <link
-      href="https://fonts.bunny.net/css?family=ibm-plex-mono:400,400i,500,500i,600,600i,700,700i"
-      rel="stylesheet"
-    />
 
     <!-- Theme detection script - runs before page renders -->
     <script is:inline>
@@ -43,7 +38,7 @@ import "../styles/global.css";
 
     <slot name="head" />
   </head>
-  <body class="bg-bg font-mono text-text-color transition-colors duration-200">
+  <body>
     <Header />
     <main>
       <slot />

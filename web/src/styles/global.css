@@ -28,16 +28,26 @@
 }
 
 
+
 :root {
+    --bg-color: #F4F6FF;
+    --text-heading: #151417;
+    --text-color: #2f3041;
+    --accent-color: #fb4c4c;
+    --accent-color-light: #fb4c4ce0;
+    --border-color: #303032;
+    --text-muted: #8a8ba4;
+}
+
+.dark {
     --bg-color: #0F0F15;
     --text-heading: #F4F6FF;
     --text-color: #74769D;
     --accent-color: #ff133e;
-    --accent-color-light: #ff133edc;
+    --accent-color-light: #ff133ee0;
     --border-color: #303032;
     --text-muted: #56576C;
 }
-
 
 @theme {
     --font-mono: "Source Code Pro Variable", monospace;
@@ -60,6 +70,6 @@
     }
 
     body {
-        @apply bg-bg text-text-color;
+        @apply bg-bg text-text-color font-content;
     }
 }
