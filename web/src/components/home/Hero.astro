@@ -1,14 +1,33 @@
-<div class="flex flex-col gap-8 sm:flex-row sm:items-center">
-  <div>
-    <h1
-      class="text-center font-heading text-3xl font-semibold text-title-color sm:text-left sm:text-4xl"
-    >
-      Rakshit Gumber
-    </h1>
-    <h2
-      class="text-center font-mono text-xl font-medium text-text-color sm:text-left sm:text-2xl"
-    >
-      <p>Building clean products and sharing what I learn.</p>
-    </h2>
+---
+import Anchor from "../common/Anchor.astro";
+---
+
+<div class="grid min-h-[34rem] gap-8 lg:min-h-[42rem] lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] lg:grid-rows-[auto_auto_1fr] lg:items-start">
+  <div class="order-2 flex flex-col gap-5 text-center lg:order-1 lg:self-end lg:pt-10 lg:text-left">
+    <p class="font-content text-xl font-semibold leading-relaxed text-text-color sm:text-2xl">
+        Driven by curiosity and Building with Passion.
+    </p>
   </div>
+  <div class="order-3 flex justify-center lg:order-2 lg:justify-start">
+    <Anchor
+      url="https://www.linkedin.com/in/gumber-rakshit"
+      class="px-5 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-title-color underline decoration-accent"
+      external
+    >
+      Let's work
+    </Anchor>
+  </div>
+  <div class="order-1 mx-auto aspect-square w-full max-w-xs overflow-hidden rounded-[2rem] border border-border-color bg-[#d9dce8] shadow-[0_24px_60px_rgba(21,20,23,0.14)] lg:order-3 lg:row-span-2 lg:ml-auto lg:max-w-sm dark:bg-[#191923]">
+    <img
+      src="/images/avatar.png"
+      alt="Portrait of Rakshit Gumber"
+      class="h-full w-full object-cover object-center"
+      loading="eager"
+    />
+  </div>
+  <h1
+    class="order-4 text-center font-heading text-5xl font-bold tracking-tight text-title-color sm:text-6xl lg:col-span-2 lg:text-left lg:text-7xl"
+  >
+    Rakshit Gumber
+  </h1>
 </div>

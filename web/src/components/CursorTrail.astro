@@ -1,0 +1,93 @@
+<canvas
+  id="cursor-trail"
+  aria-hidden="true"
+  class="pointer-events-none fixed inset-0 z-0 h-full w-full opacity-90"
+></canvas>
+
+<script>
+  const canvas = document.getElementById("cursor-trail");
+
+  if (canvas instanceof HTMLCanvasElement) {
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const prefersCoarsePointer = window.matchMedia("(pointer: coarse)");
+
+    if (!prefersReducedMotion.matches && !prefersCoarsePointer.matches) {
+      const context = canvas.getContext("2d");
+
+      if (context) {
+        const particles = [];
+        const maxParticles = 28;
+        const spawnParticle = (x, y) => {
+          particles.push({
+            x,
+            y,
+            size: Math.random() * 4 + 2,
+            alpha: 0.9,
+            dx: (Math.random() - 0.5) * 1.4,
+            dy: Math.random() * -0.9 - 0.2,
+          });
+
+          if (particles.length > maxParticles) {
+            particles.shift();
+          }
+        };
+
+        const resizeCanvas = () => {
+          const scale = window.devicePixelRatio || 1;
+          canvas.width = Math.floor(window.innerWidth * scale);
+          canvas.height = Math.floor(window.innerHeight * scale);
+          context.setTransform(scale, 0, 0, scale, 0, 0);
+        };
+
+        const render = () => {
+          context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+          for (let i = particles.length - 1; i >= 0; i -= 1) {
+            const particle = particles[i];
+            particle.x += particle.dx;
+            particle.y += particle.dy;
+            particle.alpha -= 0.03;
+            particle.size *= 0.985;
+
+            if (particle.alpha <= 0.04 || particle.size <= 0.6) {
+              particles.splice(i, 1);
+              continue;
+            }
+
+            context.beginPath();
+            context.fillStyle = `rgba(251, 76, 76, ${particle.alpha})`;
+            context.shadowColor = "rgba(251, 76, 76, 0.35)";
+            context.shadowBlur = 14;
+            context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            context.fill();
+          }
+
+          window.requestAnimationFrame(render);
+        };
+
+        let lastPoint = { x: 0, y: 0 };
+        window.addEventListener("pointermove", (event) => {
+          const dx = event.clientX - lastPoint.x;
+          const dy = event.clientY - lastPoint.y;
+          const steps = Math.max(1, Math.min(4, Math.ceil(Math.hypot(dx, dy) / 18)));
+
+          for (let i = 0; i < steps; i += 1) {
+            const progress = i / steps;
+            spawnParticle(
+              lastPoint.x + dx * progress,
+              lastPoint.y + dy * progress,
+            );
+          }
+
+          lastPoint = { x: event.clientX, y: event.clientY };
+        });
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+        render();
+      }
+    } else {
+      canvas.remove();
+    }
+  }
+</script>

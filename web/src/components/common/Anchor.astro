@@ -12,10 +12,11 @@ const { url, external, class: className } = Astro.props;
 <a
   href={url}
   class:list={[
-    "flex items-center font-medium underline underline-offset-4 focus:outline-2 focus:outline-offset-2 focus:outline-accent",
+    "inline-flex items-center font-medium text-text-color decoration-transparent underline-offset-4 transition-[color,text-decoration-color] duration-200 hover:text-title-color hover:decoration-accent focus:outline-2 focus:outline-offset-2 focus:outline-accent",
     className,
   ]}
   target={external ? "_blank" : "_self"}
+  rel={external ? "noreferrer" : undefined}
 >
   <slot />
 </a>

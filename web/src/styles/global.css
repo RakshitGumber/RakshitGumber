@@ -69,7 +69,20 @@
         @apply bg-accent-light text-title-color;
     }
 
+    html {
+        scroll-behavior: smooth;
+    }
+
     body {
         @apply bg-bg text-text-color font-content;
+        background-image:
+            radial-gradient(circle at top, color-mix(in srgb, var(--accent-color) 10%, transparent), transparent 34rem),
+            linear-gradient(180deg, color-mix(in srgb, var(--bg-color) 92%, #ffffff 8%), var(--bg-color));
+        min-height: 100vh;
+    }
+
+    a {
+        text-decoration-line: underline;
+        text-decoration-color: transparent;
     }
 }
