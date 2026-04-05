@@ -4,10 +4,14 @@ import tailwindcss from "@tailwindcss/vite";
 
 import icon from "astro-icon";
 
+import cloudflare from "@astrojs/cloudflare";
+
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  output: "static",
 
   integrations: [icon()],
+  adapter: cloudflare(),
 });
