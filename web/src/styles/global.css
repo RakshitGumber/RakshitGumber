@@ -76,9 +76,4 @@
     body {
         @apply bg-bg text-text-color font-content;
     }
-
-    a {
-        text-decoration-line: underline;
-        text-decoration-color: transparent;
-    }
 }

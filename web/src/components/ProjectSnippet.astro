@@ -13,9 +13,12 @@ export type Props = {
 const { title, description, url, githubUrl, liveUrl, tags } = Astro.props;
 ---
 
-<div class="relative flex flex-col gap-3 mb-8 hover-zag-dotted-grid">
+<div class="relative flex flex-col gap-3 mb-8">
   <div class="flex flex-col gap-3 sm:flex-row sm:justify-between">
-    <Anchor url={url} class="text-xl font-semibold text-title-color no-underline">
+    <Anchor
+      url={url}
+      class="text-xl font-semibold text-title-color no-underline"
+    >
       {title}
     </Anchor>
     <div class="flex gap-2">
@@ -35,7 +38,7 @@ const { title, description, url, githubUrl, liveUrl, tags } = Astro.props;
       }
     </div>
   </div>
-  <p class="text-secondary-text transition-colors duration-200">
+  <p class="text-lg transition-colors duration-200">
     {description}
   </p>
 </div>
