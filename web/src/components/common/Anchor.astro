@@ -12,7 +12,7 @@ const { url, external, class: className } = Astro.props;
 <a
   href={url}
   class:list={[
-    "zag-offset underline font-medium flex items-center focus:outline-2 focus:outline-offset-2 focus:outline-zag-dark dark:focus:outline-zag-light",
+    "flex items-center font-medium underline underline-offset-4 focus:outline-2 focus:outline-offset-2 focus:outline-accent",
     className,
   ]}
   target={external ? "_blank" : "_self"}
@@ -28,7 +28,7 @@ const { url, external, class: className } = Astro.props;
       >
         <title>External link</title>
         <path
-          class="zag-fill zag-transition"
+          class="fill-title-color transition-colors duration-200"
           fill-rule="evenodd"
           d="M362.666 149.333V320H320l-.001-97.831l-154.51 154.51l-30.169-30.17L289.829 192h-97.83v-42.666z"
         />
