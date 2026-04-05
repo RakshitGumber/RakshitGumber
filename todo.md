@@ -1,13 +1,3 @@
-- Navbar: remove the underline
-- Navbar: move all text on right
-- navbar: Change color on when page is selected
-- navbar: remove underline
-- navbar:increase height
-- Navbar: change logo for github
-- Navbar: Change text from home to work.
-- Hero: Increase the height of hero section.
-- Hero: Change the subheading to Driven by curiosity and Building with Passion.
-- Hero: add rakshit.png on the right in a square and crop the excess part.
 - Hero: Add let's work CTA in the Hero section.
 - Hero: Change the placement
   Image | Subheading
