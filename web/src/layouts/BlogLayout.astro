@@ -33,10 +33,7 @@ const articleDate = processArticleDate(frontmatter.timestamp);
         <meta property="og:image" content={frontmatter.cardImage} />
       )
     }
-    <meta
-      property="og:url"
-      content={`/blog/${frontmatter.slug}`}
-    />
+    <meta property="og:url" content={`/blog/${frontmatter.slug}`} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
@@ -50,10 +47,7 @@ const articleDate = processArticleDate(frontmatter.timestamp);
     }
     <meta http-equiv="content-language" content="en" />
     <meta name="language" content="English" />
-    <link
-      rel="canonical"
-      href={`/blog/${frontmatter.slug}`}
-    />
+    <link rel="canonical" href={`/blog/${frontmatter.slug}`} />
   </Fragment>
   <Section class="pt-8">
     <div class="flex flex-col gap-4 mt-8 mb-16">
