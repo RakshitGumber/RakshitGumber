@@ -3,25 +3,23 @@ import Anchor from "../components/common/Anchor.astro";
 import Section from "../components/common/Section.astro";
 import Prose from "../components/Prose.astro";
 import type { ProjectFrontmatter } from "../libs/types";
-import { getConfigurationCollection, processArticleDate } from "../libs/utils";
 import Layout from "./Layout.astro";
 
 type Props = { frontmatter: ProjectFrontmatter };
 
 const { frontmatter } = Astro.props;
-const { data: config } = await getConfigurationCollection();
 ---
 
 <Layout>
   <Fragment slot="head">
-    <title>{`${frontmatter.title} • ${config.personal.name}`}</title>
+    <title>{`${frontmatter.title} • Rakshit Gumber`}</title>
     <meta
       name="description"
       content={frontmatter.longDescription ?? frontmatter.description}
     />
     <meta
       property="og:title"
-      content={`${frontmatter.title} • ${config.personal.name}`}
+      content={`${frontmatter.title} • Rakshit Gumber`}
     />
     <meta property="og:description" content={frontmatter.description} />
     {
@@ -36,12 +34,12 @@ const { data: config } = await getConfigurationCollection();
     }
     <meta
       property="og:url"
-      content={`${config.site.baseUrl}/projects/${frontmatter.slug}`}
+      content={`/projects/${frontmatter.slug}`}
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content={`${frontmatter.title} • ${config.personal.name}`}
+      content={`${frontmatter.title} • Rakshit Gumber`}
     />
     <meta name="twitter:description" content={frontmatter.description} />
     {
@@ -53,7 +51,7 @@ const { data: config } = await getConfigurationCollection();
     <meta name="language" content="English" />
     <link
       rel="canonical"
-      href={`${config.site.baseUrl}/projects/${frontmatter.slug}`}
+      href={`/projects/${frontmatter.slug}`}
     />
   </Fragment>
   <Section class="mt-8">

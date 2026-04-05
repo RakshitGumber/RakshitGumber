@@ -2,26 +2,25 @@
 import Section from "../components/common/Section.astro";
 import Prose from "../components/Prose.astro";
 import type { ArticleFrontmatter } from "../libs/types";
-import { getConfigurationCollection, processArticleDate } from "../libs/utils";
+import { processArticleDate } from "../libs/utils";
 import Layout from "./Layout.astro";
 
 type Props = { frontmatter: ArticleFrontmatter };
 
 const { frontmatter } = Astro.props;
 const articleDate = processArticleDate(frontmatter.timestamp);
-const { data: config } = await getConfigurationCollection();
 ---
 
 <Layout>
   <Fragment slot="head">
-    <title>{`${frontmatter.title} • ${config.personal.name}`}</title>
+    <title>{`${frontmatter.title} • Rakshit Gumber`}</title>
     <meta
       name="description"
       content={frontmatter.longDescription ?? frontmatter.description}
     />
     <meta
       property="og:title"
-      content={`${frontmatter.title} • ${config.personal.name}`}
+      content={`${frontmatter.title} • Rakshit Gumber`}
     />
     <meta property="og:description" content={frontmatter.description} />
     {
@@ -36,12 +35,12 @@ const { data: config } = await getConfigurationCollection();
     }
     <meta
       property="og:url"
-      content={`${config.site.baseUrl}/blog/${frontmatter.slug}`}
+      content={`/blog/${frontmatter.slug}`}
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
-      content={`${frontmatter.title} • ${config.personal.name}`}
+      content={`${frontmatter.title} • Rakshit Gumber`}
     />
     <meta name="twitter:description" content={frontmatter.description} />
     {
@@ -53,7 +52,7 @@ const { data: config } = await getConfigurationCollection();
     <meta name="language" content="English" />
     <link
       rel="canonical"
-      href={`${config.site.baseUrl}/blog/${frontmatter.slug}`}
+      href={`/blog/${frontmatter.slug}`}
     />
   </Fragment>
   <Section class="pt-8">
@@ -71,6 +70,6 @@ const { data: config } = await getConfigurationCollection();
     <Prose>
       <slot />
     </Prose>
-    <p class="pt-8">~{config.personal.name}</p>
+    <p class="pt-8">~Rakshit Gumber</p>
   </Section>
 </Layout>

@@ -3,55 +3,40 @@ import { getCollection } from "astro:content";
 import Section from "../../components/common/Section.astro";
 import ProjectSnippet from "../../components/ProjectSnippet.astro";
 import Layout from "../../layouts/Layout.astro";
-import { getConfigurationCollection } from "../../libs/utils";
 
 const projects = (await getCollection("project")).sort(
   (a, b) => b.data.timestamp.valueOf() - a.data.timestamp.valueOf(),
 );
-
-const { data: config } = await getConfigurationCollection();
 ---
 
 <Layout>
   <Fragment slot="head">
-    <title>{config.projectMeta.title}</title>
+    <title>Projects</title>
     <meta
       name="description"
-      content={config.projectMeta.longDescription ??
-        config.projectMeta.description}
+      content="Projects built by Rakshit Gumber."
     />
-    <meta property="og:title" content={config.projectMeta.title} />
-    <meta property="og:description" content={config.projectMeta.description} />
-    {
-      config.projectMeta.keywords && (
-        <meta
-          name="keywords"
-          content={config.projectMeta.keywords.join(", ")}
-        />
-      )
-    }
-    {
-      config.projectMeta.cardImage && (
-        <meta property="og:image" content={config.projectMeta.cardImage} />
-      )
-    }
-    <meta property="og:url" content={`${config.site.baseUrl}/projects`} />
+    <meta property="og:title" content="Projects" />
+    <meta
+      property="og:description"
+      content="Projects built by Rakshit Gumber."
+    />
+    <meta name="keywords" content="projects, portfolio, work" />
+    <meta property="og:url" content="/projects" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={config.projectMeta.title} />
-    <meta name="twitter:description" content={config.projectMeta.description} />
-    {
-      config.projectMeta.cardImage && (
-        <meta name="twitter:image" content={config.projectMeta.cardImage} />
-      )
-    }
+    <meta name="twitter:title" content="Projects" />
+    <meta
+      name="twitter:description"
+      content="Projects built by Rakshit Gumber."
+    />
     <meta http-equiv="content-language" content="en" />
     <meta name="language" content="English" />
-    <link rel="canonical" href={`${config.site.baseUrl}/projects`} />
+    <link rel="canonical" href="/projects" />
   </Fragment>
   <Section class="py-4 my-8">
     <div class="flex items-center gap-4 pt-8 pb-16">
       <h1 class="font-heading text-3xl leading-loose text-title-color sm:text-4xl">
-        {config.texts.projectsName}
+        Projects
       </h1>
     </div>
     <ul>

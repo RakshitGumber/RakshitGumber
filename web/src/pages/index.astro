@@ -5,9 +5,6 @@ import FeaturedArticles from "../components/home/FeaturedArticles.astro";
 import FeaturedProjects from "../components/home/FeaturedProjects.astro";
 import Hero from "../components/home/Hero.astro";
 import Layout from "../layouts/Layout.astro";
-import { getConfigurationCollection } from "../libs/utils";
-
-const { data: config } = await getConfigurationCollection();
 
 const featuredProjects = (
   await getCollection("project", (e) => e.data.featured)
@@ -25,36 +22,30 @@ const featuredArticles = (
 
 <Layout>
   <Fragment slot="head">
-    <title>{config.globalMeta.title}</title>
+    <title>Rakshit Gumber</title>
     <meta
       name="description"
-      content={config.globalMeta.longDescription ??
-        config.globalMeta.description}
+      content="Personal site, writing, and projects by Rakshit Gumber."
     />
-    <meta property="og:title" content={config.globalMeta.title} />
-    <meta property="og:description" content={config.globalMeta.description} />
-    {
-      config.globalMeta.keywords && (
-        <meta name="keywords" content={config.globalMeta.keywords.join(", ")} />
-      )
-    }
-    {
-      config.globalMeta.cardImage && (
-        <meta property="og:image" content={config.globalMeta.cardImage} />
-      )
-    }
-    <meta property="og:url" content={config.site.baseUrl} />
+    <meta property="og:title" content="Rakshit Gumber" />
+    <meta
+      property="og:description"
+      content="Personal site, writing, and projects by Rakshit Gumber."
+    />
+    <meta
+      name="keywords"
+      content="Rakshit Gumber, portfolio, projects, blog"
+    />
+    <meta property="og:url" content="/" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={config.globalMeta.title} />
-    <meta name="twitter:description" content={config.globalMeta.description} />
-    {
-      config.globalMeta.cardImage && (
-        <meta name="twitter:image" content={config.globalMeta.cardImage} />
-      )
-    }
+    <meta name="twitter:title" content="Rakshit Gumber" />
+    <meta
+      name="twitter:description"
+      content="Personal site, writing, and projects by Rakshit Gumber."
+    />
     <meta http-equiv="content-language" content="en" />
     <meta name="language" content="English" />
-    <link rel="canonical" href={config.site.baseUrl} />
+    <link rel="canonical" href="/" />
   </Fragment>
   <Section class="my-16">
     <Hero />
