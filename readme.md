@@ -1,10 +1,8 @@
+<img src="https://user-images.githubusercontent.com/74038190/225813708-98b745f2-7d22-48cf-9150-083f1b00d6c9.gif"/>
+
 # Hi, I'm Rakshit Gumber.👋🏻
 
 **📍 Earth | 🤖 Verified Human by Captcha | 🖨️ Can fix your printer | 🥲 Cries when AI breaks my code**
-
-<img src="https://user-images.githubusercontent.com/74038190/225813708-98b745f2-7d22-48cf-9150-083f1b00d6c9.gif"/>
-
-<br/>
 
 <img src="https://skillicons.dev/icons?i=ts,js,python" width="150" />
 
@@ -20,7 +18,7 @@ An otter can do all your work.
 
 ## Current Projects
 
-- **📸 [Single Filter]("https://github.com/RakshitGumber/snap-tool")** | **[repo]("https://github.com/RakshitGumber/snap-tool")** - Photo editing shouldn't require extra skills
+- **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool)** | **[repo](https://github.com/RakshitGumber/snap-tool)** - Photo editing shouldn't require extra skills
 
 ---
 
@@ -30,7 +28,7 @@ An otter can do all your work.
 
 - **Working Across Domains:** curiosity pulls me everywhere.
 - **Learning Fast:** I close knowledge gaps aggressively.
-- **Shipping > Talking:** I build and deliver.
+- **Shipping:** I build and deliver.
 
 ```
 "You may feel lost, so be it and find the way out."
@@ -50,6 +48,6 @@ An otter can do all your work.
 ```
 Made by Rakshit Gumber
 Working on pure serotonin
-
-STAY TUNED!!!
 ```
+
+### STAY TUNED!!!
