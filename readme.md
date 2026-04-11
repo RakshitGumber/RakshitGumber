@@ -2,33 +2,41 @@
 
 **📍 Earth | 🤖 Verified Human by Captcha | 🖨️ Can fix your printer | 🥲 Cries when AI breaks my code**
 
-<img src="https://skillicons.dev/icons?i=ts,python" width="90" />
+<img src="https://user-images.githubusercontent.com/74038190/225813708-98b745f2-7d22-48cf-9150-083f1b00d6c9.gif"/>
+
+<br/>
+
+<img src="https://skillicons.dev/icons?i=ts,js,python" width="150" />
 
 ```
-👷🏻‍♂️ Build,
-✍🏻 Write,
-😴 Sleep,
-🔁 Repeat!!!
+Status: Building
+Project: Single Filter
+Mood: Curiously looking for problems to solve
 
+An otter can do all your work.
 ```
-
----
 
 <!-- Focus on adding projects nothing else will improve this -->
 
 ## Current Projects
 
-- **📸 [Single Filter]("https://github.com/RakshitGumber/snap-tool")** | [repo]("https://github.com/RakshitGumber/snap-tool") - Photo editing shouldn't require extra skills
+- **📸 [Single Filter]("https://github.com/RakshitGumber/snap-tool")** | **[repo]("https://github.com/RakshitGumber/snap-tool")** - Photo editing shouldn't require extra skills
 
 ---
 
-<!-- add a contribution section with 3d contri chart -->
+<!-- add a contribution snake diagram -->
 
 ## What I'm doing
 
-- **Finding Interests:** You can find me working in multiple fields. I am just *Curious.*😁
-- **Learning Stuff:** A quick learner, aLways looking for things I don't know.
-- **Finishing projects:** Build and Deliver. Nothing else works.
+- **Working Across Domains:** curiosity pulls me everywhere.
+- **Learning Fast:** I close knowledge gaps aggressively.
+- **Shipping > Talking:** I build and deliver.
+
+```
+"You may feel lost, so be it and find the way out."
+```
+
+---
 
 ## Connect with me
 
@@ -37,4 +45,11 @@
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/gumber-rakshit)
 [![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter)](https://x.com/Gumber_Rakshit)
 
-<!-- Add a lifetime philosophy -->
+---
+
+```
+Made by Rakshit Gumber
+Working on pure serotonin
+
+STAY TUNED!!!
+```
