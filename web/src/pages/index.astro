@@ -1,10 +1,18 @@
 ---
 import { getCollection } from "astro:content";
+import Seo from "@/components/Seo.astro";
 import Section from "../components/common/Section.astro";
 import FeaturedArticles from "../components/home/FeaturedArticles.astro";
 import FeaturedProjects from "../components/home/FeaturedProjects.astro";
 import Hero from "../components/home/Hero.astro";
 import Layout from "../layouts/Layout.astro";
+import {
+  buildPersonJsonLd,
+  buildProfilePageJsonLd,
+  getSiteUrl,
+  SAME_AS_LINKS,
+  SITE_NAME,
+} from "@/libs/seo";
 
 const featuredProjects = (
   await getCollection("project", (e) => e.data.featured)
@@ -18,34 +26,32 @@ const featuredArticles = (
   ...e.data,
   url: `/blog/${e.data.slug}`,
 }));
+const siteUrl = getSiteUrl();
+const personJsonLd = buildPersonJsonLd(siteUrl, {
+  name: SITE_NAME,
+  description:
+    "Portfolio, projects, and writing by Rakshit Gumber, a developer focused on shipping useful work.",
+  url: "/",
+  image: "/images/avatar.png",
+  sameAs: SAME_AS_LINKS,
+});
+const profilePageJsonLd = buildProfilePageJsonLd(siteUrl, {
+  name: SITE_NAME,
+  description:
+    "Portfolio, projects, and writing by Rakshit Gumber, a developer focused on shipping useful work.",
+  url: "/",
+  mainEntity: personJsonLd,
+});
 ---
 
 <Layout>
   <Fragment slot="head">
-    <title>Rakshit Gumber</title>
-    <meta
-      name="description"
-      content="Personal site, writing, and projects by Rakshit Gumber."
+    <Seo
+      title="Rakshit Gumber | Developer"
+      description="Portfolio, projects, and writing by Rakshit Gumber, a developer focused on shipping useful work."
+      path="/"
+      jsonLd={[personJsonLd, profilePageJsonLd]}
     />
-    <meta property="og:title" content="Rakshit Gumber" />
-    <meta
-      property="og:description"
-      content="Personal site, writing, and projects by Rakshit Gumber."
-    />
-    <meta
-      name="keywords"
-      content="Rakshit Gumber, portfolio, projects, blog"
-    />
-    <meta property="og:url" content="/" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Rakshit Gumber" />
-    <meta
-      name="twitter:description"
-      content="Personal site, writing, and projects by Rakshit Gumber."
-    />
-    <meta http-equiv="content-language" content="en" />
-    <meta name="language" content="English" />
-    <link rel="canonical" href="/" />
   </Fragment>
   <Section class="my-12 sm:my-16">
     <Hero />

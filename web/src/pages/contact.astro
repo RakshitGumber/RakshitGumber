@@ -1,0 +1,97 @@
+---
+import Seo from "@/components/Seo.astro";
+import Layout from "@/layouts/Layout.astro";
+import { Icon } from "astro-icon/components";
+
+const googleMeetLink =
+  "https://calendar.google.com/calendar/u/0/appointments/schedules/YOUR_ID_HERE";
+const buyMeACoffeeLink = "https://buymeacoffee.com/YOUR_USERNAME";
+const email = "gumberrakshit@gmail.com";
+---
+
+<Layout>
+  <Fragment slot="head">
+    <Seo
+      title="Contact Rakshit Gumber"
+      description="Get in touch with Rakshit Gumber for projects, collaboration, or a quick conversation."
+      path="/contact"
+    />
+  </Fragment>
+  <section class="max-w-4xl mx-auto px-6 py-20 md:py-32">
+    <!-- Header Section -->
+    <header class="mb-16">
+      <h1
+        class="font-heading text-5xl md:text-6xl font-bold text-title-color mb-4"
+      >
+        Let's Connect.
+      </h1>
+      <p class="font-content text-text-color text-lg md:text-xl max-w-2xl">
+        Whether you have a project in mind, want to discuss tech, or just want
+        to grab a virtual coffee, I'm always open to talking.
+      </p>
+    </header>
+
+    <!-- Options Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+      <!-- Google Meet Card -->
+      <div
+        class="flex flex-col items-start transition-all hover:border-text-muted"
+      >
+        <div class="mb-4 text-4xl text-title-color">
+          <Icon name="solar:headphones-square-sound-broken" />
+        </div>
+        <h2 class="font-heading text-2xl font-bold text-title-color mb-2">
+          Book a Meeting
+        </h2>
+        <p class="font-content text-text-color mb-8 grow">
+          Want to discuss a project or collaboration? Schedule a 30-minute
+          Google Meet call with me directly.
+        </p>
+        <a
+          href={googleMeetLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="bg-accent text-white font-content px-6 py-2 transition-colors hover:bg-accent-light w-full text-center sm:w-auto"
+        >
+          Schedule Call
+        </a>
+      </div>
+
+      <div
+        class="flex flex-col items-start transition-all hover:border-text-muted"
+      >
+        <div class="mb-4 text-4xl text-title-color">
+          <Icon name="solar:cup-paper-broken" />
+        </div>
+        <h2 class="font-heading text-2xl font-bold text-title-color mb-2">
+          Support My Work
+        </h2>
+        <p class="font-content text-text-color mb-8 grow">
+          If you find my open-source projects, themes, or blogs helpful,
+          consider buying me a coffee!
+        </p>
+        <!-- Secondary Button Style -->
+        <a
+          href={buyMeACoffeeLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="border border-border-color text-title-color font-content px-6 py-2 transition-colors hover:bg-border-color hover:text-title-color w-full text-center sm:w-auto flex items-center justify-center gap-2"
+        >
+          Buy me a coffee
+        </a>
+      </div>
+    </div>
+
+    <div
+      class="flex flex-col items-start transition-all hover:border-text-muted"
+    >
+      <div class="mb-4 text-4xl text-title-color">
+        <Icon name="solar:mailbox-broken" />
+      </div>
+      <h2 class="font-heading text-2xl font-bold text-title-color mb-2">
+        Drop an email
+      </h2>
+      <a class="underline underline-offset-4" href={`mailto:${email}`}>{email}</a>
+    </div>
+  </section>
+</Layout>

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import Seo from "@/components/Seo.astro";
 import ArticleSnippet from "../../components/ArticleSnippet.astro";
 import Section from "../../components/common/Section.astro";
 import Layout from "../../layouts/Layout.astro";
@@ -11,24 +12,11 @@ const articles = (await getCollection("blog")).sort(
 
 <Layout>
   <Fragment slot="head">
-    <title>Blog</title>
-    <meta name="description" content="Articles and notes by Rakshit Gumber." />
-    <meta property="og:title" content="Blog" />
-    <meta
-      property="og:description"
-      content="Articles and notes by Rakshit Gumber."
+    <Seo
+      title="Blog | Rakshit Gumber"
+      description="Articles and notes by Rakshit Gumber."
+      path="/blog"
     />
-    <meta name="keywords" content="blog, articles, notes" />
-    <meta property="og:url" content="/blog" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Blog" />
-    <meta
-      name="twitter:description"
-      content="Articles and notes by Rakshit Gumber."
-    />
-    <meta http-equiv="content-language" content="en" />
-    <meta name="language" content="English" />
-    <link rel="canonical" href="/blog" />
   </Fragment>
   <Section class="my-8">
     <div class="flex items-center gap-4 pt-8 pb-16">

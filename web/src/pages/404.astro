@@ -1,30 +1,19 @@
 ---
+import Seo from "@/components/Seo.astro";
 import Section from "../components/common/Section.astro";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
   <Fragment slot="head">
-    <title>Page Not Found</title>
-    <meta
-      name="description"
-      content="The page you are looking for does not exist."
+    <Seo
+      title="404 - Page Not Found | Rakshit Gumber"
+      description="The page you are looking for does not exist."
+      path="/404"
+      canonicalPath={null}
+      robots={{ index: false, follow: false }}
+      fallbackImage={false}
     />
-    <meta property="og:title" content="Page Not Found" />
-    <meta
-      property="og:description"
-      content="The page you are looking for does not exist."
-    />
-    <meta property="og:url" content="/" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Page Not Found" />
-    <meta
-      name="twitter:description"
-      content="The page you are looking for does not exist."
-    />
-    <meta http-equiv="content-language" content="en" />
-    <meta name="language" content="English" />
-    <link rel="canonical" href="/" />
   </Fragment>
   <Section class="mt-16">
     <h1 class="pb-8 font-heading text-3xl text-title-color sm:text-4xl">

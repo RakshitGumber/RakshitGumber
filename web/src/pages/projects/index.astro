@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import Seo from "@/components/Seo.astro";
 import Section from "../../components/common/Section.astro";
 import ProjectSnippet from "../../components/ProjectSnippet.astro";
 import Layout from "../../layouts/Layout.astro";
@@ -11,27 +12,11 @@ const projects = (await getCollection("project")).sort(
 
 <Layout>
   <Fragment slot="head">
-    <title>Projects</title>
-    <meta
-      name="description"
-      content="Projects built by Rakshit Gumber."
+    <Seo
+      title="Projects | Rakshit Gumber"
+      description="Projects built by Rakshit Gumber."
+      path="/projects"
     />
-    <meta property="og:title" content="Projects" />
-    <meta
-      property="og:description"
-      content="Projects built by Rakshit Gumber."
-    />
-    <meta name="keywords" content="projects, portfolio, work" />
-    <meta property="og:url" content="/projects" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Projects" />
-    <meta
-      name="twitter:description"
-      content="Projects built by Rakshit Gumber."
-    />
-    <meta http-equiv="content-language" content="en" />
-    <meta name="language" content="English" />
-    <link rel="canonical" href="/projects" />
   </Fragment>
   <Section class="py-4 my-8">
     <div class="flex items-center gap-4 pt-8 pb-16">

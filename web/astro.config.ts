@@ -6,7 +6,10 @@ import icon from "astro-icon";
 
 import cloudflare from "@astrojs/cloudflare";
 
+const siteUrl = process.env.WEB_URL;
+
 export default defineConfig({
+  site: siteUrl,
   vite: {
     plugins: [tailwindcss()],
   },
