@@ -1,6 +1,7 @@
 import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
+import { normalizeSlug } from "@/libs/seo";
 
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.md", base: "./content/blog" }),
@@ -17,12 +18,13 @@ const blog = defineCollection({
       timestamp: z.date().transform((val) => new Date(val)),
     })
     .transform((data) => {
-      const slug =
+      const slug = normalizeSlug(
         data.slug ??
-        data.title
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "");
+          data.title
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^\w-]/g, ""),
+      );
 
       return {
         ...data,
@@ -47,12 +49,13 @@ const project = defineCollection({
       featured: z.boolean().default(false),
     })
     .transform((data) => {
-      const slug =
+      const slug = normalizeSlug(
         data.slug ??
-        data.title
-          .toLowerCase()
-          .replace(/\s+/g, "-")
-          .replace(/[^\w-]/g, "");
+          data.title
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^\w-]/g, ""),
+      );
 
       return {
         ...data,

@@ -1,15 +1,23 @@
 ---
+import Seo from "@/components/Seo.astro";
 import Layout from "@/layouts/Layout.astro";
 import { Icon } from "astro-icon/components";
 
 const googleMeetLink =
   "https://calendar.google.com/calendar/u/0/appointments/schedules/YOUR_ID_HERE";
 const buyMeACoffeeLink = "https://buymeacoffee.com/YOUR_USERNAME";
-const email = "your.email@example.com";
+const email = "gumberrakshit@gmail.com";
 ---
 
 <Layout>
-  <main class="max-w-4xl mx-auto px-6 py-20 md:py-32">
+  <Fragment slot="head">
+    <Seo
+      title="Contact Rakshit Gumber"
+      description="Get in touch with Rakshit Gumber for projects, collaboration, or a quick conversation."
+      path="/contact"
+    />
+  </Fragment>
+  <section class="max-w-4xl mx-auto px-6 py-20 md:py-32">
     <!-- Header Section -->
     <header class="mb-16">
       <h1
@@ -83,7 +91,7 @@ const email = "your.email@example.com";
       <h2 class="font-heading text-2xl font-bold text-title-color mb-2">
         Drop an email
       </h2>
-      <span>gumberrakshit@gmail.com</span>
+      <a class="underline underline-offset-4" href={`mailto:${email}`}>{email}</a>
     </div>
-  </main>
+  </section>
 </Layout>

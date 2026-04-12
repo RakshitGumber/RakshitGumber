@@ -1,0 +1,31 @@
+---
+import Seo from "@/components/Seo.astro";
+import Section from "../components/common/Section.astro";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout>
+  <Fragment slot="head">
+    <Seo
+      title="About Rakshit Gumber"
+      description="About Rakshit Gumber, a builder focused on web experiences, writing, and practical product work."
+      path="/about"
+    />
+  </Fragment>
+  <Section class="mt-16">
+    <div class="max-w-3xl space-y-6">
+      <h1 class="font-heading text-4xl font-bold text-title-color sm:text-5xl">
+        About
+      </h1>
+      <p>
+        I build web experiences, write about what I learn, and keep a bias
+        toward shipping useful work over polished theory.
+      </p>
+      <p>
+        This site is the home for my projects, notes, and the occasional
+        experiment. If you want the shortest version: I care about clarity,
+        implementation quality, and things that actually get used.
+      </p>
+    </div>
+  </Section>
+</Layout>

@@ -1,0 +1,99 @@
+---
+import {
+  DEFAULT_LOCALE,
+  DEFAULT_SOCIAL_IMAGE,
+  FALLBACK_SITE_URL,
+  SITE_NAME,
+  getSiteUrl,
+  resolveAbsoluteUrl,
+  robotsToString,
+  type JsonLdValue,
+  type RobotsValue,
+} from "@/libs/seo";
+
+type Props = {
+  title: string;
+  description: string;
+  path: string;
+  type?: "website" | "article" | "profile";
+  image?: string;
+  robots?: RobotsValue;
+  canonicalPath?: string | null;
+  siteName?: string;
+  locale?: string;
+  jsonLd?: JsonLdValue | JsonLdValue[];
+  fallbackImage?: boolean;
+  publishedTime?: string;
+  modifiedTime?: string;
+};
+
+const {
+  title,
+  description,
+  path,
+  type = "website",
+  image,
+  robots,
+  canonicalPath,
+  siteName = SITE_NAME,
+  locale = DEFAULT_LOCALE,
+  jsonLd,
+  fallbackImage = true,
+  publishedTime,
+  modifiedTime,
+} = Astro.props;
+
+const siteUrl = getSiteUrl();
+const canonicalUrl =
+  canonicalPath === null
+    ? undefined
+    : (resolveAbsoluteUrl(siteUrl, canonicalPath ?? path) ??
+      new URL(FALLBACK_SITE_URL).toString());
+const resolvedImage =
+  resolveAbsoluteUrl(
+    siteUrl,
+    image ?? (fallbackImage ? DEFAULT_SOCIAL_IMAGE : undefined),
+  ) ?? undefined;
+const jsonLdEntries = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="robots" content={robotsToString(robots)} />
+<meta name="language" content="English" />
+<meta http-equiv="content-language" content="en" />
+{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+{canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content={locale} />
+{resolvedImage && <meta property="og:image" content={resolvedImage} />}
+{resolvedImage && <meta property="og:image:alt" content={title} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{resolvedImage && <meta name="twitter:image" content={resolvedImage} />}
+{resolvedImage && <meta name="twitter:image:alt" content={title} />}
+{
+  publishedTime && (
+    <meta property="article:published_time" content={publishedTime} />
+  )
+}
+{
+  modifiedTime && (
+    <meta property="article:modified_time" content={modifiedTime} />
+  )
+}
+
+{
+  jsonLdEntries.map((entry) => (
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(entry).replace(/</g, "\\u003c")}
+    />
+  ))
+}

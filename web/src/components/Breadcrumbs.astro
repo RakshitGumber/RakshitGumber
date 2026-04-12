@@ -1,0 +1,45 @@
+---
+import {
+  SITE_NAME,
+  resolveAbsoluteUrl,
+  getSiteUrl,
+  type BreadcrumbItem,
+} from "@/libs/seo";
+
+type Props = {
+  items: BreadcrumbItem[];
+  class?: string;
+};
+
+const { items, class: className } = Astro.props;
+const siteUrl = getSiteUrl();
+const crumbs = [{ name: SITE_NAME, href: "/" }, ...items];
+---
+
+<nav aria-label="Breadcrumb" class={className}>
+  <ol class="flex flex-wrap items-center gap-2 text-sm text-text-muted">
+    {
+      crumbs.map((item, index) => {
+        const isLast = index === crumbs.length - 1;
+
+        return (
+          <li class="flex items-center gap-2">
+            {index > 0 && <span aria-hidden="true">/</span>}
+            {isLast ? (
+              <span aria-current="page" class="text-title-color">
+                {item.name}
+              </span>
+            ) : (
+              <a
+                href={resolveAbsoluteUrl(siteUrl, item.href) ?? item.href}
+                class="transition-colors hover:text-title-color"
+              >
+                {item.name}
+              </a>
+            )}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>
