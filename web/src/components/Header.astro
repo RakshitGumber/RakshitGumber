@@ -45,7 +45,9 @@ const isActivePath = (url: string) =>
             url={item.url}
             class:list={[
               "uppercase tracking-[0.16em]",
-              isActivePath(item.url) ? "text-title-color" : "text-text-color",
+              isActivePath(item.url)
+                ? "text-title-color font-semibold"
+                : "text-text-color",
             ]}
           >
             {item.label}
