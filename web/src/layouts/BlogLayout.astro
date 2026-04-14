@@ -52,7 +52,7 @@ const breadcrumbJsonLd = buildBreadcrumbListJsonLd(breadcrumbs, siteUrl);
   </Fragment>
   <Section class="pt-8">
     <Breadcrumbs items={breadcrumbs} class="mb-10" />
-    <div class="flex flex-col gap-4 mt-8 mb-16">
+    <div class="flex flex-col gap-4 mt-8 mb-16" data-reveal data-reveal-delay="80">
       <h1
         class="font-heading text-3xl leading-normal text-title-color sm:text-4xl sm:leading-normal font-bold"
       >
@@ -66,6 +66,6 @@ const breadcrumbJsonLd = buildBreadcrumbListJsonLd(breadcrumbs, siteUrl);
     <Prose>
       <slot />
     </Prose>
-    <p class="pt-8">~Rakshit Gumber</p>
+    <p class="pt-8" data-reveal data-reveal-delay="200">~Rakshit Gumber</p>
   </Section>
 </Layout>

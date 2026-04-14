@@ -8,13 +8,16 @@ export type Props = {
   url: string;
   duration?: string;
   timestamp?: Date;
+  revealDelay?: number;
 };
 
-const { title, description, url, duration, timestamp } = Astro.props;
+const { title, description, url, duration, timestamp, revealDelay } = Astro.props;
 ---
 
 <div
   class="relative mb-8 flex flex-col gap-3 text-text-color transition-colors duration-200 hover-zag-dotted-grid"
+  data-reveal
+  data-reveal-delay={revealDelay}
 >
   <Anchor url={url} class="text-xl font-semibold text-title-color no-underline">
     {title}

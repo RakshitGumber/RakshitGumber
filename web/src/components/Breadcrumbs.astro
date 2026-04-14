@@ -16,7 +16,7 @@ const siteUrl = getSiteUrl();
 const crumbs = [{ name: SITE_NAME, href: "/" }, ...items];
 ---
 
-<nav aria-label="Breadcrumb" class={className}>
+<nav aria-label="Breadcrumb" class={className} data-reveal>
   <ol class="flex flex-wrap items-center gap-2 text-sm text-text-muted">
     {
       crumbs.map((item, index) => {

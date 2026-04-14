@@ -19,14 +19,14 @@ const projects = (await getCollection("project")).sort(
     />
   </Fragment>
   <Section class="py-4 my-8">
-    <div class="flex items-center gap-4 pt-8 pb-16">
+    <div class="flex items-center gap-4 pt-8 pb-16" data-reveal>
       <h1 class="font-heading text-4xl font-bold leading-none text-title-color sm:text-5xl">
         Projects
       </h1>
     </div>
     <ul>
       {
-        projects.map((project) => (
+        projects.map((project, index) => (
           <li>
             <ProjectSnippet
               title={project.data.title}
@@ -35,6 +35,7 @@ const projects = (await getCollection("project")).sort(
               githubUrl={project.data.githubUrl}
               liveUrl={project.data.liveDemoUrl}
               tags={project.data.tags ?? []}
+              revealDelay={index * 90}
             />
           </li>
         ))

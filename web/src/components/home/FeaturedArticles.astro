@@ -10,7 +10,7 @@ type Props = {
 const { featuredArticles } = Astro.props;
 ---
 
-<div class="flex justify-between items-center w-full">
+<div class="flex justify-between items-center w-full" data-reveal>
   <h3
     class="font-heading text-2xl font-bold leading-none text-title-color sm:text-3xl"
   >
@@ -21,7 +21,7 @@ const { featuredArticles } = Astro.props;
 <ul class="my-8">
   {
     (featuredArticles.length === 0 && <p>No articles found.</p>) ||
-      featuredArticles.map((article) => (
+      featuredArticles.map((article, index) => (
         <li>
           <ArticleSnippet
             title={article.title}
@@ -29,6 +29,7 @@ const { featuredArticles } = Astro.props;
             url={article.url}
             timestamp={article.timestamp}
             duration={`${article.readTime} min`}
+            revealDelay={index * 90}
           />
         </li>
       ))

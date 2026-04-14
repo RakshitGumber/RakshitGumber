@@ -2,6 +2,7 @@
 import CursorTrail from "@components/CursorTrail.astro";
 import Footer from "@components/Footer.astro";
 import Header from "@components/Header.astro";
+import RevealScript from "@components/RevealScript.astro";
 import "@/styles/global.css";
 ---
 
@@ -34,6 +35,10 @@ import "@/styles/global.css";
         document.documentElement.classList.add("dark");
       }
 
+      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.dataset.revealReady = "true";
+      }
+
       window.localStorage.setItem("theme", theme);
     </script>
 
@@ -46,6 +51,7 @@ import "@/styles/global.css";
       <slot />
     </main>
     <Footer />
+    <RevealScript />
   </body>
   <script>
     import Lenis from "lenis";
