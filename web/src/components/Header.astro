@@ -16,7 +16,10 @@ const isActivePath = (url: string) =>
     : pathname === url || pathname.startsWith(`${url}/`);
 ---
 
-<header class="sticky top-0 z-20 w-full bg-bg/95 backdrop-blur-2xl">
+<header
+  class="sticky top-0 z-20 w-full bg-bg/95 backdrop-blur-2xl navStyles"
+  id="main-nav"
+>
   <div
     class="relative z-50 flex items-center justify-between bg-bg/95 px-4 py-5 transition-colors duration-200 sm:hidden"
   >
@@ -45,7 +48,9 @@ const isActivePath = (url: string) =>
             url={item.url}
             class:list={[
               "uppercase tracking-[0.16em]",
-              isActivePath(item.url) ? "text-title-color" : "text-text-color",
+              isActivePath(item.url)
+                ? "text-title-color font-semibold"
+                : "text-text-color",
             ]}
           >
             {item.label}
@@ -67,6 +72,22 @@ const isActivePath = (url: string) =>
     </div>
   </nav>
 </header>
+
+<style>
+  .navStyles {
+    opacity: 1;
+    transform: translateY(0);
+
+    transition:
+      opacity 0.6s cubic-bezier(0.1, 0.25, 0.3, 1),
+      transform 0.6s cubic-bezier(0.1, 0.25, 0.3, 1);
+  }
+
+  .navStyles.is-hidden {
+    opacity: 0;
+    transform: translateY(-4rem);
+  }
+</style>
 
 <script>
   const button = document.querySelector("header button") as HTMLButtonElement;
@@ -92,4 +113,33 @@ const isActivePath = (url: string) =>
   window.addEventListener("resize", updateNavState);
 
   updateNavState();
+
+  function initNavScroll() {
+    const nav = document.getElementById("main-nav");
+    if (nav === null) return;
+
+    let prevScroll = window.scrollY;
+
+    function handleScroll() {
+      const latest = window.scrollY;
+
+      if (latest < prevScroll) {
+        nav?.classList.remove("is-hidden");
+      } else if (latest > 100 && latest > prevScroll) {
+        nav?.classList.add("is-hidden");
+      }
+
+      prevScroll = latest;
+    }
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        window.requestAnimationFrame(handleScroll);
+      },
+      { passive: true },
+    );
+  }
+
+  initNavScroll();
 </script>

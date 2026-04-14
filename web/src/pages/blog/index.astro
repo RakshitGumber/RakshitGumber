@@ -19,7 +19,7 @@ const articles = (await getCollection("blog")).sort(
     />
   </Fragment>
   <Section class="my-8">
-    <div class="flex items-center gap-4 pt-8 pb-16">
+    <div class="flex items-center gap-4 pt-8 pb-16" data-reveal>
       <h1
         class="font-heading text-4xl font-bold leading-none text-title-color sm:text-5xl"
       >
@@ -28,7 +28,7 @@ const articles = (await getCollection("blog")).sort(
     </div>
     <ul>
       {
-        articles.map((article) => (
+        articles.map((article, index) => (
           <li>
             <ArticleSnippet
               title={article.data.title}
@@ -36,6 +36,7 @@ const articles = (await getCollection("blog")).sort(
               duration={`${article.data.readTime} min`}
               url={`/blog/${article.data.slug}`}
               timestamp={article.data.timestamp}
+              revealDelay={index * 90}
             />
           </li>
         ))

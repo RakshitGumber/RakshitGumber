@@ -10,7 +10,7 @@ type Props = {
 const { featuredProjects } = Astro.props;
 ---
 
-<div class="flex justify-between items-center w-full">
+<div class="flex justify-between items-center w-full" data-reveal>
   <h3 class="font-heading text-2xl font-bold leading-none text-title-color sm:text-3xl">
     Projects
   </h3>
@@ -19,7 +19,7 @@ const { featuredProjects } = Astro.props;
 <ul class="my-8">
   {
     (featuredProjects.length === 0 && <p>No projects found.</p>) ||
-      featuredProjects.map((project) => (
+      featuredProjects.map((project, index) => (
         <li>
           <ProjectSnippet
             title={project.title}
@@ -28,6 +28,7 @@ const { featuredProjects } = Astro.props;
             githubUrl={project.githubUrl}
             liveUrl={project.liveDemoUrl}
             tags={project.tags ?? []}
+            revealDelay={index * 90}
           />
         </li>
       ))

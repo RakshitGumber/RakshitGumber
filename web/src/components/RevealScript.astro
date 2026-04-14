@@ -1,0 +1,52 @@
+<script>
+  const revealElements = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-reveal]"),
+  );
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  );
+
+  const markVisible = (element: HTMLElement) => {
+    element.dataset.revealState = "visible";
+  };
+
+  if (revealElements.length > 0) {
+    if (
+      prefersReducedMotion.matches ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      revealElements.forEach((element) => {
+        markVisible(element);
+        element.style.removeProperty("--reveal-delay");
+      });
+    } else {
+      const observer = new IntersectionObserver(
+        (entries, currentObserver) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
+
+            const element = entry.target as HTMLElement;
+            markVisible(element);
+            currentObserver.unobserve(element);
+          });
+        },
+        {
+          threshold: 0.15,
+          rootMargin: "0px 0px -12% 0px",
+        },
+      );
+
+      revealElements.forEach((element) => {
+        const delay = Number.parseInt(element.dataset.revealDelay ?? "0", 10);
+
+        if (!Number.isNaN(delay) && delay > 0) {
+          element.style.setProperty("--reveal-delay", `${delay}ms`);
+        }
+
+        observer.observe(element);
+      });
+    }
+  }
+</script>

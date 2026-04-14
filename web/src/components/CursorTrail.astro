@@ -17,9 +17,9 @@
       const context = canvas.getContext("2d");
 
       if (context) {
-        const particles = [];
+        const particles: any[] = [];
         const maxParticles = 28;
-        const spawnParticle = (x, y) => {
+        const spawnParticle = (x: number, y: number) => {
           particles.push({
             x,
             y,
