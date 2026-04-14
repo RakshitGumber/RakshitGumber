@@ -32,8 +32,8 @@
 
 :root {
     --bg-color: #F4F6FF;
-    --text-heading: #151417;
-    --text-color: #2f3041;
+    --text-heading: #171618;
+    --text-color: #23243a;
     --accent-color: #fb4c4c;
     --accent-color-light: #fb4c4ce0;
     --border-color: #303032;
@@ -43,11 +43,11 @@
 .dark {
     --bg-color: #0F0F15;
     --text-heading: #F4F6FF;
-    --text-color: #74769D;
+    --text-color: #898ba7;
     --accent-color: #ff133e;
     --accent-color-light: #ff133ee0;
     --border-color: #303032;
-    --text-muted: #56576C;
+    --text-muted: #636687;
 }
 
 @theme {
