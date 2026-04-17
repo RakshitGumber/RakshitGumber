@@ -19,6 +19,7 @@ An otter can do all your work.
 ## Current Projects
 
 - **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool)** | **[repo](https://github.com/RakshitGumber/snap-tool)** - Photo editing shouldn't require extra skills
+- **📒 Second Brain Modules - Tasks** | **[repo](https://github.com/RakshitGumber/sbm-tasks)** - Module for Second Brain - It orchestrates work into flows and helpsyou to complete the work.
 
 ---
 
