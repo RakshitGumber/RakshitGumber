@@ -4,7 +4,7 @@
 
 **📍 Earth | 🤖 Verified Human by Captcha | 🖨️ Can fix your printer | 🥲 Cries when AI breaks my code**
 
-<img src="https://skillicons.dev/icons?i=ts,js,python,rust,cpp,godot" width="300" />
+<img src="https://skillicons.dev/icons?i=ts,js,rust" width="150" />
 
 ```
 Status: Building
@@ -18,8 +18,9 @@ An otter can do all your work.
 
 ## Current Projects
 
-- **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool)** | **[repo](https://github.com/RakshitGumber/snap-tool)** - Photo editing shouldn't require extra skills
-- **📒 Second Brain Modules - Tasks** | **[repo](https://github.com/RakshitGumber/sbm-tasks)** - Module for Second Brain - It orchestrates work into flows and helpsyou to complete the work.
+- **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool) | private** - Photo editing shouldn't require extra skills
+- **📒 [Second Brain Modules - Tasks](https://github.com/RakshitGumber/sbm-tasks) | [repo](https://github.com/RakshitGumber/sbm-tasks)** - Module for Second Brain - It orchestrates work into flows and helpsyou to complete the work.
+- **👛 [Rusty Personal Budget](https://github.com/RakshitGumber/rust-budget-planner) | [repo](https://github.com/RakshitGumber/rust-budget-planner)** - Personal budget planning website made with Rust🦀
 
 ---
 
