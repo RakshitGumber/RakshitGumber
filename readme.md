@@ -10,8 +10,6 @@
 Status: Building
 Project: Single Filter
 Mood: Curiously looking for problems to solve
-
-An otter can do all your work.
 ```
 
 <!-- Focus on adding projects nothing else will improve this -->
@@ -19,8 +17,8 @@ An otter can do all your work.
 ## Current Projects
 
 - **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool) | private** - Photo editing shouldn't require extra skills
-- **📒 [Second Brain Modules - Tasks](https://github.com/RakshitGumber/sbm-tasks) | [repo](https://github.com/RakshitGumber/sbm-tasks)** - Module for Second Brain - It orchestrates work into flows and helpsyou to complete the work.
-- **👛 [Rusty Personal Budget](https://github.com/RakshitGumber/rust-budget-planner) | [repo](https://github.com/RakshitGumber/rust-budget-planner)** - Personal budget planning website made with Rust🦀
+- **📒 [Second Brain Modules - Tasks](https://github.com/RakshitGumber/sbm-tasks) | [repo](https://github.com/RakshitGumber/sbm-tasks)** - It orchestrates work into flows and helps in completing the work.
+- **👛 [Rusty Personal Budget](https://github.com/RakshitGumber/rust-budget-planner) | [repo](https://github.com/RakshitGumber/rust-budget-planner)** - Personal budget planner made with Rust🦀
 
 ---
 
@@ -32,9 +30,7 @@ An otter can do all your work.
 - **Learning Fast:** I close knowledge gaps aggressively.
 - **Shipping:** I build and deliver.
 
-```
-"You may feel lost, so be it and find the way out."
-```
+> "You may feel lost, so be it and find the way out."
 
 ---
 
@@ -47,9 +43,9 @@ An otter can do all your work.
 
 ---
 
-```
 Prime???.... There is no prime for me I will keep evolving
 
+```
 Made by Rakshit Gumber
 Working on pure serotonin
 ```
