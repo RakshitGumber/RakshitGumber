@@ -17,8 +17,9 @@ Mood: Curiously looking for problems to solve
 ## Current Projects
 
 - **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool) | private** - Photo editing shouldn't require extra skills
-- **📒 [Second Brain Modules - Tasks](https://github.com/RakshitGumber/sbm-tasks) | [repo](https://github.com/RakshitGumber/sbm-tasks)** - It orchestrates work into flows and helps in completing the work.
-- **👛 [Rusty Personal Budget](https://github.com/RakshitGumber/rust-budget-planner) | [repo](https://github.com/RakshitGumber/rust-budget-planner)** - Personal budget planner made with Rust🦀
+- **📝 [Curaly](https://curaly.app) | private** - Filter the noise and get informed
+  <!-- - **📒 [Second Brain Modules - Tasks](https://github.com/RakshitGumber/sbm-tasks) | [repo](https://github.com/RakshitGumber/sbm-tasks)** - It orchestrates work into flows and helps in completing the work. -->
+  <!-- - **👛 [Rusty Personal Budget](https://github.com/RakshitGumber/rust-budget-planner) | [repo](https://github.com/RakshitGumber/rust-budget-planner)** - Personal budget planner made with Rust🦀 -->
 
 ---
 
@@ -30,24 +31,34 @@ Mood: Curiously looking for problems to solve
 - **Learning Fast:** I close knowledge gaps aggressively.
 - **Shipping:** I build and deliver.
 
+## My Current Roadmap
+
+```
+I’m focused on becoming both a quant engineer and an exceptional product builder. I work independently on projects that sharpen my skills in systems, mathematics, finance, and software engineering while simultaneously building products with real-world value.
+
+I document the journey through writing, blogs; Not just to share knowledge, but to create a public record of growth, thinking, and execution.
+
+Over the next five years, my aim is to build a portfolio of meaningful products, develop deep technical expertise, and position myself to operate at the frontier of technology and finance.
+```
+
 > "You may feel lost, so be it and find the way out."
 
 ---
 
 ## Connect with me
 
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github)](https://github.com/RakshitGumber)
-[![Website](https://img.shields.io/badge/Website-1e1e1a?style=for-the-badge&logo=dbeaver)](https://github.com/RakshitGumber)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/gumber-rakshit)
-[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter)](https://x.com/Gumber_Rakshit)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge)](https://github.com/RakshitGumber)
+[![Website](https://img.shields.io/badge/Website-1e1e1a?style=for-the-badge)](https://github.com/RakshitGumber)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge)](https://www.linkedin.com/in/gumber-rakshit)
+[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge)](https://x.com/Gumber_Rakshit)
 
 ---
 
 Prime???.... There is no prime for me I will keep evolving
 
+### STAY TUNED!!!
+
 ```
 Made by Rakshit Gumber
 Working on pure serotonin
 ```
-
-### STAY TUNED!!!
