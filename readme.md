@@ -4,11 +4,11 @@
 
 **📍 Earth | 🤖 Verified Human by Captcha | 🖨️ Can fix your printer | 🥲 Cries when AI breaks my code**
 
-<img src="https://skillicons.dev/icons?i=ts,js,rust" width="150" />
+<img src="https://skillicons.dev/icons?i=ts,js,python,rust" width="150" />
 
 ```
 Status: Building
-Project: Single Filter
+Project: Curiously Randomly Workingly Brainstormingly Thinkinglys
 Mood: Curiously looking for problems to solve
 ```
 
@@ -16,9 +16,9 @@ Mood: Curiously looking for problems to solve
 
 ## Current Projects
 
-- **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool) | private** - Photo editing shouldn't require extra skills
+- **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool) | [repo](https://github.com/RakshitGumber/single-filter)** - Photo editing shouldn't require extra skills
 - **📝 [Curaly](https://curaly.app) | private** - Filter the noise and get informed
-  <!-- - **📒 [Second Brain Modules - Tasks](https://github.com/RakshitGumber/sbm-tasks) | [repo](https://github.com/RakshitGumber/sbm-tasks)** - It orchestrates work into flows and helps in completing the work. -->
+- **📝 Rustle | [repo](https://github.com/RakshitGumber/rustle)** - All the news in your terminal
   <!-- - **👛 [Rusty Personal Budget](https://github.com/RakshitGumber/rust-budget-planner) | [repo](https://github.com/RakshitGumber/rust-budget-planner)** - Personal budget planner made with Rust🦀 -->
 
 ---
