@@ -1,0 +1,87 @@
+<div class="brand">
+  <a class="mark" href="/" aria-label="Rakshit Gumber home">
+    <span class="monogram">
+      <span class="letter-r">R</span>
+      <span class="letter-g">G</span>
+    </span>
+  </a>
+  <span class="name">Rakshit Gumber</span>
+</div>
+
+<style>
+  .brand {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .mark {
+    display: grid;
+    width: 2rem;
+    height: 2.5rem;
+    flex: 0 0 auto;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 0.65rem;
+    background: linear-gradient(180deg, #ff8fa3 0%, #ff4d6d 48%, #c9184a 100%);
+    box-shadow: 0 0.4rem 1rem rgb(201 24 74 / 22%);
+    transition:
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  .mark:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.55rem 1.2rem rgb(201 24 74 / 30%);
+  }
+
+  .mark:focus-visible {
+    outline: 2px solid var(--text-heading);
+    outline-offset: 3px;
+  }
+
+  .monogram {
+    position: relative;
+    width: 1.55rem;
+    height: 1.9rem;
+    color: var(--bg-color);
+    font-family: "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .letter-r,
+  .letter-g {
+    position: absolute;
+  }
+
+  .letter-r {
+    top: 0;
+    left: 0.05rem;
+    z-index: 1;
+    font-size: 1.3rem;
+  }
+
+  .letter-g {
+    right: 0;
+    bottom: 0;
+    font-size: 1.2rem;
+  }
+
+  .name {
+    display: block;
+    color: var(--text-heading);
+    white-space: nowrap;
+    font-family: "Montserrat Variable", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark {
+      transition: none;
+    }
+  }
+</style>
