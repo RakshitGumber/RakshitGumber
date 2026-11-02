@@ -3,144 +3,110 @@ type LogoProps = {
   title?: string
 }
 
-export function Logo({ className = 'h-40 w-auto', title = 'RG' }: LogoProps) {
-  // Portrait sticker:
-  // - top / right / bottom mostly clean
-  // - all corners withered differently
-  // - one clear cut on the left side
-  const outer = [
-    'M 14 4',
-    'L 36 2.5',
-    'L 54 3.5',
-    // top-right withered
-    'C 59.5 4.2 62 9 60.5 14',
-    'L 61.5 40',
-    'L 61 70',
-    'L 60 90',
-    // bottom-right withered
-    'C 59 96.5 53 100 45.5 99',
-    'L 28 100.5',
-    'L 13 98.5',
-    // bottom-left withered
-    'C 7.5 97.5 5.5 92 7 86.5',
-    'L 6.5 72',
-    // LEFT-SIDE CUT
-    'L 6 64',
-    'L 20 58.5',
-    'L 6.5 53',
-    'L 7 30',
-    'L 7.5 14',
-    // top-left withered
-    'C 8 8.5 10.5 4.8 14 4',
-    'Z',
-  ].join(' ')
+export function Logo({ className = 'size-40', title = 'RG' }: LogoProps) {
+  // Near-circle with tiny edge ridges
+  // Inner black ring — close to the sticker edge (less padding)
+  const ring =
+    'M 50 7.51 L 52.78 7.63 L 55.57 7.67 L 58.34 8.09 L 60.99 8.99 L 63.58 9.98 L 66.25 10.76 L 68.91 11.66 L 71.35 13.03 L 73.58 14.71 L 75.93 16.21 L 78.07 17.99 L 79.91 20.09 L 81.72 22.18 L 83.65 24.18 L 85.59 26.22 L 86.95 28.67 L 88.03 31.25 L 89.27 33.73 L 90.33 36.31 L 90.86 39.05 L 91.39 41.77 L 92.11 44.46 L 92.66 47.2 L 92.68 50 L 92.29 52.77 L 92.08 55.54 L 91.76 58.31 L 90.89 60.96 L 90.13 63.62 L 89.32 66.29 L 88.36 68.92 L 86.93 71.32 L 85.23 73.54 L 83.55 75.74 L 81.97 78.04 L 80.09 80.09 L 77.91 81.82 L 75.96 83.83 L 73.81 85.64 L 71.24 86.78 L 68.66 87.84 L 66.2 89.12 L 63.71 90.38 L 61.03 91.15 L 58.3 91.73 L 55.57 92.31 L 52.79 92.59 L 50 92.41 L 47.24 92.17 L 44.48 91.97 L 41.68 91.84 L 38.95 91.23 L 36.36 90.19 L 33.7 89.35 L 31.12 88.29 L 28.75 86.8 L 26.53 85.12 L 24.22 83.6 L 21.83 82.12 L 19.87 80.13 L 18.05 78.02 L 16.34 75.83 L 14.66 73.61 L 13.29 71.2 L 12.16 68.66 L 10.7 66.28 L 9.45 63.76 L 8.7 61.07 L 8.48 58.26 L 7.96 55.53 L 7.53 52.78 L 7.6 50 L 7.79 47.23 L 7.8 44.44 L 8.09 41.66 L 8.77 38.95 L 9.98 36.42 L 10.94 33.82 L 11.86 31.19 L 13.15 28.72 L 14.81 26.49 L 16.2 24.07 L 17.86 21.81 L 19.86 19.86 L 22.1 18.18 L 24.29 16.49 L 26.34 14.59 L 28.68 13.08 L 31.23 11.94 L 33.7 10.65 L 36.26 9.51 L 39 8.93 L 41.78 8.67 L 44.49 8.12 L 47.21 7.46 Z'
 
-  const inner = [
-    'M 17 7.5',
-    'L 36 6.2',
-    'L 51.5 7',
-    'C 55.5 7.6 57.8 11 56.8 14.8',
-    'L 57.8 40',
-    'L 57.2 70',
-    'L 56.2 88.5',
-    'C 55.5 93.5 51 96.2 44.5 95.5',
-    'L 28 96.8',
-    'L 15.5 95',
-    'C 11.5 94.2 10 90 11 85.5',
-    'L 10.5 72',
-    'L 10 64.5',
-    'L 20.5 59',
-    'L 10.5 54',
-    'L 11 30',
-    'L 11.5 15.5',
-    'C 11.8 11 14 8.2 17 7.5',
-    'Z',
-  ].join(' ')
+  const red =
+    'M 50 2.51 L 52.07 2.58 L 54.15 2.55 L 56.21 2.83 L 58.24 3.28 L 60.23 3.87 L 62.28 4.18 L 64.32 4.58 L 66.27 5.29 L 68.19 6.1 L 70.1 6.9 L 71.95 7.84 L 73.7 8.95 L 75.39 10.14 L 77.25 11.08 L 79.02 12.18 L 80.58 13.56 L 82.04 15.03 L 83.59 16.41 L 85.02 17.91 L 86.34 19.5 L 87.57 21.17 L 88.92 22.75 L 90.26 24.35 L 91.26 26.18 L 92.04 28.11 L 92.94 29.98 L 93.91 31.81 L 94.6 33.77 L 95.16 35.76 L 95.89 37.7 L 96.54 39.68 L 96.86 41.74 L 96.96 43.82 L 97.19 45.87 L 97.51 47.93 L 97.53 50 L 97.45 52.07 L 97.42 54.15 L 97.23 56.22 L 96.76 58.25 L 96.19 60.24 L 95.8 62.27 L 95.39 64.31 L 94.68 66.26 L 93.85 68.16 L 93.15 70.12 L 92.23 71.99 L 91.17 73.77 L 89.88 75.4 L 88.8 77.17 L 87.79 79 L 86.49 80.62 L 84.98 82.05 L 83.64 83.64 L 82.15 85.09 L 80.46 86.31 L 78.8 87.53 L 77.17 88.8 L 75.63 90.24 L 73.83 91.28 L 71.93 92.13 L 70.05 92.99 L 68.2 93.93 L 66.23 94.58 L 64.22 95.11 L 62.3 95.89 L 60.33 96.61 L 58.27 96.88 L 56.19 97.03 L 54.13 97.25 L 52.07 97.49 L 50 97.41 L 47.94 97.28 L 45.86 97.34 L 43.78 97.28 L 41.74 96.84 L 39.74 96.29 L 37.75 95.73 L 35.72 95.3 L 33.77 94.6 L 31.87 93.77 L 29.9 93.1 L 27.96 92.33 L 26.2 91.21 L 24.55 89.96 L 22.85 88.78 L 21.04 87.75 L 19.41 86.46 L 17.95 84.98 L 16.36 83.64 L 14.89 82.17 L 13.59 80.55 L 12.43 78.83 L 11.2 77.16 L 9.84 75.58 L 8.77 73.8 L 7.85 71.94 L 6.88 70.11 L 5.99 68.23 L 5.36 66.25 L 4.9 64.22 L 4.23 62.26 L 3.47 60.32 L 3.14 58.26 L 2.87 56.2 L 2.69 54.14 L 2.53 52.07 L 2.53 50 L 2.74 47.94 L 2.75 45.87 L 2.72 43.78 L 3.09 41.73 L 3.67 39.73 L 4.16 37.72 L 4.65 35.7 L 5.43 33.78 L 6.3 31.9 L 6.96 29.93 L 7.72 27.99 L 8.79 26.2 L 10.04 24.54 L 11.22 22.85 L 12.3 21.07 L 13.59 19.45 L 15.06 17.98 L 16.37 16.37 L 17.75 14.8 L 19.36 13.48 L 21.16 12.41 L 22.86 11.24 L 24.48 9.93 L 26.21 8.79 L 28.09 7.91 L 29.9 6.9 L 31.74 5.92 L 33.73 5.3 L 35.75 4.81 L 37.75 4.29 L 39.7 3.55 L 41.74 3.14 L 43.8 2.91 L 45.86 2.67 L 47.92 2.37 Z'
 
   return (
     <svg
-      viewBox="0 0 68 103"
+      viewBox="0 0 100 100"
       role="img"
       aria-label={title}
       className={className}
+      overflow="visible"
     >
       <title>{title}</title>
       <defs>
         <filter
-          id="grain"
-          x="-2%"
-          y="-2%"
-          width="104%"
-          height="104%"
+          id="sticker-grain"
+          x="-4%"
+          y="-4%"
+          width="108%"
+          height="108%"
           colorInterpolationFilters="sRGB"
         >
           <feTurbulence
             type="fractalNoise"
-            baseFrequency="1.15"
-            numOctaves="3"
-            seed="12"
+            baseFrequency="1.2"
+            numOctaves="4"
+            seed="6"
             stitchTiles="stitch"
             result="noise"
           />
           <feColorMatrix
             in="noise"
             type="matrix"
-            values="0 0 0 0 0.42
-                    0 0 0 0 0.3
+            values="0 0 0 0 0.55
                     0 0 0 0 0.2
-                    0 0 0 0.42 0"
-            result="grainAlpha"
+                    0 0 0 0 0.15
+                    0 0 0 0.55 0"
+            result="grain"
           />
-          <feBlend in="SourceGraphic" in2="grainAlpha" mode="multiply" result="stained" />
+          <feBlend in="SourceGraphic" in2="grain" mode="multiply" result="stained" />
           <feComposite in="stained" in2="SourceGraphic" operator="in" />
         </filter>
 
-        <clipPath id="sticker">
-          <path d={outer} />
+        {/* Flat shiny black — no bevel */}
+        <linearGradient id="shiny-black" x1="0%" y1="0%" x2="40%" y2="100%">
+          <stop offset="0%" stopColor="#3A3A3A" />
+          <stop offset="45%" stopColor="#0A0A0A" />
+          <stop offset="100%" stopColor="#000000" />
+        </linearGradient>
+
+        <clipPath id="face">
+          <path d={red} />
         </clipPath>
       </defs>
 
-      <path d={outer} fill="#C4A872" filter="url(#grain)" />
-      <path d={inner} fill="#5C1824" filter="url(#grain)" />
+      <g filter="url(#sticker-grain)">
+        <path d={red} fill="#D01E14" />
 
-      <text
-        x="35"
-        y="75"
-        textAnchor="middle"
-        fill="#D9C193"
-        fontFamily="'Bebas Neue', 'Arial Narrow', sans-serif"
-        fontSize="74"
-        letterSpacing="-6"
-        transform="translate(35 51) scale(1.06 1.38) translate(-35 -51)"
-        style={{ userSelect: 'none' }}
-      >
-        RG
-      </text>
+        <g clipPath="url(#face)" pointerEvents="none">
+          <ellipse cx="40" cy="34" rx="16" ry="12" fill="#9A120C" opacity="0.14" />
+          <ellipse cx="60" cy="60" rx="14" ry="11" fill="#C41E14" opacity="0.12" />
 
-      <g clipPath="url(#sticker)" pointerEvents="none">
-        <g fill="none" strokeLinecap="round" style={{ mixBlendMode: 'multiply' }}>
-          <path d="M 12 17 C 26 24 42 11 58 18" stroke="#1A070B" strokeWidth="2" opacity="0.34" />
-          <path d="M 11 40 C 24 32 36 50 50 38 C 56 32 58 44 57 52" stroke="#1A070B" strokeWidth="2.3" opacity="0.4" />
-          <path d="M 14 66 C 28 75 42 60 56 70" stroke="#1A070B" strokeWidth="1.8" opacity="0.3" />
-          <path d="M 13 87 C 28 94 42 83 54 90" stroke="#1A070B" strokeWidth="1.45" opacity="0.26" />
-          <path d="M 25 5 C 20 42 28 72 22 98" stroke="#1A070B" strokeWidth="1.25" opacity="0.2" />
-          <path d="M 46 4 C 51 44 43 76 48 98" stroke="#1A070B" strokeWidth="1.1" opacity="0.18" />
+          <g stroke="#E6D9C4" strokeLinecap="round">
+            <path d="M 30 26 L 31.2 44" strokeWidth="0.4" opacity="0.2" />
+            <path d="M 68 28 L 66.8 46" strokeWidth="0.3" opacity="0.16" />
+            <path d="M 44 70 L 45 83" strokeWidth="0.35" opacity="0.18" />
+          </g>
+
+          <circle cx="34" cy="42" r="0.5" fill="#E6D9C4" opacity="0.4" />
+          <circle cx="70" cy="48" r="0.35" fill="#E6D9C4" opacity="0.3" />
+          <circle cx="48" cy="28" r="0.4" fill="#E6D9C4" opacity="0.28" />
+          <circle cx="56" cy="72" r="0.4" fill="#E6D9C4" opacity="0.35" />
         </g>
 
-        <g fill="none" strokeLinecap="round" opacity="0.2">
-          <path d="M 12 18.4 C 26 25.4 42 12.4 58 19.4" stroke="#E8D4A8" strokeWidth="0.6" />
-          <path d="M 11 41.6 C 24 33.6 36 51.6 50 39.6" stroke="#E8D4A8" strokeWidth="0.65" />
-        </g>
-
-        {/* Peel at the left cut */}
-        <path d="M 20 58.5 L 24.5 60 L 19.5 63 Z" fill="#C4A872" />
+        {/* Black ring inside the sticker — close to the edge */}
         <path
-          d="M 20 58.5 L 24.5 60 L 19.5 63"
+          d={ring}
           fill="none"
-          stroke="#1A070B"
-          strokeWidth="0.55"
-          opacity="0.45"
+          stroke="#0A0A0A"
+          strokeWidth="2.4"
+          strokeLinejoin="round"
+          strokeLinecap="round"
         />
+
+        {/* Shiny black RG — longer, tight spacing, centered */}
+        <text
+          x="50"
+          y="50"
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="url(#shiny-black)"
+          fontFamily="'Archivo Black', Impact, sans-serif"
+          fontSize="44"
+          letterSpacing="-3.5"
+          transform="translate(50 50) scale(1 1.4) translate(-50 -50)"
+          style={{ userSelect: 'none' }}
+        >
+          RG
+        </text>
       </g>
     </svg>
   )
