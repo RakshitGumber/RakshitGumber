@@ -3,7 +3,7 @@ import { Logo } from './components/Logo'
 function App() {
   return (
     <main className="min-h-dvh bg-black grid place-items-center">
-      <Logo className="size-40" />
+      <Logo className="h-52 w-auto" />
     </main>
   )
 }
