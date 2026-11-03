@@ -1,4 +1,5 @@
-import { Application, Container, Texture, TilingSprite } from 'pixi.js'
+import { Application, Container, Graphics, Rectangle, Texture, TilingSprite } from 'pixi.js'
+import { createCrtFilter } from './crtFilter'
 
 export type WorldPoint = { x: number; y: number }
 
@@ -42,9 +43,37 @@ export const createPanZoomCanvas = async (
     cursor: 'grab',
   })
 
+  const glass = new Container()
+  const screen = new Graphics()
   const world = new Container()
-  app.stage.addChild(world)
+  const ui = new Container()
+  glass.addChild(screen, world, ui)
+  app.stage.addChild(glass)
   world.position.set(app.screen.width / 2, app.screen.height / 2)
+
+  let screenColor = 0x0b0b0b
+  const paintScreen = () => {
+    screen.clear()
+    screen.rect(0, 0, app.screen.width, app.screen.height)
+    screen.fill({ color: screenColor })
+  }
+  paintScreen()
+
+  const crt = createCrtFilter()
+  crt.filter.resolution = app.renderer.resolution
+  glass.filters = [crt.filter]
+  glass.filterArea = new Rectangle(0, 0, app.screen.width, app.screen.height)
+
+  const syncGlass = () => {
+    crt.filter.resolution = app.renderer.resolution
+    glass.filterArea = new Rectangle(0, 0, app.screen.width, app.screen.height)
+    paintScreen()
+  }
+
+  const setScreenColor = (hex: string) => {
+    screenColor = Number.parseInt(hex.slice(1), 16)
+    paintScreen()
+  }
 
   const cell = 120
   const dotCanvas = document.createElement('canvas')
@@ -112,7 +141,11 @@ export const createPanZoomCanvas = async (
   }
 
   paintGrid()
-  app.renderer.on('resize', clampWorld)
+  const onResize = () => {
+    syncGlass()
+    clampWorld()
+  }
+  app.renderer.on('resize', onResize)
 
   const snap = {
     active: false,
@@ -279,6 +312,7 @@ export const createPanZoomCanvas = async (
   app.canvas.addEventListener('wheel', onWheel, { passive: false })
 
   app.ticker.add((ticker) => {
+    crt.tick(ticker.deltaMS)
     if (!snap.active) return
     snap.elapsed += ticker.deltaMS
     const t = Math.min(1, snap.elapsed / SNAP_MS)
@@ -299,10 +333,12 @@ export const createPanZoomCanvas = async (
   return {
     app,
     world,
+    ui,
     snapTo,
     clampWorld,
+    setScreenColor,
     destroy() {
-      app.renderer.off('resize', clampWorld)
+      app.renderer.off('resize', onResize)
       app.canvas.removeEventListener('pointerdown', onPointerDown)
       app.canvas.removeEventListener('pointermove', onPointerMove)
       app.canvas.removeEventListener('pointerup', onPointerUp)

@@ -2,7 +2,7 @@ import { Assets, Container, Graphics, Sprite, Texture } from 'pixi.js'
 
 const BORDER_PAD = 14
 const BORDER_WIDTH = 5
-const SVG_SIZE = 240
+const SVG_SIZE = 120
 const PARALLAX = 36
 const FRAME_MS = 980
 
