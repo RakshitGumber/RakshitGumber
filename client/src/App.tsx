@@ -1,9 +1,9 @@
-import { Logo } from './components/Logo'
+import Overlay from "./components/Screen/Overlay"
 
 function App() {
   return (
-    <main className="min-h-dvh bg-black grid place-items-center">
-      <Logo className="size-56" />
+    <main className="">
+    <Overlay />
     </main>
   )
 }

@@ -3,7 +3,7 @@ type LogoProps = {
   title?: string
 }
 
-export function Logo({ className = 'size-40', title = 'RG' }: LogoProps) {
+export function Logo({ className = 'size-40', title = 'Rakshit Gumber' }: LogoProps) {
   // Near-circle with tiny edge ridges
   // Inner black ring — close to the sticker edge (less padding)
   const ring =
