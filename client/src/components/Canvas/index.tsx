@@ -94,7 +94,7 @@ export const Canvas = () => {
 
   return (
     <div
-      className="absolute inset-0 overflow-hidden transition-colors duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+      className="absolute inset-0 overflow-hidden transition-colors duration-[980ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
       style={{ backgroundColor: bg }}
       aria-label="Retro gadgets canvas — drag to pan, scroll to zoom"
     >

@@ -4,6 +4,7 @@ const BORDER_PAD = 14
 const BORDER_WIDTH = 5
 const SVG_SIZE = 240
 const PARALLAX = 36
+const FRAME_MS = 980
 
 export type GadgetDef = {
   src: string
@@ -86,6 +87,10 @@ function hexToNum(hex: string) {
   return Number.parseInt(hex.slice(1), 16)
 }
 
+function easeOut(t: number) {
+  return 1 - (1 - t) ** 3
+}
+
 export async function createRetroGadget(def: GadgetDef, resolution: number): Promise<RetroGadget> {
   const texture = await Assets.load<Texture>({
     alias: `${def.src}@${resolution}`,
@@ -104,6 +109,10 @@ export async function createRetroGadget(def: GadgetDef, resolution: number): Pro
   let focused = false
   let panX = 0
   let panY = 0
+  let frame = 0
+  let frameTarget = 0
+  let raf = 0
+  let lastTs = 0
 
   const applyPos = () => {
     root.position.set(x + panX, y + panY)
@@ -111,12 +120,47 @@ export async function createRetroGadget(def: GadgetDef, resolution: number): Pro
 
   const drawBorder = () => {
     border.clear()
-    if (!focused) return
+    if (frame <= 0.001) {
+      border.alpha = 0
+      return
+    }
+    const t = easeOut(frame)
     const w = sprite.width
     const h = sprite.height
+    const settle = (1 - t) * 32
     border
-      .rect(-w / 2 - BORDER_PAD, -h / 2 - BORDER_PAD, w + BORDER_PAD * 2, h + BORDER_PAD * 2)
-      .stroke({ width: BORDER_WIDTH, color: hexToNum(def.ink) })
+      .rect(
+        -w / 2 - BORDER_PAD - settle,
+        -h / 2 - BORDER_PAD - settle,
+        w + (BORDER_PAD + settle) * 2,
+        h + (BORDER_PAD + settle) * 2,
+      )
+      .stroke({ width: BORDER_WIDTH * (0.35 + 0.65 * t), color: hexToNum(def.ink) })
+    border.alpha = t
+  }
+
+  const pump = (ts: number) => {
+    if (!lastTs) lastTs = ts
+    const dt = Math.min(48, ts - lastTs)
+    lastTs = ts
+    const step = dt / FRAME_MS
+    if (frame < frameTarget) frame = Math.min(frameTarget, frame + step)
+    else if (frame > frameTarget) frame = Math.max(frameTarget, frame - step)
+    drawBorder()
+    if (frame !== frameTarget) {
+      raf = requestAnimationFrame(pump)
+    } else {
+      raf = 0
+      lastTs = 0
+    }
+  }
+
+  const setFrameTarget = (next: number) => {
+    frameTarget = next
+    if (!raf) {
+      lastTs = 0
+      raf = requestAnimationFrame(pump)
+    }
   }
 
   return {
@@ -142,7 +186,7 @@ export async function createRetroGadget(def: GadgetDef, resolution: number): Pro
         panY = 0
         applyPos()
       }
-      drawBorder()
+      setFrameTarget(on ? 1 : 0)
     },
     setParallax(nx, ny) {
       if (!focused) return

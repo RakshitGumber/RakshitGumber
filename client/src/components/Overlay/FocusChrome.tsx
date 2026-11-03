@@ -7,21 +7,31 @@ type FocusChromeProps = {
   focus: FocusInfo | null
 }
 
+const EXIT_MS = 1100
+
 export function FocusChrome({ focus }: FocusChromeProps) {
   const [shown, setShown] = useState<FocusInfo | null>(focus)
-  const active = focus !== null
+  const [entered, setEntered] = useState(false)
 
   useEffect(() => {
     if (focus) {
       setShown(focus)
-      return
+      setEntered(false)
+      const id = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setEntered(true))
+      })
+      return () => cancelAnimationFrame(id)
     }
-    const id = window.setTimeout(() => setShown(null), 720)
+
+    setEntered(false)
+    const id = window.setTimeout(() => setShown(null), EXIT_MS)
     return () => window.clearTimeout(id)
   }, [focus])
 
   const tone = shown ?? focus
   if (!tone) return null
+
+  const active = entered
 
   return (
     <div
@@ -31,8 +41,10 @@ export function FocusChrome({ focus }: FocusChromeProps) {
       <p
         className={[
           'absolute left-0 right-0 top-[7%] px-6 text-center text-[clamp(2rem,6vw,4.5rem)] leading-none tracking-tight',
-          'transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
-          active ? 'translate-y-0' : '-translate-y-[120vh]',
+          'transition-[transform,opacity] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+          active
+            ? 'translate-x-0 translate-y-0 opacity-100'
+            : '-translate-x-[40vw] -translate-y-[30vh] opacity-0',
         ].join(' ')}
         style={{ color: tone.ink, fontFamily: "'Archivo Black', Impact, sans-serif" }}
       >
@@ -41,8 +53,10 @@ export function FocusChrome({ focus }: FocusChromeProps) {
       <p
         className={[
           'absolute bottom-[8%] left-0 right-0 px-6 text-center text-[clamp(0.95rem,2.4vw,1.35rem)] font-medium tracking-[0.18em] uppercase',
-          'transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]',
-          active ? 'translate-y-0' : 'translate-y-[120vh]',
+          'transition-[transform,opacity] duration-[900ms] delay-150 ease-[cubic-bezier(0.16,1,0.3,1)]',
+          active
+            ? 'translate-x-0 translate-y-0 opacity-100'
+            : 'translate-x-[40vw] translate-y-[30vh] opacity-0',
         ].join(' ')}
         style={{ color: tone.ink, fontFamily: "'Space Grotesk', system-ui, sans-serif" }}
       >
