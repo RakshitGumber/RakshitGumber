@@ -2,49 +2,31 @@ import { Application, Container, Texture, TilingSprite } from 'pixi.js'
 
 export type WorldPoint = { x: number; y: number }
 
-type Snap = {
-  active: boolean
-  point: WorldPoint
-  fromX: number
-  fromY: number
-  fromZ: number
-  toZ: number
-  elapsed: number
-}
-
 const FOCUS_RADIUS = 0.28
 const SNAP_MS = 780
 const ZOOM_MIN = 0.28
 const ZOOM_MAX = 1.2
-export const FOCUS_ZOOM = 1.06
+const FOCUS_ZOOM = 1.06
 const WHEEL_STEP = 0.0014
+const EDGE = 0.08
 
-/** Soft ease-out — free drift, no slam. */
 function easeOut(t: number) {
   return 1 - (1 - t) ** 3
 }
 
-export type PanZoomCanvas = {
-  app: Application
-  world: Container
-  snapTo: (point: WorldPoint, zoom?: number) => void
-  nearestInFocus: (points: WorldPoint[]) => number
-  destroy: () => void
-}
-
-export async function createPanZoomCanvas(
+export const createPanZoomCanvas = async (
   host: HTMLElement,
   opts: {
     getPoints: () => WorldPoint[]
-    onNear?: (index: number) => void
     onSnap?: (index: number) => void
     onClear?: () => void
+    onPointer?: (sx: number, sy: number, dragging: boolean) => void
   },
-): Promise<PanZoomCanvas> {
+) => {
   const app = new Application()
   await app.init({
     resizeTo: host,
-    background: '#0B0B0B',
+    backgroundAlpha: 0,
     antialias: true,
     resolution: Math.min(window.devicePixelRatio || 1, 2),
     autoDensity: true,
@@ -64,14 +46,14 @@ export async function createPanZoomCanvas(
   app.stage.addChild(world)
   world.position.set(app.screen.width / 2, app.screen.height / 2)
 
-  const cell = 28
+  const cell = 120
   const dotCanvas = document.createElement('canvas')
   dotCanvas.width = cell
   dotCanvas.height = cell
   const ctx = dotCanvas.getContext('2d')!
   ctx.fillStyle = 'rgba(255,255,255,0.2)'
   ctx.beginPath()
-  ctx.arc(0.75, 0.75, 1.1, 0, Math.PI * 2)
+  ctx.arc(3.5, 3.5, 3.2, 0, Math.PI * 2)
   ctx.fill()
 
   const dots = new TilingSprite({
@@ -81,17 +63,60 @@ export async function createPanZoomCanvas(
   })
   world.addChild(dots)
 
-  const paintGrid = () => {
-    const extent = Math.max(app.screen.width, app.screen.height) * 8
-    dots.width = extent * 2
-    dots.height = extent * 2
-    dots.position.set(-extent, -extent)
+  const contentBounds = () => {
+    const points = opts.getPoints()
+    if (points.length === 0) return null
+    let minX = Infinity
+    let maxX = -Infinity
+    let minY = Infinity
+    let maxY = -Infinity
+    for (const p of points) {
+      minX = Math.min(minX, p.x)
+      maxX = Math.max(maxX, p.x)
+      minY = Math.min(minY, p.y)
+      maxY = Math.max(maxY, p.y)
+    }
+    return { minX, maxX, minY, maxY }
   }
-  paintGrid()
-  app.renderer.on('resize', paintGrid)
 
-  const snap: Snap = {
+  const clampAxis = (pos: number, minC: number, maxC: number, view: number, z: number) => {
+    const inset = view * EDGE
+    const lo = inset - maxC * z
+    const hi = view - inset - minC * z
+    return lo <= hi ? Math.min(hi, Math.max(lo, pos)) : (lo + hi) / 2
+  }
+
+  const paintGrid = () => {
+    const b = contentBounds()
+    const pad = Math.max(app.screen.width, app.screen.height)
+    if (!b) {
+      const extent = pad * 2
+      dots.width = extent * 2
+      dots.height = extent * 2
+      dots.position.set(-extent, -extent)
+      return
+    }
+    const half = Math.min(app.screen.width, app.screen.height) * 0.21
+    dots.width = b.maxX - b.minX + half * 2 + pad * 2
+    dots.height = b.maxY - b.minY + half * 2 + pad * 2
+    dots.position.set(b.minX - half - pad, b.minY - half - pad)
+  }
+
+  const clampWorld = () => {
+    paintGrid()
+    const b = contentBounds()
+    if (!b) return
+    const z = world.scale.x
+    world.x = clampAxis(world.x, b.minX, b.maxX, app.screen.width, z)
+    world.y = clampAxis(world.y, b.minY, b.maxY, app.screen.height, z)
+  }
+
+  paintGrid()
+  app.renderer.on('resize', clampWorld)
+
+  const snap = {
     active: false,
+    index: -1,
     point: { x: 0, y: 0 },
     fromX: 0,
     fromY: 0,
@@ -100,11 +125,6 @@ export async function createPanZoomCanvas(
     elapsed: 0,
   }
 
-  const screenOf = (p: WorldPoint) => ({
-    x: world.x + p.x * world.scale.x,
-    y: world.y + p.y * world.scale.y,
-  })
-
   const nearestInFocus = (points: WorldPoint[]) => {
     const cx = app.screen.width / 2
     const cy = app.screen.height / 2
@@ -112,8 +132,8 @@ export async function createPanZoomCanvas(
     let best = -1
     let bestDist = Infinity
     for (let i = 0; i < points.length; i++) {
-      const s = screenOf(points[i])
-      const d = Math.hypot(s.x - cx, s.y - cy)
+      const p = points[i]
+      const d = Math.hypot(world.x + p.x * world.scale.x - cx, world.y + p.y * world.scale.y - cy)
       if (d < r && d < bestDist) {
         best = i
         bestDist = d
@@ -122,14 +142,20 @@ export async function createPanZoomCanvas(
     return best
   }
 
-  const snapTo = (point: WorldPoint, zoom = FOCUS_ZOOM) => {
+  const snapTo = (point: WorldPoint, zoom = FOCUS_ZOOM, index = -1) => {
     snap.active = true
+    snap.index = index
     snap.point = point
     snap.fromX = world.x
     snap.fromY = world.y
     snap.fromZ = world.scale.x
     snap.toZ = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom))
     snap.elapsed = 0
+  }
+
+  const cancelSnap = () => {
+    snap.active = false
+    snap.index = -1
   }
 
   const setZoomAt = (next: number, ax: number, ay: number) => {
@@ -140,7 +166,9 @@ export async function createPanZoomCanvas(
     world.scale.set(z)
     world.x = ax - wx * z
     world.y = ay - wy * z
-    snap.active = false
+    cancelSnap()
+    opts.onClear?.()
+    clampWorld()
   }
 
   let dragging = false
@@ -163,12 +191,17 @@ export async function createPanZoomCanvas(
       return
     }
 
-    snap.active = false
+    cancelSnap()
     dragging = true
     pointerId = e.pointerId
     lastX = e.clientX
     lastY = e.clientY
     app.canvas.style.cursor = 'grabbing'
+  }
+
+  const emitPointer = (e: PointerEvent) => {
+    const rect = app.canvas.getBoundingClientRect()
+    opts.onPointer?.(e.clientX - rect.left, e.clientY - rect.top, dragging)
   }
 
   const onPointerMove = (e: PointerEvent) => {
@@ -189,15 +222,16 @@ export async function createPanZoomCanvas(
       return
     }
 
+    emitPointer(e)
+
     if (!dragging || e.pointerId !== pointerId) return
     world.x += e.clientX - lastX
     world.y += e.clientY - lastY
     lastX = e.clientX
     lastY = e.clientY
+    clampWorld()
 
-    const i = nearestInFocus(opts.getPoints())
-    if (i >= 0) opts.onNear?.(i)
-    else opts.onClear?.()
+    if (nearestInFocus(opts.getPoints()) < 0) opts.onClear?.()
   }
 
   const onPointerUp = (e: PointerEvent) => {
@@ -224,12 +258,8 @@ export async function createPanZoomCanvas(
 
     const points = opts.getPoints()
     const i = nearestInFocus(points)
-    if (i >= 0) {
-      snapTo(points[i])
-      opts.onSnap?.(i)
-    } else {
-      opts.onClear?.()
-    }
+    if (i >= 0) snapTo(points[i], FOCUS_ZOOM, i)
+    else opts.onClear?.()
   }
 
   const onWheel = (e: WheelEvent) => {
@@ -255,21 +285,24 @@ export async function createPanZoomCanvas(
     const k = easeOut(t)
     const z = snap.fromZ + (snap.toZ - snap.fromZ) * k
     world.scale.set(z)
-    const toX = app.screen.width / 2 - snap.point.x * z
-    const toY = app.screen.height / 2 - snap.point.y * z
-    world.x = snap.fromX + (toX - snap.fromX) * k
-    world.y = snap.fromY + (toY - snap.fromY) * k
-    if (t >= 1) snap.active = false
-
+    world.x = snap.fromX + (app.screen.width / 2 - snap.point.x * z - snap.fromX) * k
+    world.y = snap.fromY + (app.screen.height / 2 - snap.point.y * z - snap.fromY) * k
+    clampWorld()
+    if (t >= 1) {
+      const i = snap.index
+      snap.active = false
+      snap.index = -1
+      if (i >= 0) opts.onSnap?.(i)
+    }
   })
 
   return {
     app,
     world,
     snapTo,
-    nearestInFocus,
+    clampWorld,
     destroy() {
-      app.renderer.off('resize', paintGrid)
+      app.renderer.off('resize', clampWorld)
       app.canvas.removeEventListener('pointerdown', onPointerDown)
       app.canvas.removeEventListener('pointermove', onPointerMove)
       app.canvas.removeEventListener('pointerup', onPointerUp)
@@ -278,6 +311,5 @@ export async function createPanZoomCanvas(
       app.destroy(true, { children: true })
       host.replaceChildren()
     },
-
   }
 }
