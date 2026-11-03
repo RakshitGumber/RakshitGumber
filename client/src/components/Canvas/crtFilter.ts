@@ -9,9 +9,9 @@ const VIGNETTE = 0.6
 const GRAIN = 0.06
 const BEZEL_RADIUS = 0.045
 /** Black pad around the glass as a fraction of the short side. */
-const INSET = 0.045
-/** Soft rim width in CSS px — blur + fade so content doesn't clip hard. */
-const EDGE_SOFT = 28
+const INSET = 0.06
+/** Soft rim fade width in CSS px — alpha only, no spatial blur. */
+const EDGE_SOFT = 48
 
 const FRAGMENT = /* glsl */ `
 in vec2 vTextureCoord;
@@ -89,22 +89,6 @@ vec3 fringeSample(vec2 at, vec2 spread) {
   return sum / max(weight, vec3(1e-4));
 }
 
-// Rim blur — pull color from neighbors so the edge dissolves instead of clipping.
-vec3 edgeBlur(vec2 at, float amount) {
-  vec2 px = 1.0 / max(uOutputFrame.zw, vec2(1.0));
-  float r = mix(1.5, 6.0, amount);
-  vec3 sum = sampleRgb(clamp(at, 0.0, 1.0)) * 0.2;
-  sum += sampleRgb(clamp(at + vec2(r, 0.0) * px, 0.0, 1.0)) * 0.15;
-  sum += sampleRgb(clamp(at - vec2(r, 0.0) * px, 0.0, 1.0)) * 0.15;
-  sum += sampleRgb(clamp(at + vec2(0.0, r) * px, 0.0, 1.0)) * 0.15;
-  sum += sampleRgb(clamp(at - vec2(0.0, r) * px, 0.0, 1.0)) * 0.15;
-  sum += sampleRgb(clamp(at + vec2(r, r) * px * 0.7, 0.0, 1.0)) * 0.05;
-  sum += sampleRgb(clamp(at + vec2(-r, r) * px * 0.7, 0.0, 1.0)) * 0.05;
-  sum += sampleRgb(clamp(at + vec2(r, -r) * px * 0.7, 0.0, 1.0)) * 0.05;
-  sum += sampleRgb(clamp(at + vec2(-r, -r) * px * 0.7, 0.0, 1.0)) * 0.05;
-  return sum;
-}
-
 void main() {
   vec2 screenUv = toScreen(vTextureCoord);
   vec2 outDims = max(uOutputFrame.zw, vec2(1.0));
@@ -117,8 +101,8 @@ void main() {
 
   float soft = max(uEdgeSoft, 1.0);
   float dist = glassDist(uv, uBezelRadius, uInset);
-  // Wide soft mask: fully clear deep inside, black past the rim.
-  float glass = 1.0 - smoothstep(-soft, soft * 0.35, dist);
+  // Soft rim fade only — sharp picture inside, alpha falloff at the bezel.
+  float glass = 1.0 - smoothstep(-soft, soft * 0.25, dist);
   if (glass < 0.001 || uv.x < -0.02 || uv.x > 1.02 || uv.y < -0.02 || uv.y > 1.02) {
     finalColor = vec4(0.0, 0.0, 0.0, 1.0);
     return;
@@ -134,13 +118,6 @@ void main() {
   vec3 color = reach < 0.5
     ? sampleRgb(clamp(uv, 0.0, 1.0))
     : fringeSample(uv, spread);
-
-  // Near the rim, blur and darken so UI doesn't hard-pop against the bezel.
-  float edge = 1.0 - smoothstep(-soft, -soft * 0.15, dist);
-  if (edge > 0.01) {
-    color = mix(color, edgeBlur(uv, edge), edge * 0.85);
-    color *= 1.0 - edge * 0.55;
-  }
 
   // Light phosphor grain locked to scanline rows.
   float scanSize = max(uScanSize, 1.0);
@@ -192,7 +169,7 @@ export function createCrtFilter() {
     glProgram: GlProgram.from({
       vertex: defaultFilterVert,
       fragment: FRAGMENT,
-      name: 'crt-filter-v12',
+      name: 'crt-filter-v13',
     }),
     resources: { crtUniforms },
     padding: 0,
