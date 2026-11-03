@@ -107,8 +107,25 @@ export default function RetroGadgetsCanvas() {
       const world = new Container()
       instance.stage.addChild(world)
 
+      // Pixi rasterizes SVGs to bitmaps. Native viewBox is 240px, but we
+      // display much larger (and on retina), so load at a matching resolution.
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const displayPx =
+        Math.min(instance.screen.width, instance.screen.height) * 0.42 * dpr
+      const svgResolution = Math.max(2, Math.ceil(displayPx / 240))
+
       const textures = await Promise.all(
-        GADGETS.map((g) => Assets.load<Texture>(g.src)),
+        GADGETS.map((g) =>
+          Assets.load<Texture>({
+            alias: `${g.src}@${svgResolution}`,
+            src: g.src,
+            data: {
+              width: 240,
+              height: 240,
+              resolution: svgResolution,
+            },
+          }),
+        ),
       )
 
       if (destroyed) return
