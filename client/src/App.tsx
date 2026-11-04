@@ -1,3 +1,3 @@
-import { Canvas } from './components/Canvas'
+import { Shell } from './components/Shell'
 
-export const App = () => <Canvas />
+export const App = () => <Shell />

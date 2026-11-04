@@ -1,11 +1,36 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type MutableRefObject } from 'react'
 import { createPanZoomCanvas } from './controls'
 import { createFocusUi } from './focusUi'
-import { createRetroGadget, GADGETS, type RetroGadget } from '../Objects/RetroGadget'
+import { createHomeCard } from '../Board/HomeCard'
+import { createProjectCard } from '../Board/ProjectCard'
 import { createLogoSprite } from '../Overlay/logoTexture'
+import { HOME_INDEX, PROJECTS, projectByIndex } from '../../data/projects'
+import { SITE } from '../../data/site'
 
-export const Canvas = () => {
+const SPACING = 560
+
+export type BoardApi = {
+  snapToIndex: (index: number) => void
+  getFocusedIndex: () => number
+  panBy: (dx: number, dy: number) => void
+  clearFocus: () => void
+}
+
+type Props = {
+  onFocusChange: (index: number) => void
+  onActivate: (index: number) => void
+  apiRef: MutableRefObject<BoardApi | null>
+}
+
+export const Canvas = ({ onFocusChange, onActivate, apiRef }: Props) => {
   const hostRef = useRef<HTMLDivElement>(null)
+  const onFocusChangeRef = useRef(onFocusChange)
+  const onActivateRef = useRef(onActivate)
+
+  useEffect(() => {
+    onFocusChangeRef.current = onFocusChange
+    onActivateRef.current = onActivate
+  })
 
   useEffect(() => {
     const host = hostRef.current
@@ -15,25 +40,42 @@ export const Canvas = () => {
     let destroy = () => {}
 
     void (async () => {
-      const gadgets: RetroGadget[] = []
+      const home = createHomeCard()
+      const cards = PROJECTS.map((p) => createProjectCard(p, SPACING))
+      const points = () => [{ x: home.x, y: home.y }, ...cards.map((c) => ({ x: c.x, y: c.y }))]
+
       let focused = -1
       let focusUi: ReturnType<typeof createFocusUi> | null = null
       let setScreenColor = (_hex: string) => {}
 
+      const focusTone = (i: number) => {
+        if (i === HOME_INDEX) {
+          return {
+            accent: '#FFE566',
+            ink: '#FFE566',
+            title: SITE.name,
+            detail: SITE.role,
+          }
+        }
+        const p = projectByIndex(i)
+        if (!p) return null
+        return {
+          accent: p.accent,
+          ink: p.ink,
+          title: p.title,
+          detail: p.tags,
+        }
+      }
+
       const setFocus = (i: number) => {
         if (focused === i) return
-        if (focused >= 0) gadgets[focused]?.setFocused(false)
         focused = i
-        if (focused >= 0) {
-          const g = gadgets[focused]
-          g.setFocused(true)
-          focusUi?.setFocus({
-            accent: g.def.accent,
-            ink: g.def.ink,
-            title: g.def.title,
-            detail: g.def.detail,
-          })
-          setScreenColor(g.def.accent)
+        onFocusChangeRef.current(i)
+        const tone = i >= 0 ? focusTone(i) : null
+        if (tone) {
+          focusUi?.setFocus(tone)
+          // Keep glass mostly dark; only project cards tint the phosphor.
+          setScreenColor(i === HOME_INDEX ? '#0B0B0B' : tone.accent)
         } else {
           focusUi?.setFocus(null)
           setScreenColor('#0B0B0B')
@@ -41,56 +83,57 @@ export const Canvas = () => {
       }
 
       const camera = await createPanZoomCanvas(host, {
-        getPoints: () => gadgets.map((g) => ({ x: g.x, y: g.y })),
+        getPoints: points,
         onSnap: setFocus,
         onClear: () => setFocus(-1),
-        onPointer: (sx, sy, dragging) => {
-          if (focused < 0 || dragging) return
-          const { width: w, height: h } = camera.app.screen
-          const nx = Math.max(-1, Math.min(1, (sx - w / 2) / (w * 0.5)))
-          const ny = Math.max(-1, Math.min(1, (sy - h / 2) / (h * 0.5)))
-          gadgets[focused]?.setParallax(nx, ny)
-        },
+        onActivate: (i) => onActivateRef.current(i),
       })
       destroy = () => camera.destroy()
       if (dead) return destroy()
       setScreenColor = camera.setScreenColor
 
       focusUi = createFocusUi(camera.ui)
-      const logo = await createLogoSprite(160)
+      const logo = await createLogoSprite(132)
       if (dead) return destroy()
       camera.ui.addChild(logo)
 
+      camera.world.addChild(home.root)
+      for (const c of cards) camera.world.addChild(c.root)
+
       const placeUi = () => {
         const { width: w, height: h } = camera.app.screen
-        // Keep chrome inside the CRT glass pad + soft rim.
-        logo.position.set(Math.max(120, w * 0.14), Math.max(120, h * 0.15))
+        logo.position.set(Math.max(110, w * 0.14), Math.max(110, h * 0.15))
         focusUi?.layout(w, h)
       }
       placeUi()
 
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      const displayPx = Math.min(camera.app.screen.width, camera.app.screen.height) * 0.42 * dpr
-      const resolution = Math.max(2, Math.ceil(displayPx / 240))
-
-      for (const def of GADGETS) {
-        const gadget = await createRetroGadget(def, resolution)
-        if (dead) return destroy()
-        camera.world.addChild(gadget.root)
-        gadgets.push(gadget)
-      }
-
       const layout = () => {
         const { width: w, height: h } = camera.app.screen
         placeUi()
-        for (const g of gadgets) g.place(w, h)
+        home.place(SPACING)
+        for (const c of cards) c.place(SPACING)
         if (focused >= 0) {
-          const g = gadgets[focused]
-          const z = camera.world.scale.x
-          camera.world.x = w / 2 - g.x * z
-          camera.world.y = h / 2 - g.y * z
+          const pts = points()
+          const p = pts[focused]
+          if (p) {
+            const z = camera.world.scale.x
+            camera.world.x = w / 2 - p.x * z
+            camera.world.y = h / 2 - p.y * z
+          }
         }
         camera.clampWorld()
+      }
+
+      apiRef.current = {
+        snapToIndex: (index) => {
+          const pts = points()
+          const p = pts[index]
+          if (!p) return
+          camera.snapTo(p, undefined, index)
+        },
+        getFocusedIndex: () => camera.getFocusedIndex(),
+        panBy: (dx, dy) => camera.panBy(dx, dy),
+        clearFocus: () => camera.clearFocus(),
       }
 
       const onTick = (ticker: { deltaMS: number }) => {
@@ -99,9 +142,10 @@ export const Canvas = () => {
       camera.app.ticker.add(onTick)
 
       layout()
-      camera.snapTo({ x: gadgets[0].x, y: gadgets[0].y }, undefined, 0)
+      camera.snapTo({ x: home.x, y: home.y }, undefined, HOME_INDEX)
       camera.app.renderer.on('resize', layout)
       destroy = () => {
+        apiRef.current = null
         camera.app.ticker.remove(onTick)
         camera.app.renderer.off('resize', layout)
         camera.destroy()
@@ -112,12 +156,12 @@ export const Canvas = () => {
       dead = true
       destroy()
     }
-  }, [])
+  }, [apiRef])
 
   return (
     <div
       className="absolute inset-0 overflow-hidden bg-black"
-      aria-label="Retro gadgets canvas — drag to pan, scroll to zoom"
+      aria-label="Portfolio board — drag to pan, scroll to zoom, click a screen to open"
     >
       <div ref={hostRef} className="absolute inset-0" />
     </div>

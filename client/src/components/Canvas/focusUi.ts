@@ -1,7 +1,11 @@
 import { Container, Text } from 'pixi.js'
-import type { GadgetDef } from '../Objects/RetroGadget'
 
-export type FocusInfo = Pick<GadgetDef, 'accent' | 'ink' | 'title' | 'detail'>
+export type FocusInfo = {
+  accent: string
+  ink: string
+  title: string
+  detail: string
+}
 
 const ENTER_MS = 900
 const EXIT_MS = 1100
@@ -29,7 +33,7 @@ export function createFocusUi(parent: Container) {
   const title = new Text({
     text: '',
     style: {
-      fontFamily: '"Archivo Black", Impact, sans-serif',
+      fontFamily: 'Anton, Impact, sans-serif',
       fontSize: 48,
       fill: 0xffffff,
       align: 'center',
@@ -42,9 +46,9 @@ export function createFocusUi(parent: Container) {
   const detail = new Text({
     text: '',
     style: {
-      fontFamily: '"Space Grotesk", system-ui, sans-serif',
+      fontFamily: '"IBM Plex Sans Condensed", sans-serif',
       fontSize: 18,
-      fontWeight: '500',
+      fontWeight: '600',
       fill: 0xffffff,
       align: 'center',
       letterSpacing: 3,

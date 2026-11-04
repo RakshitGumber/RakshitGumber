@@ -51,6 +51,7 @@ export const createPanZoomCanvas = async (
     getPoints: () => WorldPoint[]
     onSnap?: (index: number) => void
     onClear?: () => void
+    onActivate?: (index: number) => void
     onPointer?: (sx: number, sy: number, dragging: boolean) => void
   },
 ) => {
@@ -303,6 +304,7 @@ export const createPanZoomCanvas = async (
     if (i >= 0) snapTo(points[i], FOCUS_ZOOM, i)
     else {
       mode = 'idle'
+      focusedIndex = -1
       opts.onClear?.()
     }
   }
@@ -313,6 +315,7 @@ export const createPanZoomCanvas = async (
     press = 0
     wantPress = false
     applyZoomAt(baseZoom, ax, ay)
+    focusedIndex = -1
     opts.onClear?.()
     hardClamp()
   }
@@ -322,9 +325,13 @@ export const createPanZoomCanvas = async (
   let lastY = 0
   let lastT = 0
   let pointerId: number | null = null
+  let dragDist = 0
+  let focusedIndex = -1
+  let pressFocused = -1
   const pointers = new Map<number, { x: number; y: number }>()
   let pinchDist = 0
   const samples: { dx: number; dy: number; dt: number }[] = []
+  const TAP_PX = 10
 
   const onPointerDown = (e: PointerEvent) => {
     pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
@@ -348,6 +355,8 @@ export const createPanZoomCanvas = async (
     lastX = e.clientX
     lastY = e.clientY
     lastT = performance.now()
+    dragDist = 0
+    pressFocused = focusedIndex
     samples.length = 0
     vx = 0
     vy = 0
@@ -387,6 +396,7 @@ export const createPanZoomCanvas = async (
     const dt = Math.max(1, now - lastT)
     const dx = e.clientX - lastX
     const dy = e.clientY - lastY
+    dragDist += Math.hypot(dx, dy)
     world.x += dx
     world.y += dy
     softClamp()
@@ -439,6 +449,7 @@ export const createPanZoomCanvas = async (
     const vel = releaseVelocity()
     samples.length = 0
     const speed = Math.hypot(vel.x, vel.y)
+    const wasTap = dragDist < TAP_PX
 
     if (outOfBounds()) {
       vx = vel.x
@@ -452,6 +463,20 @@ export const createPanZoomCanvas = async (
       vy = vel.y
       mode = 'fling'
       return
+    }
+
+    if (wasTap) {
+      const points = opts.getPoints()
+      const i = nearestInFocus(points)
+      if (i >= 0) {
+        if (pressFocused === i) {
+          focusedIndex = i
+          opts.onActivate?.(i)
+          return
+        }
+        snapTo(points[i], FOCUS_ZOOM, i)
+        return
+      }
     }
 
     trySnapOrClear()
@@ -573,7 +598,10 @@ export const createPanZoomCanvas = async (
       press = 0
       mode = 'idle'
       snap.index = -1
-      if (i >= 0) opts.onSnap?.(i)
+      if (i >= 0) {
+        focusedIndex = i
+        opts.onSnap?.(i)
+      }
     }
   }
 
@@ -593,6 +621,25 @@ export const createPanZoomCanvas = async (
     snapTo,
     clampWorld: hardClamp,
     setScreenColor,
+    getFocusedIndex: () => focusedIndex,
+    clearFocus() {
+      focusedIndex = -1
+      opts.onClear?.()
+    },
+    panBy(dx: number, dy: number) {
+      cancelMotion()
+      world.x += dx
+      world.y += dy
+      hardClamp()
+      const i = nearestInFocus(opts.getPoints())
+      if (i >= 0) {
+        focusedIndex = i
+        opts.onSnap?.(i)
+      } else {
+        focusedIndex = -1
+        opts.onClear?.()
+      }
+    },
     destroy() {
       app.renderer.off('resize', onResize)
       app.canvas.removeEventListener('pointerdown', onPointerDown)
