@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+:root {
+  --color-bg: #050505;
+  --color-title: #fffaf2;
+  --font-title: "Syne", "Noto Sans Devanagari", "Noto Sans JP", sans-serif;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-title);
+}

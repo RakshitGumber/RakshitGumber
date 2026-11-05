@@ -1,6 +1,10 @@
+import {Title} from '@/components/Title'
+
 const App = () => {
   return (
-    <div>App</div>
+    <main className="flex min-h-dvh items-start bg-[var(--color-bg)]">
+      <Title />
+    </main>
   )
 }
 
