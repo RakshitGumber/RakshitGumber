@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
 import { Application, Container, Sprite, Texture } from 'pixi.js'
 
 const PETAL_COUNT = 18
@@ -6,7 +7,9 @@ const OVERLAY_COUNT = 6
 const EDGE_MARGIN = 48
 const FADE_IN = 0.45
 const FADE_OUT = 0.35
-const GLOW_CHANCE = 0.12
+const GLOW_CHANCE = 0.28
+const PARALLAX_X = 24
+const PARALLAX_Y = 16
 
 const COLORS = [0xf4b6d2, 0xf8d4e4, 0xd98cb8, 0xc66fa5, 0xe6b8e0, 0xfff0f7] as const
 
@@ -82,38 +85,51 @@ const drawPetalVariant = (
   ctx.save()
   ctx.translate(w / 2, h / 2)
 
+  const path = sakuraPath(w * 0.78, h * 0.78, variant)
+
   if (glow) {
-    const bloom = ctx.createRadialGradient(0, 0, h * 0.08, 0, 0, h * 0.48)
-    bloom.addColorStop(0, `rgba(255,245,250,0.35)`)
-    bloom.addColorStop(0.45, `rgba(${r},${g},${b},0.18)`)
-    bloom.addColorStop(1, `rgba(${r},${g},${b},0)`)
-    ctx.fillStyle = bloom
-    ctx.beginPath()
-    ctx.ellipse(0, 0, w * 0.48, h * 0.48, 0, 0, Math.PI * 2)
-    ctx.fill()
+    // Soft bloom that follows the petal silhouette — no circular halo.
+    for (const [scale, blur, alpha] of [
+      [1.55, 10, 0.1],
+      [1.28, 6, 0.16],
+      [1.1, 3, 0.22],
+    ] as const) {
+      ctx.save()
+      ctx.filter = `blur(${blur}px)`
+      ctx.fillStyle = `rgba(${Math.min(255, r + 40)},${Math.min(255, g + 50)},${Math.min(255, b + 45)},${alpha})`
+      ctx.scale(scale, scale)
+      ctx.fill(sakuraPath(w * 0.78, h * 0.78, variant))
+      ctx.restore()
+    }
   }
 
-  const path = sakuraPath(w * 0.92, h * 0.92, variant)
-  const body = ctx.createLinearGradient(0, -h * 0.42, 0, h * 0.46)
-  body.addColorStop(0, `rgba(${Math.min(255, r + 35)},${Math.min(255, g + 40)},${Math.min(255, b + 35)},0.95)`)
-  body.addColorStop(0.35, `rgba(${r},${g},${b},0.9)`)
-  body.addColorStop(0.75, `rgba(${Math.max(0, r - 25)},${Math.max(0, g - 40)},${Math.max(0, b - 20)},0.82)`)
-  body.addColorStop(1, `rgba(${Math.max(0, r - 40)},${Math.max(0, g - 55)},${Math.max(0, b - 30)},0.7)`)
+  const body = ctx.createLinearGradient(0, -h * 0.36, 0, h * 0.4)
+  if (glow) {
+    body.addColorStop(0, `rgba(255,248,252,0.98)`)
+    body.addColorStop(0.3, `rgba(${Math.min(255, r + 50)},${Math.min(255, g + 55)},${Math.min(255, b + 50)},0.95)`)
+    body.addColorStop(0.7, `rgba(${r},${g},${b},0.9)`)
+    body.addColorStop(1, `rgba(${Math.max(0, r - 15)},${Math.max(0, g - 30)},${Math.max(0, b - 10)},0.75)`)
+  } else {
+    body.addColorStop(0, `rgba(${Math.min(255, r + 35)},${Math.min(255, g + 40)},${Math.min(255, b + 35)},0.95)`)
+    body.addColorStop(0.35, `rgba(${r},${g},${b},0.9)`)
+    body.addColorStop(0.75, `rgba(${Math.max(0, r - 25)},${Math.max(0, g - 40)},${Math.max(0, b - 20)},0.82)`)
+    body.addColorStop(1, `rgba(${Math.max(0, r - 40)},${Math.max(0, g - 55)},${Math.max(0, b - 30)},0.7)`)
+  }
   ctx.fillStyle = body
   ctx.fill(path)
 
   ctx.save()
   ctx.clip(path)
-  const hi = ctx.createRadialGradient(0, -h * 0.12, 0, 0, -h * 0.05, w * 0.32)
-  hi.addColorStop(0, 'rgba(255,255,255,0.4)')
+  const hi = ctx.createRadialGradient(0, -h * 0.1, 0, 0, -h * 0.04, w * 0.28)
+  hi.addColorStop(0, glow ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.4)')
   hi.addColorStop(1, 'rgba(255,255,255,0)')
   ctx.fillStyle = hi
   ctx.fillRect(-w / 2, -h / 2, w, h)
-  ctx.strokeStyle = `rgba(255,255,255,${glow ? 0.35 : 0.18})`
+  ctx.strokeStyle = `rgba(255,255,255,${glow ? 0.4 : 0.18})`
   ctx.lineWidth = Math.max(1, w * 0.02)
   ctx.beginPath()
-  ctx.moveTo(0, -h * 0.2)
-  ctx.quadraticCurveTo(w * 0.01, h * 0.05, 0, h * 0.32)
+  ctx.moveTo(0, -h * 0.18)
+  ctx.quadraticCurveTo(w * 0.01, h * 0.04, 0, h * 0.28)
   ctx.stroke()
   ctx.restore()
   ctx.restore()
@@ -124,9 +140,17 @@ const buildPetalTextures = (): Texture[] => {
   for (let variant = 0; variant < 4; variant++) {
     for (const glow of [false, true]) {
       const canvas = document.createElement('canvas')
-      canvas.width = 112
-      canvas.height = 168
-      drawPetalVariant(canvas.getContext('2d')!, 112, 168, variant, 0xf4b6d2, glow)
+      // Extra padding so soft blur isn't clipped.
+      canvas.width = glow ? 160 : 112
+      canvas.height = glow ? 220 : 168
+      drawPetalVariant(
+        canvas.getContext('2d')!,
+        canvas.width,
+        canvas.height,
+        variant,
+        0xf4b6d2,
+        glow,
+      )
       textures.push(Texture.from(canvas))
     }
   }
@@ -182,6 +206,24 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
     const host = hostRef.current
     if (!host) return
 
+    const xTo = gsap.quickTo(host, 'x', { duration: 0.55, ease: 'power3.out' })
+    const yTo = gsap.quickTo(host, 'y', { duration: 0.55, ease: 'power3.out' })
+
+    const onMove = (event: MouseEvent) => {
+      const nx = event.clientX / window.innerWidth - 0.5
+      const ny = event.clientY / window.innerHeight - 0.5
+      xTo(-nx * 2 * PARALLAX_X)
+      yTo(-ny * 2 * PARALLAX_Y)
+    }
+
+    window.addEventListener('mousemove', onMove)
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [])
+
+  useEffect(() => {
+    const host = hostRef.current
+    if (!host) return
+
     let destroyed = false
     let app: Application | null = null
     let textures: Texture[] = []
@@ -190,11 +232,11 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
     let lastTs = 0
     let visible = document.visibilityState === 'visible'
 
-    // Strong downward wind from the top; light wind from the right for drift.
-    let windX = -35
-    let windY = 210
-    let windXTarget = -35
-    let windYTarget = 210
+    // Gentler fall; light wind from the right for drift.
+    let windX = -22
+    let windY = 110
+    let windXTarget = -22
+    let windYTarget = 110
     let gustUntil = 0
     let windNoiseT = 0
 
@@ -281,11 +323,11 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
       if (now > gustUntil) {
         if (Math.random() < 0.22 * dt) {
           gustUntil = now + rand(1800, 4000)
-          windXTarget = rand(-80, -20)
-          windYTarget = rand(200, 320) // top-down gust
+          windXTarget = rand(-55, -12)
+          windYTarget = rand(100, 160)
         } else {
-          windXTarget = -35 + turmoil * 0.25
-          windYTarget = 210 + turmoil * 0.45
+          windXTarget = -22 + turmoil * 0.2
+          windYTarget = 110 + turmoil * 0.3
         }
       }
 
@@ -445,7 +487,11 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
   }, [count, overlay])
 
   return (
-    <div ref={hostRef} className={`pointer-events-none absolute inset-0 ${zClass}`} aria-hidden />
+    <div
+      ref={hostRef}
+      className={`pointer-events-none absolute inset-0 will-change-transform ${zClass}`}
+      aria-hidden
+    />
   )
 }
 
