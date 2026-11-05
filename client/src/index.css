@@ -3,7 +3,9 @@
 :root {
   --color-bg: #050505;
   --color-title: #fffaf2;
-  --font-title: "Syne", "Noto Sans Devanagari", "Noto Sans JP", sans-serif;
+  --font-en: "DM Sans", sans-serif;
+  --font-hi: "Tiro Devanagari Marathi", serif;
+  --font-ja: "UoqMunThenKhung", serif;
 }
 
 html,
