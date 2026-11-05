@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 
 const ENGLISH_LEN = 7
+const HOLD_MS = 1000
+const FLIP_OUT = 0.22
+const FLIP_IN = 0.28
 
 const LOCALES = [
   {
@@ -33,13 +36,13 @@ export const Title = () => {
 
     gsap.fromTo(
       letters,
-      { opacity: 0, y: '0.35em' },
+      { opacity: 0, rotationX: -90 },
       {
         opacity: 1,
-        y: 0,
-        duration: 0.7,
-        stagger: 0.05,
-        ease: 'power3.out',
+        rotationX: 0,
+        duration: FLIP_IN,
+        stagger: 0.03,
+        ease: 'power2.out',
       },
     )
   }, [index])
@@ -54,27 +57,30 @@ export const Title = () => {
 
       gsap.to(letters, {
         opacity: 0,
-        y: '-0.25em',
-        duration: 0.4,
-        stagger: 0.03,
+        rotationX: 90,
+        duration: FLIP_OUT,
+        stagger: 0.025,
         ease: 'power2.in',
         onComplete: () => setIndex((i) => (i + 1) % LOCALES.length),
       })
-    }, 5000)
+    }, HOLD_MS)
 
     return () => window.clearInterval(id)
   }, [])
 
   return (
     <h1
-      className="w-full px-[4vw] text-[clamp(2.5rem,11vw,9rem)] font-bold uppercase leading-none text-[var(--color-title)]"
-      style={{ fontFamily: `"${locale.font}", sans-serif` }}
+      className="w-full px-[1.5vw] text-[clamp(3.5rem,16vw,14rem)] font-bold uppercase leading-none text-[var(--color-title)] select-none"
+      style={{
+        fontFamily: `"${locale.font}", sans-serif`,
+        perspective: '900px',
+      }}
       aria-label="Rakshit"
     >
       <div
         ref={rowRef}
         className="mx-auto flex justify-between"
-        style={{ width: trackWidth }}
+        style={{ width: trackWidth, transformStyle: 'preserve-3d' }}
         lang={locale.id}
       >
         {locale.chars.map((char, i) => (
@@ -82,6 +88,7 @@ export const Title = () => {
             key={`${locale.id}-${i}`}
             data-letter
             className="inline-block will-change-transform"
+            style={{ transformOrigin: '50% 50%', transformStyle: 'preserve-3d' }}
           >
             {char}
           </span>
