@@ -58,7 +58,7 @@ const App = () => {
       >
         <div
           ref={sceneRef}
-          className="absolute inset-0 flex items-center will-change-transform"
+          className="absolute inset-0 flex items-end pb-[30dvh] will-change-transform"
           style={{ transformStyle: 'preserve-3d' }}
         >
           <PixiStage />

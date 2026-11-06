@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Application, Container, PerspectiveMesh, Sprite, Texture } from 'pixi.js'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const PETAL_COUNT = 8
 const OVERLAY_COUNT = 6
@@ -15,6 +18,14 @@ const ROAD_PARALLAX_X = 8
 const ROAD_PARALLAX_Y = 5
 const ROAD_TEX_W = 512
 const ROAD_TEX_H = 512
+const SKY_TEX_W = 640
+const SKY_TEX_H = 960
+/** Sky drifts least — farthest layer. */
+const SKY_PARALLAX_X = 4
+const SKY_PARALLAX_Y = 2.5
+/** Fraction of viewport height the road occupies at rest / after scroll. */
+const ROAD_HEIGHT_START = 0.4
+const ROAD_HEIGHT_END = 0.35
 
 const COLORS = [0xf4b6d2, 0xf8d4e4, 0xd98cb8, 0xc66fa5, 0xe6b8e0, 0xfff0f7] as const
 
@@ -94,6 +105,114 @@ const fbm = (x: number, y: number) => {
   return sum
 }
 
+/** Urban night sky — zenith navy, city light-pollution wash, sparse stars. */
+const buildNightSkyTexture = (): Texture => {
+  const canvas = document.createElement('canvas')
+  canvas.width = SKY_TEX_W
+  canvas.height = SKY_TEX_H
+  const ctx = canvas.getContext('2d')!
+  const { width: w, height: h } = canvas
+
+  const sky = ctx.createLinearGradient(0, 0, 0, h)
+  sky.addColorStop(0, '#04060f')
+  sky.addColorStop(0.28, '#070b1a')
+  sky.addColorStop(0.55, '#0c1228')
+  sky.addColorStop(0.78, '#161428')
+  sky.addColorStop(0.9, '#2a1c22')
+  sky.addColorStop(1, '#3d2818')
+  ctx.fillStyle = sky
+  ctx.fillRect(0, 0, w, h)
+
+  // Soft city glow spilling upward from the horizon.
+  const glow = ctx.createRadialGradient(w * 0.5, h * 1.05, h * 0.05, w * 0.5, h * 0.72, h * 0.55)
+  glow.addColorStop(0, 'rgba(255,170,70,0.38)')
+  glow.addColorStop(0.35, 'rgba(220,120,60,0.18)')
+  glow.addColorStop(0.7, 'rgba(120,70,90,0.08)')
+  glow.addColorStop(1, 'rgba(0,0,0,0)')
+  ctx.fillStyle = glow
+  ctx.fillRect(0, 0, w, h)
+
+  // Secondary street-glow pockets left / right.
+  for (const [cx, strength] of [
+    [0.22, 0.14],
+    [0.78, 0.12],
+    [0.5, 0.1],
+  ] as const) {
+    const pocket = ctx.createRadialGradient(w * cx, h * 0.98, 0, w * cx, h * 0.98, h * 0.35)
+    pocket.addColorStop(0, `rgba(255,190,90,${strength})`)
+    pocket.addColorStop(0.5, `rgba(180,90,50,${strength * 0.35})`)
+    pocket.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = pocket
+    ctx.fillRect(0, 0, w, h)
+  }
+
+  // Thin haze band just above the city.
+  const haze = ctx.createLinearGradient(0, h * 0.62, 0, h)
+  haze.addColorStop(0, 'rgba(40,50,80,0)')
+  haze.addColorStop(0.45, 'rgba(90,70,80,0.12)')
+  haze.addColorStop(1, 'rgba(60,40,30,0.2)')
+  ctx.fillStyle = haze
+  ctx.fillRect(0, 0, w, h)
+
+  // Distant skyline silhouettes along the horizon.
+  ctx.fillStyle = 'rgba(4,6,12,0.72)'
+  const baseY = h * 0.88
+  let x = -10
+  while (x < w + 20) {
+    const bw = 8 + hash2(x * 0.1, 3) * 28
+    const bh = 10 + hash2(x * 0.07, 9) * 55
+    const top = baseY - bh
+    ctx.fillRect(x, top, bw, bh + h * 0.14)
+    // Occasional taller tower.
+    if (hash2(x * 0.13, 1.7) > 0.82) {
+      const tw = bw * 0.45
+      const th = bh * (0.4 + hash2(x, 2.2) * 0.7)
+      ctx.fillRect(x + bw * 0.25, top - th, tw, th)
+    }
+    x += bw + 2 + hash2(x, 4.4) * 10
+  }
+
+  // Specks of window light on the skyline.
+  for (let i = 0; i < 90; i++) {
+    const lx = hash2(i * 1.7, 11) * w
+    const ly = baseY - hash2(i * 2.3, 13) * h * 0.12
+    const a = 0.15 + hash2(i, 17) * 0.55
+    ctx.fillStyle =
+      hash2(i, 19) > 0.55
+        ? `rgba(255,220,140,${a})`
+        : `rgba(170,210,255,${a * 0.7})`
+    ctx.fillRect(lx, ly, 1.2, 1.6)
+  }
+
+  // Stars — denser / brighter toward zenith, washed out near the city glow.
+  for (let i = 0; i < 280; i++) {
+    const sx = hash2(i * 3.1, 0.4) * w
+    const sy = hash2(i * 5.7, 1.9) * h * 0.86
+    const depth = 1 - sy / h
+    if (hash2(i, 2.8) > depth * 0.95 + 0.08) continue
+    const size = (0.4 + hash2(i, 7.1) * 1.6) * (0.45 + depth)
+    const alpha = (0.25 + hash2(i, 8.3) * 0.7) * (0.25 + depth * 0.85)
+    ctx.beginPath()
+    ctx.fillStyle = `rgba(230,235,255,${alpha})`
+    ctx.arc(sx, sy, size, 0, Math.PI * 2)
+    ctx.fill()
+    if (size > 1.3 && hash2(i, 9.5) > 0.7) {
+      ctx.beginPath()
+      ctx.fillStyle = `rgba(255,255,255,${alpha * 0.35})`
+      ctx.arc(sx, sy, size * 2.2, 0, Math.PI * 2)
+      ctx.fill()
+    }
+  }
+
+  return Texture.from(canvas)
+}
+
+const layoutSky = (sprite: Sprite, w: number, h: number) => {
+  sprite.width = w * 1.12
+  sprite.height = h * 1.08
+  sprite.position.set(-w * 0.06, -h * 0.03)
+}
+
 /** Night asphalt ground — noise, ambience, diffusion. */
 const buildAsphaltTexture = (): Texture => {
   const canvas = document.createElement('canvas')
@@ -149,17 +268,18 @@ const buildAsphaltTexture = (): Texture => {
   return Texture.from(canvas)
 }
 
-const layoutRoad = (mesh: PerspectiveMesh, w: number, h: number) => {
-  const horizonY = h * 0.46
-  const nearY = h * 1.28
+const layoutRoad = (mesh: PerspectiveMesh, w: number, h: number, heightFrac = ROAD_HEIGHT_START) => {
+  // Bottom band of the viewport; slight far-edge skew keeps the perspective read.
+  const horizonY = h * (1 - heightFrac)
+  const nearY = h + h * heightFrac * 0.08
   mesh.setCorners(
-    -w * 0.28,
+    -w * 0.18,
     horizonY,
+    w * 1.18,
+    horizonY - h * 0.012,
     w * 1.28,
-    horizonY * 0.94,
-    w * 1.45,
     nearY,
-    -w * 0.45,
+    -w * 0.28,
     nearY,
   )
 }
@@ -337,6 +457,9 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
     let destroyed = false
     let app: Application | null = null
     let textures: Texture[] = []
+    let skyTexture: Texture | null = null
+    let skyRoot: Container | null = null
+    let sky: Sprite | null = null
     let roadTexture: Texture | null = null
     let roadRoot: Container | null = null
     let road: PerspectiveMesh | null = null
@@ -346,6 +469,8 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
     let lastTs = 0
     let visible = document.visibilityState === 'visible'
     let removeParallax: (() => void) | null = null
+    let roadScroll: gsap.core.Tween | null = null
+    let roadHeightFrac = ROAD_HEIGHT_START
 
     // Gentler fall; light wind from the right for drift.
     let windX = -22
@@ -363,10 +488,21 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
           fg: new Container(),
         }
 
+    const applyRoadLayout = () => {
+      if (!app || !road) return
+      layoutRoad(road, app.screen.width, app.screen.height, roadHeightFrac)
+    }
+
+    const applySkyLayout = () => {
+      if (!app || !sky) return
+      layoutSky(sky, app.screen.width, app.screen.height)
+    }
+
     const resize = () => {
       if (!app) return
       app.renderer.resize(window.innerWidth, window.innerHeight)
-      if (road) layoutRoad(road, app.screen.width, app.screen.height)
+      applySkyLayout()
+      applyRoadLayout()
     }
 
     const onVisibility = () => {
@@ -561,6 +697,14 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
       app.stage.sortableChildren = true
 
       if (!overlay) {
+        skyTexture = buildNightSkyTexture()
+        skyRoot = new Container()
+        skyRoot.zIndex = -1
+        sky = new Sprite(skyTexture)
+        skyRoot.addChild(sky)
+        app.stage.addChild(skyRoot)
+        applySkyLayout()
+
         roadTexture = buildAsphaltTexture()
         roadRoot = new Container()
         roadRoot.zIndex = 0
@@ -571,7 +715,7 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
         })
         roadRoot.addChild(road)
         app.stage.addChild(roadRoot)
-        layoutRoad(road, app.screen.width, app.screen.height)
+        applyRoadLayout()
 
         petalsRoot = new Container()
         petalsRoot.zIndex = 1
@@ -583,6 +727,8 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
         petalsRoot.addChild(layers!.bg, layers!.mid, layers!.fg)
         app.stage.addChild(petalsRoot)
 
+        const skyX = gsap.quickTo(skyRoot, 'x', { duration: 0.85, ease: 'power3.out' })
+        const skyY = gsap.quickTo(skyRoot, 'y', { duration: 0.85, ease: 'power3.out' })
         const roadX = gsap.quickTo(roadRoot, 'x', { duration: 0.7, ease: 'power3.out' })
         const roadY = gsap.quickTo(roadRoot, 'y', { duration: 0.7, ease: 'power3.out' })
         const petalsX = gsap.quickTo(petalsRoot, 'x', { duration: 0.55, ease: 'power3.out' })
@@ -591,6 +737,8 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
         const onMove = (event: MouseEvent) => {
           const nx = event.clientX / window.innerWidth - 0.5
           const ny = event.clientY / window.innerHeight - 0.5
+          skyX(-nx * 2 * SKY_PARALLAX_X)
+          skyY(-ny * 2 * SKY_PARALLAX_Y)
           roadX(-nx * 2 * ROAD_PARALLAX_X)
           roadY(-ny * 2 * ROAD_PARALLAX_Y)
           petalsX(-nx * 2 * PARALLAX_X)
@@ -598,6 +746,23 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
         }
         window.addEventListener('mousemove', onMove)
         removeParallax = () => window.removeEventListener('mousemove', onMove)
+
+        const roadProxy = { height: ROAD_HEIGHT_START }
+        const hero = host.closest('section') ?? host
+        roadScroll = gsap.to(roadProxy, {
+          height: ROAD_HEIGHT_END,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: hero,
+            start: 'top top',
+            end: '+=100%',
+            scrub: 0.65,
+          },
+          onUpdate: () => {
+            roadHeightFrac = roadProxy.height
+            applyRoadLayout()
+          },
+        })
       } else if (layers) {
         layers.bg.zIndex = 1
         layers.mid.zIndex = 2
@@ -631,15 +796,22 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
       destroyed = true
       cancelAnimationFrame(rafId)
       removeParallax?.()
+      roadScroll?.scrollTrigger?.kill()
+      roadScroll?.kill()
+      roadScroll = null
       window.removeEventListener('resize', resize)
       document.removeEventListener('visibilitychange', onVisibility)
       if (app) {
         app.destroy(true)
         app = null
       }
+      sky = null
+      skyRoot = null
       road = null
       roadRoot = null
       petalsRoot = null
+      skyTexture?.destroy(true)
+      skyTexture = null
       roadTexture?.destroy(true)
       roadTexture = null
       textures.forEach((t) => t.destroy(true))

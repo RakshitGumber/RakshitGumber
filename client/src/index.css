@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #050505;
+  --color-bg: #04060f;
   --color-title: #fffaf2;
   --font-en: "DM Sans", sans-serif;
   --font-hi: "Tiro Devanagari Marathi", serif;
