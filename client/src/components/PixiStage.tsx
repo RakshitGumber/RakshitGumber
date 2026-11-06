@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { Application, Container, Sprite, Texture } from 'pixi.js'
+import { Application, Container, PerspectiveMesh, Sprite, Texture } from 'pixi.js'
 
 const PETAL_COUNT = 8
 const OVERLAY_COUNT = 6
@@ -10,6 +10,11 @@ const FADE_OUT = 0.35
 const GLOW_CHANCE = 0.28
 const PARALLAX_X = 24
 const PARALLAX_Y = 16
+/** Road sits farther back — drifts less than the title / petals. */
+const ROAD_PARALLAX_X = 8
+const ROAD_PARALLAX_Y = 5
+const ROAD_TEX_W = 512
+const ROAD_TEX_H = 512
 
 const COLORS = [0xf4b6d2, 0xf8d4e4, 0xd98cb8, 0xc66fa5, 0xe6b8e0, 0xfff0f7] as const
 
@@ -56,6 +61,108 @@ const hexToRgb = (hex: number) => ({
   g: (hex >> 8) & 255,
   b: hex & 255,
 })
+
+/** Hash noise in [0, 1] — asphalt grain. */
+const hash2 = (x: number, y: number) => {
+  const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453
+  return n - Math.floor(n)
+}
+
+const valueNoise = (x: number, y: number) => {
+  const x0 = Math.floor(x)
+  const y0 = Math.floor(y)
+  const fx = x - x0
+  const fy = y - y0
+  const u = fx * fx * (3 - 2 * fx)
+  const v = fy * fy * (3 - 2 * fy)
+  const a = hash2(x0, y0)
+  const b = hash2(x0 + 1, y0)
+  const c = hash2(x0, y0 + 1)
+  const d = hash2(x0 + 1, y0 + 1)
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v
+}
+
+const fbm = (x: number, y: number) => {
+  let amp = 0.5
+  let freq = 1
+  let sum = 0
+  for (let i = 0; i < 5; i++) {
+    sum += valueNoise(x * freq, y * freq) * amp
+    amp *= 0.5
+    freq *= 2.05
+  }
+  return sum
+}
+
+/** Night asphalt ground — noise, ambience, diffusion. */
+const buildAsphaltTexture = (): Texture => {
+  const canvas = document.createElement('canvas')
+  canvas.width = ROAD_TEX_W
+  canvas.height = ROAD_TEX_H
+  const ctx = canvas.getContext('2d')!
+  const { width: w, height: h } = canvas
+  const img = ctx.createImageData(w, h)
+  const data = img.data
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const nx = x / w
+      const ny = y / h
+      const grain = fbm(x * 0.045, y * 0.045)
+      const grit = fbm(x * 0.18, y * 0.18)
+      const blotch = fbm(x * 0.012 + 20, y * 0.012 - 8)
+
+      const edgeX = Math.min(nx, 1 - nx) * 2
+      const edgeY = Math.min(ny, 1 - ny) * 2
+      const ambience = 0.72 + 0.28 * Math.min(edgeX, edgeY) ** 0.65
+      const diffusion =
+        0.88 +
+        0.12 * Math.exp(-((nx - 0.5) ** 2 + (ny - 0.55) ** 2) * 3.2) -
+        0.08 * (1 - ny)
+
+      const shade = (0.07 + grain * 0.09 + grit * 0.04 + blotch * 0.05) * ambience * diffusion
+      const r = Math.min(255, Math.floor(shade * 255 * 0.92))
+      const g = Math.min(255, Math.floor(shade * 255 * 0.94))
+      const b = Math.min(255, Math.floor(shade * 255 * 1.02))
+      const i = (y * w + x) * 4
+      data[i] = r
+      data[i + 1] = g
+      data[i + 2] = b
+      data[i + 3] = 255
+    }
+  }
+  ctx.putImageData(img, 0, 0)
+
+  const wash = ctx.createLinearGradient(0, 0, 0, h)
+  wash.addColorStop(0, 'rgba(40,42,48,0.35)')
+  wash.addColorStop(0.45, 'rgba(18,18,20,0.08)')
+  wash.addColorStop(1, 'rgba(0,0,0,0.28)')
+  ctx.fillStyle = wash
+  ctx.fillRect(0, 0, w, h)
+
+  const vignette = ctx.createRadialGradient(w * 0.5, h * 0.4, h * 0.1, w * 0.5, h * 0.55, h * 0.75)
+  vignette.addColorStop(0, 'rgba(0,0,0,0)')
+  vignette.addColorStop(1, 'rgba(0,0,0,0.45)')
+  ctx.fillStyle = vignette
+  ctx.fillRect(0, 0, w, h)
+
+  return Texture.from(canvas)
+}
+
+const layoutRoad = (mesh: PerspectiveMesh, w: number, h: number) => {
+  const horizonY = h * 0.46
+  const nearY = h * 1.28
+  mesh.setCorners(
+    -w * 0.28,
+    horizonY,
+    w * 1.28,
+    horizonY * 0.94,
+    w * 1.45,
+    nearY,
+    -w * 0.45,
+    nearY,
+  )
+}
 
 const sakuraPath = (w: number, h: number, variant: number) => {
   const path = new Path2D()
@@ -206,6 +313,9 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
     const host = hostRef.current
     if (!host) return
 
+    // Overlay keeps host parallax; main stage parallax is applied per-layer in boot.
+    if (!overlay) return
+
     const xTo = gsap.quickTo(host, 'x', { duration: 0.55, ease: 'power3.out' })
     const yTo = gsap.quickTo(host, 'y', { duration: 0.55, ease: 'power3.out' })
 
@@ -218,7 +328,7 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
 
     window.addEventListener('mousemove', onMove)
     return () => window.removeEventListener('mousemove', onMove)
-  }, [])
+  }, [overlay])
 
   useEffect(() => {
     const host = hostRef.current
@@ -227,10 +337,15 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
     let destroyed = false
     let app: Application | null = null
     let textures: Texture[] = []
+    let roadTexture: Texture | null = null
+    let roadRoot: Container | null = null
+    let road: PerspectiveMesh | null = null
+    let petalsRoot: Container | null = null
     let petals: Petal[] = []
     let rafId = 0
     let lastTs = 0
     let visible = document.visibilityState === 'visible'
+    let removeParallax: (() => void) | null = null
 
     // Gentler fall; light wind from the right for drift.
     let windX = -22
@@ -251,6 +366,7 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
     const resize = () => {
       if (!app) return
       app.renderer.resize(window.innerWidth, window.innerHeight)
+      if (road) layoutRoad(road, app.screen.width, app.screen.height)
     }
 
     const onVisibility = () => {
@@ -443,7 +559,46 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
 
       app = next
       app.stage.sortableChildren = true
-      if (layers) {
+
+      if (!overlay) {
+        roadTexture = buildAsphaltTexture()
+        roadRoot = new Container()
+        roadRoot.zIndex = 0
+        road = new PerspectiveMesh({
+          texture: roadTexture,
+          verticesX: 24,
+          verticesY: 24,
+        })
+        roadRoot.addChild(road)
+        app.stage.addChild(roadRoot)
+        layoutRoad(road, app.screen.width, app.screen.height)
+
+        petalsRoot = new Container()
+        petalsRoot.zIndex = 1
+        petalsRoot.sortableChildren = true
+        layers!.bg.zIndex = 1
+        layers!.mid.zIndex = 2
+        layers!.fg.zIndex = 3
+        for (const c of Object.values(layers!)) c.sortableChildren = true
+        petalsRoot.addChild(layers!.bg, layers!.mid, layers!.fg)
+        app.stage.addChild(petalsRoot)
+
+        const roadX = gsap.quickTo(roadRoot, 'x', { duration: 0.7, ease: 'power3.out' })
+        const roadY = gsap.quickTo(roadRoot, 'y', { duration: 0.7, ease: 'power3.out' })
+        const petalsX = gsap.quickTo(petalsRoot, 'x', { duration: 0.55, ease: 'power3.out' })
+        const petalsY = gsap.quickTo(petalsRoot, 'y', { duration: 0.55, ease: 'power3.out' })
+
+        const onMove = (event: MouseEvent) => {
+          const nx = event.clientX / window.innerWidth - 0.5
+          const ny = event.clientY / window.innerHeight - 0.5
+          roadX(-nx * 2 * ROAD_PARALLAX_X)
+          roadY(-ny * 2 * ROAD_PARALLAX_Y)
+          petalsX(-nx * 2 * PARALLAX_X)
+          petalsY(-ny * 2 * PARALLAX_Y)
+        }
+        window.addEventListener('mousemove', onMove)
+        removeParallax = () => window.removeEventListener('mousemove', onMove)
+      } else if (layers) {
         layers.bg.zIndex = 1
         layers.mid.zIndex = 2
         layers.fg.zIndex = 3
@@ -475,12 +630,18 @@ const usePetalLayer = ({ count, overlay, zClass }: LayerOpts) => {
     return () => {
       destroyed = true
       cancelAnimationFrame(rafId)
+      removeParallax?.()
       window.removeEventListener('resize', resize)
       document.removeEventListener('visibilitychange', onVisibility)
       if (app) {
         app.destroy(true)
         app = null
       }
+      road = null
+      roadRoot = null
+      petalsRoot = null
+      roadTexture?.destroy(true)
+      roadTexture = null
       textures.forEach((t) => t.destroy(true))
       host.replaceChildren()
     }
