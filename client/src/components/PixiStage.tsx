@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { Application, Container, Sprite, Texture } from 'pixi.js'
 
-const PETAL_COUNT = 18
+const PETAL_COUNT = 8
 const OVERLAY_COUNT = 6
 const EDGE_MARGIN = 48
 const FADE_IN = 0.45
