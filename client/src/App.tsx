@@ -46,7 +46,7 @@ const PageShell = ({
 
 const HomePage = () => (
   <section className="relative h-dvh overflow-hidden">
-    <div className="absolute inset-0 flex items-end pb-[calc(4rem+100px)]">
+    <div className="absolute inset-0 flex items-center">
       <div className="relative z-10 w-full">
         <Title />
       </div>
