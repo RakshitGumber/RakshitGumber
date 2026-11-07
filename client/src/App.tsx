@@ -1,15 +1,17 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { PixiOverlay } from '@/components/PixiStage'
 import { Title } from '@/components/Title'
 import { Tuner, type Station } from '@/components/Tuner'
 
 const STATIONS: Station[] = [
-  { id: 'home', label: '88.1', title: 'Home' },
-  { id: 'work', label: '92.5', title: 'Work' },
-  { id: 'about', label: '96.3', title: 'About' },
-  { id: 'notes', label: '100.1', title: 'Notes' },
-  { id: 'contact', label: '104.7', title: 'Contact' },
+  { id: 'home', title: 'Home' },
+  { id: 'work', title: 'Work' },
+  { id: 'about', title: 'About' },
+  { id: 'notes', title: 'Notes' },
+  { id: 'contact', title: 'Contact' },
 ]
+
+const GLITCH_MS = 480
 
 const PageShell = ({
   title,
@@ -18,7 +20,7 @@ const PageShell = ({
   title: string
   copy: string
 }) => (
-  <section className="flex h-dvh items-end px-[1.5vw] pb-[calc(min(22dvh,11rem)+3rem)]">
+  <section className="flex h-dvh items-end px-[1.5vw] pb-[calc(3rem+100px)]">
     <div className="max-w-3xl">
       <p
         className="mb-3 text-[0.7rem] tracking-[0.32em] text-white/35 uppercase"
@@ -44,7 +46,7 @@ const PageShell = ({
 
 const HomePage = () => (
   <section className="relative h-dvh overflow-hidden">
-    <div className="absolute inset-0 flex items-end pb-[calc(min(22dvh,11rem)+4rem)]">
+    <div className="absolute inset-0 flex items-end pb-[calc(4rem+100px)]">
       <div className="relative z-10 w-full">
         <Title />
       </div>
@@ -83,13 +85,68 @@ const PAGES: Record<string, () => ReactNode> = {
 
 const App = () => {
   const [stationIndex, setStationIndex] = useState(0)
-  const station = STATIONS[stationIndex]
+  const [displayIndex, setDisplayIndex] = useState(0)
+  const [glitchKey, setGlitchKey] = useState(0)
+  const [glitching, setGlitching] = useState(false)
+  const timersRef = useRef<number[]>([])
+  const pageRef = useRef<HTMLDivElement>(null)
+
+  const clearTimers = () => {
+    for (const id of timersRef.current) window.clearTimeout(id)
+    timersRef.current = []
+  }
+
+  useEffect(() => () => clearTimers(), [])
+
+  useEffect(() => {
+    const el = pageRef.current
+    if (!glitching || !el) return
+    el.classList.remove('page-glitch')
+    void el.offsetWidth
+    el.classList.add('page-glitch')
+  }, [glitchKey, glitching])
+
+  const handleStationChange = (next: number) => {
+    if (next === stationIndex) return
+    setStationIndex(next)
+    clearTimers()
+    setGlitching(true)
+    setGlitchKey((key) => key + 1)
+
+    timersRef.current.push(
+      window.setTimeout(() => {
+        setDisplayIndex(next)
+      }, Math.floor(GLITCH_MS * 0.35)),
+    )
+    timersRef.current.push(
+      window.setTimeout(() => {
+        setGlitching(false)
+        pageRef.current?.classList.remove('page-glitch')
+      }, GLITCH_MS),
+    )
+  }
+
+  const station = STATIONS[displayIndex]
   const Page = PAGES[station.id]
 
   return (
     <main className="relative h-dvh overflow-hidden bg-[var(--color-bg)]">
-      {Page?.()}
-      <Tuner stations={STATIONS} index={stationIndex} onChange={setStationIndex} />
+      <div ref={pageRef} className="absolute inset-0">
+        {Page?.()}
+      </div>
+
+      {glitching ? (
+        <>
+          <div key={`overlay-${glitchKey}`} className="page-glitch-overlay" aria-hidden />
+          <div key={`static-${glitchKey}`} className="page-glitch-static" aria-hidden />
+        </>
+      ) : null}
+
+      <Tuner
+        stations={STATIONS}
+        index={stationIndex}
+        onChange={handleStationChange}
+      />
     </main>
   )
 }
