@@ -55,7 +55,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     <main class="stage">${STATIONS.map((s, i) => `<section class="st st-${s.id}" data-i="${i}" aria-label="${esc(s.label)}"></section>`).join("")}<canvas class="noise" aria-hidden="true"></canvas></main>
     <div class="deck">
       <canvas class="edge" aria-hidden="true"></canvas>
-      <div class="channel" aria-hidden="true" style="--spin:0deg">
+      <div class="channel" aria-hidden="true" style="--spin:45deg">
         <svg class="channel-svg" viewBox="0 0 200 200" aria-hidden="true">
           <defs>
             <linearGradient id="channel-glow" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -121,17 +121,18 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     channelFacePath.setAttribute("d", face);
     channelDotsPath.setAttribute("d", face);
   };
-  let channelSpin = 0;
+  const CHANNEL_SPIN_BASE = 45;
+  let channelSpin = CHANNEL_SPIN_BASE;
   const paintChannelBadge = (i: number) => {
     const [a, b] = STATIONS[i].glow;
     channelGlowA.setAttribute("stop-color", a);
     channelGlowB.setAttribute("stop-color", b);
   };
-  /** Land the hex on one of N equal stops — one stop per station. */
+  /** Land the hex on one of 6 equal stops — one stop per station — from a 45° base. */
   const spinChannelTo = (i: number) => {
     const n = STATIONS.length;
     const step = 360 / n;
-    const desired = ((i % n) + n) % n * step;
+    const desired = (CHANNEL_SPIN_BASE + (((i % n) + n) % n) * step) % 360;
     const current = ((channelSpin % 360) + 360) % 360;
     let delta = desired - current;
     if (delta > 180) delta -= 360;

@@ -44,9 +44,9 @@ const STATIONS: StationSpec[] = [
   {
     id: 'projects',
     label: 'Projects',
-    field: '#be123c',
+    field: '#ff4d6d',
     ink: '#fff1f2',
-    glow: ['#881337', '#fb7185'],
+    glow: ['#0f766e', '#2dd4bf'],
     wave: sine(1, 0.2),
     content: (
       <PageShell
@@ -58,9 +58,9 @@ const STATIONS: StationSpec[] = [
   {
     id: 'cases',
     label: 'Cases',
-    field: '#f59e0b',
+    field: '#ffb703',
     ink: '#1c1000',
-    glow: ['#b45309', '#fde047'],
+    glow: ['#1d4ed8', '#60a5fa'],
     wave: (u) => Math.tanh(3.2 * Math.sin(u)) * 0.85,
     content: (
       <PageShell
@@ -72,9 +72,9 @@ const STATIONS: StationSpec[] = [
   {
     id: 'blogs',
     label: 'Blogs',
-    field: '#0e7490',
-    ink: '#ecfeff',
-    glow: ['#155e75', '#22d3ee'],
+    field: '#00d4ff',
+    ink: '#042f2e',
+    glow: ['#ea580c', '#fb923c'],
     wave: (u) => Math.sin(u) * 0.7 + Math.sin(u * 5) * 0.25,
     content: (
       <PageShell
@@ -84,11 +84,25 @@ const STATIONS: StationSpec[] = [
     ),
   },
   {
+    id: 'about',
+    label: 'About',
+    field: '#7c3aed',
+    ink: '#f3e8ff',
+    glow: ['#ca8a04', '#facc15'],
+    wave: (u) => Math.sin(u * 2) * 0.55 + Math.sin(u) * 0.35,
+    content: (
+      <PageShell
+        title="About"
+        copy="A short signal about who I am, how I build, and what I care about."
+      />
+    ),
+  },
+  {
     id: 'contact',
     label: 'Contact',
-    field: '#172554',
-    ink: '#dbeafe',
-    glow: ['#1e3a8a', '#38bdf8'],
+    field: '#93c5fd',
+    ink: '#0c1a3a',
+    glow: ['#c2410c', '#fb923c'],
     wave: (u) => {
       const t = ((u / (Math.PI * 2)) % 1) - 0.5
       return Math.exp(-(t * t) * 40) * 1.4 - 0.4
