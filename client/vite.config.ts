@@ -16,12 +16,4 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  server: {
-    fs: {
-      allow: [
-        fileURLToPath(new URL('.', import.meta.url)),
-        fileURLToPath(new URL('../package/stations-example', import.meta.url)),
-      ],
-    },
-  },
 })

@@ -162,13 +162,28 @@
 
 /* ---------------------------------------------------------------- deck */
 
+@property --hex-border {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ffffff;
+}
+
+@property --contrast {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #000000;
+}
+
 .d-stations .deck {
   position: relative;
   flex: none;
   z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: var(--ink);
-  color: var(--field);
-  padding: 0 16px calc(8px + env(safe-area-inset-bottom));
+  color: var(--contrast);
+  padding: 4px 16px calc(6px + env(safe-area-inset-bottom));
 }
 
 
@@ -178,77 +193,76 @@
   right: 0;
   bottom: calc(100% - 1px);
   width: 100%;
-  height: 40px;
+  height: 28px;
   pointer-events: none;
 }
 
 
-.d-stations .readout {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  height: 40px;
-  padding-top: 2px;
+/* Channel badge sits on the tuner edge, left side. */
+.d-stations .channel {
+  --spin: 16deg;
+  position: absolute;
+  left: max(12px, env(safe-area-inset-left));
+  bottom: calc(100% - 48px);
+  z-index: 5;
+  width: 210px;
+  height: 210px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  transform: rotate(var(--spin));
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 
-.d-stations .freq {
-  display: inline-flex;
+.d-stations .channel-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+
+.d-stations .channel-ring-path {
+  fill: var(--hex-border);
+  transition: fill 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+
+.d-stations .channel-face-path {
+  fill: url(#channel-glow);
+}
+
+
+/* Comic Ben-Day dots on the hex fill — denser from bottom-right upward. */
+.d-stations .channel-dots-path {
+  fill: url(#channel-benday);
+}
+
+
+.d-stations .channel-num {
+  position: relative;
+  z-index: 1;
   font-family: var(--bsd);
-  font-size: 38px;
-  font-weight: calc(300 + 500 * var(--sw));
+  font-size: 42px;
+  font-weight: calc(700 + 200 * var(--sw));
   line-height: 1;
-}
-
-
-.d-stations .freq i {
-  font-style: normal;
-  display: inline-block;
-  width: 0.5em;
-  text-align: center;
-}
-
-
-.d-stations .freq i.dot {
-  width: 0.2em;
-}
-
-
-.d-stations .unit {
-  font-family: var(--bsd);
-  font-size: 16px;
-  font-weight: 650;
-}
-
-
-.d-stations .hint {
-  margin-left: auto;
-  font-size: 13px;
-  font-weight: 500;
-  transition: opacity 0.5s ease;
-}
-
-
-.d-stations .touched .hint {
-  opacity: 0;
-}
-
-
-.d-stations .h-wide {
-  display: none;
+  letter-spacing: 0.04em;
+  transform: rotate(calc(-1 * var(--spin)));
+  color: #000;
 }
 
 
 .d-stations .drum {
   position: relative;
-  height: 64px;
-  margin: 4px -16px 0;
+  width: 100%;
+  max-width: 920px;
+  height: 44px;
+  margin: 0;
   cursor: grab;
   touch-action: none;
-  background: color-mix(in srgb, var(--field) 9%, var(--ink));
-  box-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--field) 22%, transparent),
-    inset 0 -1px 0 color-mix(in srgb, var(--field) 22%, transparent);
+  background: transparent;
 }
 
 
@@ -261,61 +275,6 @@
 
 .d-stations .drum:focus-visible {
   outline-offset: -3px;
-}
-
-
-.d-stations .presets {
-  display: grid;
-  grid-template-columns: repeat(var(--n, 8), minmax(0, 1fr));
-  gap: 5px;
-}
-
-
-.d-stations .pre {
-  appearance: none;
-  border: 0;
-  background: none;
-  color: inherit;
-  min-height: 46px;
-  padding: 8px 0 2px;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: 7px;
-  cursor: pointer;
-  font: 560 14px/1 var(--bsd);
-}
-
-
-.d-stations .pre .sw {
-  height: 8px;
-  border-radius: 1.5px;
-  background: var(--c);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--field) 45%, transparent);
-  transform-origin: 50% 100%;
-  transition: transform 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
-}
-
-
-.d-stations .pre[aria-current] .sw {
-  transform: scaleY(1.6);
-}
-
-
-.d-stations .pre .lb {
-  text-align: center;
-  white-space: nowrap;
-}
-
-
-.d-stations .pre[aria-current] .lb {
-  font-weight: 850;
-}
-
-
-.d-stations .pre:active .sw {
-  transform: translateY(2px);
 }
 
 
@@ -349,54 +308,18 @@
   }
 
 
-  /* deck: readout, drum, presets on one line */
   .d-stations .deck {
-    display: grid;
-    grid-template-columns: 236px minmax(0, 1fr) min(440px, 32vw);
-    align-items: center;
-    column-gap: 28px;
-    padding: 6px var(--pad) calc(14px + env(safe-area-inset-bottom));
+    padding: 6px var(--pad) calc(10px + env(safe-area-inset-bottom));
   }
 
 
-  .d-stations .readout {
-    height: auto;
-    flex-wrap: wrap;
-    row-gap: 4px;
-  }
-
-
-  .d-stations .freq {
-    font-size: 52px;
-  }
-
-
-  .d-stations .hint {
-    flex-basis: 100%;
-    margin-left: 0;
-    font-size: 13px;
-  }
-
-
-  .d-stations .h-wide {
-    display: inline;
-  }
-
-
-  .d-stations .h-narrow {
-    display: none;
+  .d-stations .channel {
+    left: var(--pad);
   }
 
 
   .d-stations .drum {
-    height: 78px;
-    margin: 0;
-    border-radius: 4px;
-  }
-
-
-  .d-stations .pre {
-    font-size: 15px;
+    height: 52px;
   }
 
 }
@@ -420,27 +343,24 @@
 
 
   .d-stations .deck {
-    display: grid;
-    grid-template-columns: 120px minmax(0, 1fr) min(380px, 44vw);
-    column-gap: 16px;
-    align-items: center;
-    padding: 2px max(16px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    padding: 2px max(16px, env(safe-area-inset-right)) calc(4px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
   }
 
 
-  .d-stations .readout {
-    height: auto;
+  .d-stations .channel {
+    left: max(12px, env(safe-area-inset-left));
+    width: min(210px, 42vw);
+    height: min(210px, 42vw);
   }
 
 
-  .d-stations .hint {
-    display: none;
+  .d-stations .channel-num {
+    font-size: clamp(28px, 8vw, 42px);
   }
 
 
   .d-stations .drum {
-    margin: 0;
-    height: 56px;
+    height: 36px;
   }
 
 }
@@ -449,9 +369,7 @@
 /* ---------------------------------------------------------------- reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
-  .d-stations .det,
-  .d-stations .hint,
-  .d-stations .pre .sw {
+  .d-stations .det {
     transition: none;
   }
 

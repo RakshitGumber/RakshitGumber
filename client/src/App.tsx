@@ -1,6 +1,6 @@
-import { PixiOverlay } from '@/components/PixiStage'
 import { Stations, type StationSpec } from '@/components/Stations'
 import { Title } from '@/components/Title'
+import { PetalOverlay } from '@/components/petals/PetalOverlay'
 
 const sine =
   (amp = 1, harm = 0.15): StationSpec['wave'] =>
@@ -26,7 +26,7 @@ const HomePage = () => (
       <div className="rg-home-title">
         <Title />
       </div>
-      <PixiOverlay />
+      <PetalOverlay />
     </div>
   </div>
 )
@@ -37,6 +37,7 @@ const STATIONS: StationSpec[] = [
     label: 'Home',
     field: '#03040a',
     ink: '#fffaf2',
+    glow: ['#8b0000', '#ff0040'],
     wave: sine(0.9, 0.12),
     content: <HomePage />,
   },
@@ -45,6 +46,7 @@ const STATIONS: StationSpec[] = [
     label: 'Projects',
     field: '#12261c',
     ink: '#d9f2e0',
+    glow: ['#004d1a', '#00e676'],
     wave: sine(1, 0.2),
     content: (
       <PageShell
@@ -58,6 +60,7 @@ const STATIONS: StationSpec[] = [
     label: 'Cases',
     field: '#1a1528',
     ink: '#efe6ff',
+    glow: ['#2a0066', '#b400ff'],
     wave: (u) => Math.tanh(3.2 * Math.sin(u)) * 0.85,
     content: (
       <PageShell
@@ -71,6 +74,7 @@ const STATIONS: StationSpec[] = [
     label: 'Blogs',
     field: '#24180c',
     ink: '#ffe8c7',
+    glow: ['#7a1e00', '#ff6d00'],
     wave: (u) => Math.sin(u) * 0.7 + Math.sin(u * 5) * 0.25,
     content: (
       <PageShell
@@ -84,6 +88,7 @@ const STATIONS: StationSpec[] = [
     label: 'About',
     field: '#0c1c2a',
     ink: '#d7ecff',
+    glow: ['#003a66', '#00b7ff'],
     wave: (u) => Math.sin(u * 2) * 0.55 + Math.sin(u) * 0.35,
     content: (
       <PageShell
@@ -97,6 +102,7 @@ const STATIONS: StationSpec[] = [
     label: 'Contact',
     field: '#2a120f',
     ink: '#ffd7cb',
+    glow: ['#5c0000', '#ff2a00'],
     wave: (u) => {
       const t = ((u / (Math.PI * 2)) % 1) - 0.5
       return Math.exp(-(t * t) * 40) * 1.4 - 0.4

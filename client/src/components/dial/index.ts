@@ -10,15 +10,10 @@ export type MountOptions = {
   title: string;
   /** Stations on the dial, in order. */
   stations: Station[];
-  /** Starting frequency in MHz. Default 88.1 */
-  f0?: number;
-  /** MHz between neighbouring stations. Default 2.6 */
-  df?: number;
 };
 
 const TAU = Math.PI * 2;
 const frac = (x: number) => x - Math.floor(x);
-const fmt = (f: number) => (Math.round(f * 10) / 10).toFixed(1);
 
 /* ------------------------------------------------------------------ utils */
 
@@ -31,6 +26,10 @@ const hex = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16))
 const mix = (a: number[], b: number[], t: number) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
 const css = (c: number[], a = 1) => (a >= 1 ? `rgb(${c[0]},${c[1]},${c[2]})` : `rgba(${c[0]},${c[1]},${c[2]},${a})`);
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+/** Relative luminance — used to pick black/white with the most contrast. */
+const luma = (c: number[]) => (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255;
+/** Softly crossfades to black on light grounds and white on dark grounds. */
+const contrastOf = (c: number[]) => mix([255, 255, 255], [0, 0, 0], smooth(0.42, 0.58, luma(c)));
 
 /* ------------------------------------------------------------------ mount */
 
@@ -44,9 +43,6 @@ export function mount(root: HTMLElement, opts: MountOptions) {
 
   const STATIONS = MODS.map((m) => m.meta);
   const LAST = STATIONS.length - 1;
-  const F0 = opts.f0 ?? 88.1;
-  const DF = opts.df ?? 2.6;
-  const freqOf = (p: number) => F0 + p * DF;
   const RGB = STATIONS.map((s) => ({ field: hex(s.field), ink: hex(s.ink) }));
 
   root.classList.add("d-stations");
@@ -59,19 +55,36 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     <main class="stage">${STATIONS.map((s, i) => `<section class="st st-${s.id}" data-i="${i}" aria-label="${esc(s.label)}"></section>`).join("")}<canvas class="noise" aria-hidden="true"></canvas></main>
     <div class="deck">
       <canvas class="edge" aria-hidden="true"></canvas>
-      <div class="readout" aria-hidden="true">
-        <span class="freq"></span><span class="unit">MHz</span>
-        <span class="hint"><span class="h-wide">Drag, scroll or use the arrow keys</span><span class="h-narrow">Drag the dial to tune</span></span>
+      <div class="channel" aria-hidden="true" style="--spin:16deg">
+        <svg class="channel-svg" viewBox="0 0 200 200" aria-hidden="true">
+          <defs>
+            <linearGradient id="channel-glow" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop class="channel-glow-a" offset="0%" />
+              <stop class="channel-glow-b" offset="100%" />
+            </linearGradient>
+            <pattern id="channel-benday" width="14" height="14" patternUnits="userSpaceOnUse">
+              <circle cx="7" cy="7" r="3.4" fill="#000" fill-opacity="0.22" />
+            </pattern>
+            <linearGradient id="channel-dot-fade" x1="100%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" stop-color="#fff" />
+              <stop offset="18%" stop-color="#ddd" />
+              <stop offset="42%" stop-color="#444" />
+              <stop offset="68%" stop-color="#000" />
+              <stop offset="100%" stop-color="#000" />
+            </linearGradient>
+            <mask id="channel-dot-mask">
+              <rect width="200" height="200" fill="url(#channel-dot-fade)" />
+            </mask>
+          </defs>
+          <path class="channel-ring-path" />
+          <path class="channel-face-path" />
+          <path class="channel-dots-path" mask="url(#channel-dot-mask)" />
+        </svg>
+        <span class="channel-num"></span>
       </div>
-      <div class="drum" role="slider" tabindex="0" aria-label="Tuning dial" aria-valuemin="${F0}" aria-valuemax="${fmt(freqOf(LAST))}">
+      <div class="drum" role="slider" tabindex="0" aria-label="Tuning dial" aria-valuemin="1" aria-valuemax="${STATIONS.length}">
         <canvas aria-hidden="true"></canvas>
       </div>
-      <nav class="presets" aria-label="Stations" style="--n:${STATIONS.length}">
-        ${STATIONS.map(
-          (s, i) =>
-            `<button type="button" class="pre" data-i="${i}" aria-label="${esc(s.label)}, ${fmt(freqOf(i))} megahertz" style="--c:${s.field}"><span class="sw"></span><span class="lb">${esc(s.label)}</span></button>`,
-        ).join("")}
-      </nav>
     </div>
     <p class="sr" aria-live="polite"></p>
   </div>`;
@@ -86,10 +99,38 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   const edge = $<HTMLCanvasElement>(".edge");
   const drum = $<HTMLDivElement>(".drum");
   const drumCv = drum.querySelector("canvas")!;
-  const freqEl = $<HTMLSpanElement>(".freq");
-  const presetNav = $<HTMLElement>(".presets");
-  const presets = [...root.querySelectorAll<HTMLButtonElement>(".pre")];
+  const channel = $<HTMLDivElement>(".channel");
+  const channelEl = $<HTMLSpanElement>(".channel-num");
+  const channelGlowA = $<SVGStopElement>(".channel-glow-a");
+  const channelGlowB = $<SVGStopElement>(".channel-glow-b");
+  const channelRingPath = $<SVGPathElement>(".channel-ring-path");
+  const channelFacePath = $<SVGPathElement>(".channel-face-path");
+  const channelDotsPath = $<SVGPathElement>(".channel-dots-path");
   const live = $<HTMLParagraphElement>("[aria-live]");
+  const channelOf = (i: number) => String(Math.round(i) + 1).padStart(2, "0");
+
+  /* Regular pointy-top hexagon — equal radius on every corner. */
+  const regularHexPath = (cx: number, cy: number, r: number) =>
+    Array.from({ length: 6 }, (_, i) => {
+      const a = -Math.PI / 2 + (i * Math.PI) / 3;
+      return `${i ? "L" : "M"}${(cx + Math.cos(a) * r).toFixed(2)} ${(cy + Math.sin(a) * r).toFixed(2)}`;
+    }).join("") + "Z";
+  const paintChannelShape = () => {
+    const face = regularHexPath(100, 100, 80);
+    channelRingPath.setAttribute("d", regularHexPath(100, 100, 92));
+    channelFacePath.setAttribute("d", face);
+    channelDotsPath.setAttribute("d", face);
+  };
+  let channelSpin = 16;
+  const paintChannelBadge = (i: number) => {
+    const [a, b] = STATIONS[i].glow;
+    channelGlowA.setAttribute("stop-color", a);
+    channelGlowB.setAttribute("stop-color", b);
+  };
+  const spinChannel = () => {
+    channelSpin += 60;
+    channel.style.setProperty("--spin", `${channelSpin}deg`);
+  };
   const nctx = noise.getContext("2d")!;
   const ectx = edge.getContext("2d")!;
   const dctx = drumCv.getContext("2d")!;
@@ -181,6 +222,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   let nMix = 0;
   let field = RGB[0].field;
   let ink = RGB[0].ink;
+  let contrast = contrastOf(ink);
   let colourKey = "";
   const computeColour = () => {
     const q = clamp(p, 0, LAST);
@@ -189,6 +231,9 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     const m = smooth(0.47, 0.53, q - a);
     field = mix(RGB[a].field, RGB[b].field, m);
     ink = mix(RGB[a].ink, RGB[b].ink, m);
+    // Border tracks the stage; tuner marks track the deck.
+    const border = contrastOf(field);
+    contrast = contrastOf(ink);
     // the static is printed from both neighbours' inks: two stations interfering
     const near = q - a < 0.5 ? a : b;
     const far = near === a ? b : a;
@@ -202,6 +247,8 @@ export function mount(root: HTMLElement, opts: MountOptions) {
       colourKey = key;
       t.style.setProperty("--field", css(field));
       t.style.setProperty("--ink", css(ink));
+      t.style.setProperty("--contrast", css(contrast));
+      t.style.setProperty("--hex-border", css(border));
       drumDirty = true;
     }
   };
@@ -211,6 +258,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   const showSection = (i: number) => {
     if (i === shown) return;
     if (shown >= 0 && bigs[shown]) bigs[shown]!.style.translate = "";
+    const first = shown < 0;
     shown = i;
     lastS = -1;
     secs.forEach((s, j) => {
@@ -225,7 +273,8 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     });
     t.dataset.s = STATIONS[i].id;
     paintChrome(i);
-    presets.forEach((b, j) => b.toggleAttribute("aria-current", j === i));
+    paintChannelBadge(i);
+    if (!first) spinChannel();
     drumDirty = true;
   };
 
@@ -424,13 +473,6 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     }
   };
 
-  const onPreset = (e: Event) => {
-    const b = (e.target as HTMLElement).closest<HTMLButtonElement>(".pre");
-    if (!b) return;
-    touch();
-    go(Number(b.dataset.i), 0);
-  };
-
   // back and forward retune the dial
   const onPop = () => {
     const i = readStation();
@@ -457,7 +499,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
       }
     }
     fromPop = false;
-    live.textContent = `${STATIONS[i].label}, ${fmt(freqOf(i))} megahertz`;
+    live.textContent = `${STATIONS[i].label}, channel ${channelOf(i)}`;
   };
 
   /* ---- drawing ---- */
@@ -470,45 +512,45 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     c.clearRect(0, 0, w, h);
     const cx = w / 2;
     const th = pps / R; // radians per station
-    const fieldC = css(field);
+    const markC = css(contrast);
     const cur = Math.round(clamp(p, 0, LAST));
-    c.fillStyle = fieldC;
+    c.fillStyle = markC;
     c.textAlign = "center";
     c.textBaseline = "alphabetic";
-    const fs = h < 70 ? 15 : 17;
+    const fs = h < 48 ? 13 : 15;
     // ticks every 0.4 MHz: eight to a gap, a longer one halfway
     for (let k = -3; k <= LAST * 8 + 3; k++) {
-      const a = (k / 8 - p) * th;
+      const mark = k / 8;
+      const a = (mark - p) * th;
       if (Math.abs(a) > 1.5) continue;
       const cos = Math.cos(a);
       const x = cx + R * Math.sin(a);
       const major = k % 8 === 0 && k >= 0 && k <= LAST * 8;
       const mid = k % 4 === 0;
       const len = major ? h * 0.4 : mid ? h * 0.25 : h * 0.15;
-      c.globalAlpha = cos * cos * (major ? 0.95 : 0.55);
-      const tw = Math.max(0.6, (major ? 2.5 : 1.2) * cos);
+      // Soft blur by distance from the needle — selected channel stays sharp.
+      const distance = Math.abs(mark - p);
+      const blur = rm ? 0 : Math.min(distance * 0.7, 1.6);
+      const fade = Math.max(1 - distance * 0.22, 0.4);
+      c.save();
+      c.globalAlpha = cos * cos * (major ? 0.95 : 0.55) * fade;
+      if (blur > 0.04) c.filter = `blur(${blur.toFixed(2)}px)`;
+      const tw = Math.max(0.6, (major ? 2.5 : 1.2) * Math.max(0.35, cos));
       c.fillRect(x - tw / 2, 0, tw, len);
       if (major) {
         const i = k / 8;
-        c.save();
         c.translate(x, h - 8);
-        c.scale(Math.max(0.05, cos), 1);
+        // Keep label readable while still foreshortening a little.
+        c.scale(Math.max(0.55, cos), 1);
         c.font = `${i === cur ? 800 : 500} ${fs}px "Big Shoulders Display Variable"`;
         c.fillText(STATIONS[i].label, 0, 0);
-        c.restore();
       }
+      c.restore();
     }
+    c.filter = "none";
     c.globalAlpha = 1;
-    // cylinder shading: the drum turns away into the deck at both ends
-    const g = c.createLinearGradient(0, 0, w, 0);
-    g.addColorStop(0, css(ink, 1));
-    g.addColorStop(0.18, css(ink, 0));
-    g.addColorStop(0.82, css(ink, 0));
-    g.addColorStop(1, css(ink, 1));
-    c.fillStyle = g;
-    c.fillRect(0, 0, w, h);
-    // needle
-    c.fillStyle = fieldC;
+    // needle stays sharp above the blurred marks
+    c.fillStyle = markC;
     c.fillRect(cx - 1.5, 0, 3, h * 0.66);
     c.beginPath();
     c.moveTo(cx - 6.5, 0);
@@ -653,14 +695,12 @@ export function mount(root: HTMLElement, opts: MountOptions) {
       }
     }
 
-    const f = fmt(freqOf(q));
-    if (f !== readKey) {
-      readKey = f;
-      freqEl.innerHTML = [...f.padStart(5, " ")]
-        .map((ch) => `<i${ch === " " ? ' class="sp"' : ch === "." ? ' class="dot"' : ""}>${ch}</i>`)
-        .join("");
-      drum.setAttribute("aria-valuenow", f);
-      drum.setAttribute("aria-valuetext", `${STATIONS[nearest].label}, ${f} megahertz`);
+    const ch = channelOf(nearest);
+    if (ch !== readKey) {
+      readKey = ch;
+      channelEl.textContent = ch;
+      drum.setAttribute("aria-valuenow", String(nearest + 1));
+      drum.setAttribute("aria-valuetext", `${STATIONS[nearest].label}, channel ${ch}`);
     }
     if (drumDirty || mode !== "rest" || boot < 1) {
       drawDrum();
@@ -730,7 +770,6 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   t.addEventListener("pointercancel", onUp);
   t.addEventListener("click", onClickCapture, true);
   t.addEventListener("wheel", onWheel, { passive: false });
-  presetNav.addEventListener("click", onPreset);
   window.addEventListener("keydown", onKey);
   window.addEventListener("popstate", onPop);
   reduce.addEventListener("change", onReduce);
@@ -738,8 +777,12 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   document.fonts?.addEventListener("loadingdone", onFonts);
 
   if (interacted) t.classList.add("touched");
+  const start = Math.round(p);
+  channelEl.textContent = channelOf(start);
+  paintChannelShape();
+  paintChannelBadge(start);
   measure();
-  showSection(Math.round(p));
+  showSection(start);
   computeColour();
   wake();
 
@@ -756,7 +799,6 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     t.removeEventListener("pointercancel", onUp);
     t.removeEventListener("click", onClickCapture, true);
     t.removeEventListener("wheel", onWheel);
-    presetNav.removeEventListener("click", onPreset);
     window.removeEventListener("keydown", onKey);
     window.removeEventListener("popstate", onPop);
     reduce.removeEventListener("change", onReduce);
