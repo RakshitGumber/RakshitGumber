@@ -2,8 +2,6 @@
 // the deck, the static and the URL. A station owns everything inside its own
 // <section>, and nothing outside it.
 
-export type Wave = (u: number) => number;
-
 export type Meta = {
   id: string;
   /** Short name on the drum. */
@@ -14,8 +12,6 @@ export type Meta = {
   ink: string;
   /** Bold gradient on the channel badge: [from, to]. */
   glow: [string, string];
-  /** Shape of the triangle edge rising from the deck. u is radians. */
-  wave: Wave;
 };
 
 export type Ctx = {

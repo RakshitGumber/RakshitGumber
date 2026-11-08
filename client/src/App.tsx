@@ -2,11 +2,6 @@ import { Stations, type StationSpec } from '@/components/Stations'
 import { Title } from '@/components/Title'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
 
-const sine =
-  (amp = 1, harm = 0.15): StationSpec['wave'] =>
-  (u) =>
-    Math.sin(u) * amp + Math.sin(u * 3) * harm
-
 const PageShell = ({
   title,
   copy,
@@ -38,7 +33,6 @@ const STATIONS: StationSpec[] = [
     field: '#000000',
     ink: '#fffaf2',
     glow: ['#8b0000', '#ff0040'],
-    wave: sine(0.9, 0.12),
     content: <HomePage />,
   },
   {
@@ -47,7 +41,6 @@ const STATIONS: StationSpec[] = [
     field: '#ff4d6d',
     ink: '#fff1f2',
     glow: ['#0f766e', '#2dd4bf'],
-    wave: sine(1, 0.2),
     content: (
       <PageShell
         title="Projects"
@@ -61,7 +54,6 @@ const STATIONS: StationSpec[] = [
     field: '#ffb703',
     ink: '#1c1000',
     glow: ['#1d4ed8', '#60a5fa'],
-    wave: (u) => Math.tanh(3.2 * Math.sin(u)) * 0.85,
     content: (
       <PageShell
         title="Case Studies"
@@ -75,7 +67,6 @@ const STATIONS: StationSpec[] = [
     field: '#00d4ff',
     ink: '#042f2e',
     glow: ['#ea580c', '#fb923c'],
-    wave: (u) => Math.sin(u) * 0.7 + Math.sin(u * 5) * 0.25,
     content: (
       <PageShell
         title="Blogs"
@@ -89,7 +80,6 @@ const STATIONS: StationSpec[] = [
     field: '#7c3aed',
     ink: '#f3e8ff',
     glow: ['#ca8a04', '#facc15'],
-    wave: (u) => Math.sin(u * 2) * 0.55 + Math.sin(u) * 0.35,
     content: (
       <PageShell
         title="About"
@@ -103,10 +93,6 @@ const STATIONS: StationSpec[] = [
     field: '#93c5fd',
     ink: '#0c1a3a',
     glow: ['#c2410c', '#fb923c'],
-    wave: (u) => {
-      const t = ((u / (Math.PI * 2)) % 1) - 0.5
-      return Math.exp(-(t * t) * 40) * 1.4 - 0.4
-    },
     content: (
       <PageShell
         title="Contact"

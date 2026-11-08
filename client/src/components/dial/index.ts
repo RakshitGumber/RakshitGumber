@@ -3,7 +3,7 @@ import "@fontsource-variable/hanken-grotesk";
 import "./shell.css";
 import type { Handle, Station } from "./types";
 
-export type { Handle, Station, Meta, Ctx, Wave } from "./types";
+export type { Handle, Station, Meta, Ctx } from "./types";
 
 export type MountOptions = {
   /** Screen-reader title for the page. */
@@ -568,6 +568,35 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     c.fill();
   };
 
+  // Page 1 is flat; then ocean → right-triangle → reverse-scallop, repeating.
+  const edgeWave = (i: number, u: number) => {
+    if (i <= 0) return 0;
+    const kind = (i - 1) % 3;
+    if (kind === 0) return 0.5 + 0.5 * Math.sin(u);
+    const t = ((u / TAU) % 1 + 1) % 1;
+    // Vertical rise, then hypotenuse down to the tuner.
+    if (kind === 1) return 1 - t;
+    // Soft bites from a high crest — reverse of the ocean hills.
+    const d = (t - 0.5) * 2;
+    return 1 - Math.sqrt(Math.max(0, 1 - d * d));
+  };
+
+  // Comic Ben-Day tile — reused for the shadow wave print texture.
+  let benday: CanvasPattern | null = null;
+  const bendayPattern = () => {
+    if (benday) return benday;
+    const tile = document.createElement("canvas");
+    tile.width = 14;
+    tile.height = 14;
+    const tc = tile.getContext("2d")!;
+    tc.fillStyle = "rgba(0,0,0,0.34)";
+    tc.beginPath();
+    tc.arc(7, 7, 3.1, 0, TAU);
+    tc.fill();
+    benday = ectx.createPattern(tile, "repeat");
+    return benday;
+  };
+
   const drawEdge = (n: number, sigma: number) => {
     const c = ectx;
     const w = W;
@@ -579,33 +608,49 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     const a = Math.floor(q);
     const b = Math.min(LAST, a + 1);
     const m = q - a;
-    const wa = STATIONS[a].wave;
-    const wb = STATIONS[b].wave;
-    const amp = 10 + 18 * n + 4 * (1 - sigma);
-    const ph = rm ? 0 : clock * 1.4;
-    // Black scalene teeth rising from the tuner into the page.
-    c.fillStyle = "#000";
-    c.beginPath();
-    c.moveTo(0, h);
-    let x = 0;
-    let i = 0;
-    while (x < w + 8) {
-      // Uneven bases + off-center peaks → sharp scalene triangles.
-      const span = 16 + ((i * 29 + 11) % 23);
-      const lean = 0.18 + ((i * 17 + 5) % 13) / 28;
-      const peakX = x + span * lean;
-      const u = (peakX / 140) * TAU + ph;
-      let y = wa(u) * (1 - m) + wb(u) * m;
-      if (n > 0.01) y += (Math.random() - 0.5) * 2.2 * n;
-      const peakY = Math.max(1, h - (10 + clamp(y, -1.4, 1.6) * amp + (i % 4) * 2.2));
-      c.lineTo(x, h);
-      c.lineTo(peakX, peakY);
-      c.lineTo(x + span, h);
-      x += span;
-      i++;
+    // Flat on page 1; amplitude eases in as we leave it.
+    const presence = a <= 0 ? m : 1;
+    if (presence < 0.001 && n < 0.01) return;
+    // ~2.5 periods across the viewport — long enough that only 2–3 waves show.
+    const wavelength = Math.max(120, w / 2.5);
+    const amp = (h * 0.72 + 10 * n + 4 * (1 - sigma)) * Math.max(presence, n * 0.35);
+    const step = Math.max(1, Math.round(1.25 / Math.max(dpr, 1)));
+
+    const trace = (xOff: number, ampScale: number) => {
+      c.beginPath();
+      c.moveTo(0, h);
+      for (let x = 0; x <= w; x += step) {
+        const u = ((x + xOff) / wavelength) * TAU;
+        const y = edgeWave(a, u) * (1 - m) + edgeWave(b, u) * m;
+        c.lineTo(x, h - clamp(y, 0, 1.15) * amp * ampScale);
+      }
+      c.lineTo(w, h);
+      c.closePath();
+    };
+
+    // Shadow wave: shifted on x, darker than the page field, printed with Ben-Day dots.
+    const shade = mix(field, [0, 0, 0], 0.58);
+    const xShift = wavelength * 0.3;
+    const shadowA = 0.55 * Math.max(presence, 0.2);
+    trace(xShift, 0.94);
+    c.globalAlpha = shadowA;
+    c.fillStyle = css(shade);
+    c.fill();
+    c.save();
+    trace(xShift, 0.94);
+    c.clip();
+    const dots = bendayPattern();
+    if (dots) {
+      c.globalAlpha = 0.42 * Math.max(presence, 0.2);
+      c.fillStyle = dots;
+      c.fillRect(0, 0, w, h);
     }
-    c.lineTo(w, h);
-    c.closePath();
+    c.restore();
+    c.globalAlpha = 1;
+
+    // Front wave sits on the tuner in solid black.
+    trace(0, 1);
+    c.fillStyle = "#000";
     c.fill();
   };
 
@@ -724,9 +769,8 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     drawEdge(n, sig);
     drawNoise(n);
 
-    // the edge waveform breathes while idle; with reduced motion we stop when still
     const busy = mode !== "rest" || boot < 1 || n > 0.01;
-    if (busy || !rm) wake();
+    if (busy) wake();
   };
   const wake = () => {
     if (!raf) raf = requestAnimationFrame(frame);

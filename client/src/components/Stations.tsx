@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { mount, type Meta, type Station, type Wave } from '@/components/dial'
+import { mount, type Meta, type Station } from '@/components/dial'
 
 export type StationSpec = {
   id: string
@@ -8,7 +8,6 @@ export type StationSpec = {
   field: string
   ink: string
   glow: [string, string]
-  wave: Wave
   content: ReactNode
 }
 
@@ -35,7 +34,6 @@ export const Stations = ({ title, stations }: StationsProps) => {
         field: spec.field,
         ink: spec.ink,
         glow: spec.glow,
-        wave: spec.wave,
       }
       return {
         meta,
