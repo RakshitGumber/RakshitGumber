@@ -1,0 +1,335 @@
+/* Mail: an airmail envelope, addressed to him. Literata, paper, two inks of
+   the post: airmail red and blue. */
+
+.d-stations .st-mail {
+  --ml-paper: #f4eee1;
+  --ml-red: #c9373b;
+  --ml-blue: #24418f;
+  --ml-ink: #1c2747;
+  --ml-serif: "Literata Variable", Georgia, serif;
+  padding: calc(var(--top) - 8px) 12px 18px;
+  color: var(--ml-ink);
+}
+
+.d-stations .st-mail p,
+.d-stations .st-mail h2,
+.d-stations .st-mail address {
+  margin: 0;
+}
+
+/* the envelope: airmail stripes, a paper face inset from them */
+.d-stations .st-mail .ml-env {
+  position: relative;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 26px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(var(--ml-paper), var(--ml-paper)) padding-box,
+    repeating-linear-gradient(
+        -45deg,
+        var(--ml-red) 0 14px,
+        var(--ml-paper) 14px 21px,
+        var(--ml-blue) 21px 35px,
+        var(--ml-paper) 35px 42px
+      )
+      border-box;
+  border: 10px solid transparent;
+  box-shadow: 0 18px 40px -26px rgba(28, 39, 71, 0.55);
+}
+
+.d-stations .st-mail .ml-air {
+  align-self: flex-start;
+  padding: 3px 8px 4px;
+  border: 1.5px solid var(--ml-blue);
+  color: var(--ml-blue);
+  font: italic 500 13px/1 var(--ml-serif);
+}
+
+/* ---- the stamp, perforated, with his portrait ---- */
+
+.d-stations .st-mail .ml-stampwrap {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  rotate: 3deg;
+  opacity: 0;
+  translate: 0 -14px;
+  scale: 1.15;
+}
+
+.d-stations .st-mail .ml-stamp {
+  /* perforations only along the edge: solid middle + a row of holes */
+  --hole: 3.4px;
+  --step: 10px;
+  width: 90px;
+  height: 100px;
+  box-sizing: border-box;
+  padding: 8px;
+  display: grid;
+  place-items: center;
+  background: #fbf7ee;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    radial-gradient(circle var(--hole), #0000 96%, #000) calc(var(--step) / -2) calc(var(--step) / -2) / var(--step) var(--step);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    radial-gradient(circle var(--hole), #0000 96%, #000) calc(var(--step) / -2) calc(var(--step) / -2) / var(--step) var(--step);
+  filter: drop-shadow(0 1px 1px rgba(28, 39, 71, 0.25));
+}
+
+.d-stations .st-mail .ml-stamp img {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  background: #e6dcc6;
+  outline: 6px solid #e6dcc6;
+}
+
+.d-stations .st-mail .ml-stampwrap.in {
+  opacity: 1;
+  translate: 0 0;
+  scale: 1;
+  transition:
+    opacity 0.2s,
+    translate 0.5s cubic-bezier(0.2, 1.6, 0.4, 1),
+    scale 0.5s cubic-bezier(0.2, 1.6, 0.4, 1);
+}
+
+/* the postmark lands across the stamp and onto the envelope */
+.d-stations .st-mail .ml-post {
+  position: absolute;
+  left: -26px;
+  top: 44px;
+  width: 170px;
+  height: 85px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--ml-ink);
+  stroke-width: 2;
+  opacity: 0;
+  rotate: -9deg;
+  pointer-events: none;
+  mix-blend-mode: multiply;
+}
+
+.d-stations .st-mail .ml-post text {
+  fill: var(--ml-ink);
+  stroke: none;
+  font: 600 9.5px/1 var(--hk);
+  letter-spacing: 0.02em;
+}
+
+.d-stations .st-mail .ml-post .ml-date {
+  font-size: 10.5px;
+}
+
+.d-stations .st-mail .ml-stampwrap.sent .ml-post {
+  animation: ml-slam 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) forwards;
+}
+
+@keyframes ml-slam {
+  0% {
+    opacity: 0;
+    scale: 1.5;
+  }
+  60% {
+    opacity: 0.85;
+    scale: 0.97;
+  }
+  100% {
+    opacity: 0.78;
+    scale: 1;
+  }
+}
+
+/* ---- the face of the envelope ---- */
+
+.d-stations .st-mail .ml-head {
+  margin-top: 28px;
+  max-width: 7em;
+  font: 640 clamp(40px, 13cqw, 104px) / 0.98 var(--ml-serif);
+  letter-spacing: -0.03em;
+  color: var(--ml-ink);
+  text-wrap: balance;
+}
+
+.d-stations .st-mail .ml-to {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  font: normal 400 19px/1.3 var(--ml-serif);
+}
+
+.d-stations .st-mail .ml-k {
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ml-red);
+}
+
+.d-stations .st-mail .ml-name {
+  font-weight: 600;
+}
+
+.d-stations .st-mail .ml-to a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.d-stations .st-mail .ml-mail {
+  font-weight: 560;
+  font-size: 21px;
+  color: var(--ml-blue) !important;
+}
+
+.d-stations .st-mail .ml-act {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.d-stations .st-mail .ml-copy {
+  appearance: none;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 2px solid var(--ml-blue);
+  border-radius: 999px;
+  background: var(--ml-blue);
+  color: var(--ml-paper);
+  font: 600 16px/1 var(--hk);
+  cursor: pointer;
+  transition: translate 0.15s;
+}
+
+.d-stations .st-mail .ml-copy:active {
+  translate: 0 1px;
+}
+
+.d-stations .st-mail .ml-note {
+  display: none;
+  font: italic 400 15px/1.4 var(--ml-serif);
+}
+
+.d-stations .st-mail .ml-ps {
+  margin-top: 18px;
+  max-width: 24em;
+  font: italic 420 16px/1.4 var(--ml-serif);
+}
+
+.d-stations .st-mail .ml-ps span {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--ml-red);
+}
+
+/* ---- desktop: a proper envelope, landscape ---- */
+
+@media (min-width: 960px) {
+  .d-stations .st-mail {
+    padding: calc(var(--top) - 12px) var(--pad) 30px;
+  }
+
+  .d-stations .st-mail .ml-env {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 40px 56px 40px;
+    border-width: 14px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    column-gap: 48px;
+  }
+
+  .d-stations .st-mail .ml-air {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    font-size: 15px;
+  }
+
+  .d-stations .st-mail .ml-stampwrap {
+    top: 34px;
+    right: 44px;
+  }
+
+  .d-stations .st-mail .ml-stamp {
+    width: 160px;
+    height: 180px;
+    padding: 12px;
+  }
+
+  .d-stations .st-mail .ml-stamp img {
+    width: 128px;
+    height: 128px;
+    outline-width: 8px;
+  }
+
+  .d-stations .st-mail .ml-post {
+    left: -150px;
+    top: 50px;
+    width: 300px;
+    height: 150px;
+  }
+
+  .d-stations .st-mail .ml-head {
+    grid-column: 1;
+    grid-row: 2 / span 3;
+    align-self: end;
+    margin: 0;
+    font-size: clamp(64px, 8.4cqw, 128px);
+  }
+
+  .d-stations .st-mail .ml-to {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    font-size: 22px;
+  }
+
+  .d-stations .st-mail .ml-mail {
+    font-size: 26px;
+  }
+
+  .d-stations .st-mail .ml-act {
+    grid-column: 2;
+    grid-row: 3;
+    margin-top: 22px;
+  }
+
+  .d-stations .st-mail .ml-note {
+    display: block;
+  }
+
+  .d-stations .st-mail .ml-ps {
+    grid-column: 2;
+    grid-row: 4;
+    margin-top: 26px;
+    font-size: 18px;
+  }
+}
+
+@container (max-height: 560px) {
+  .d-stations .st-mail .ml-air,
+  .d-stations .st-mail .ml-ps {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .d-stations .st-mail .ml-stampwrap.in {
+    transition: none;
+  }
+
+  .d-stations .st-mail .ml-stampwrap.sent .ml-post {
+    animation: none;
+    opacity: 0.78;
+  }
+}

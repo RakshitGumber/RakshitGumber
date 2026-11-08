@@ -1,0 +1,80 @@
+/* Opinions: ported from Tuner, where he liked it. */
+
+.d-stations .st-opinions .label {
+  font-family: var(--bsd);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.d-stations .st-opinions .quote {
+  margin-top: 4cqh;
+  font-size: min(15.5cqw, 9.6cqh);
+  line-height: 0.9;
+  text-wrap: balance;
+  max-width: 14ch;
+}
+
+.d-stations .st-opinions .ctl {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  bottom: 34px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.d-stations .st-opinions .count {
+  font-family: var(--bsd);
+  font-weight: 650;
+  font-size: 19px;
+  margin-right: auto;
+}
+
+.d-stations .st-opinions button {
+  appearance: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: 600 16px/1 var(--hk);
+  min-height: 44px;
+  padding: 0 12px;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  cursor: pointer;
+}
+
+.d-stations .st-opinions button:last-child {
+  margin-right: -12px;
+}
+
+@media (min-width: 960px) {
+  .d-stations .st-opinions .label {
+    font-size: 26px;
+  }
+
+  .d-stations .st-opinions .quote {
+    margin-top: 5cqh;
+    font-size: min(9.6cqw, 15cqh);
+    max-width: 17ch;
+  }
+
+  .d-stations .st-opinions .ctl {
+    left: auto;
+    right: var(--pad);
+    bottom: 48px;
+    gap: 12px;
+  }
+
+  .d-stations .st-opinions .count {
+    margin-right: 12px;
+  }
+
+}
+
+/* A new opinion re-tunes: the weight falls to a hairline and comes back. */
+.d-stations .st-opinions .quote {
+  font-weight: calc(100 + 800 * var(--sw) * (1 - 0.9 * var(--dip, 0)));
+}

@@ -1,0 +1,458 @@
+/* Stations: the shared frame. Each station styles itself in st/<id>.css. */
+
+.d-stations .t {
+  --field: #34503d;
+  --ink: #f9f3e8;
+  --s: 0;
+  --sw: 0;
+  --bsd: "Big Shoulders Display Variable", "Arial Narrow", sans-serif;
+  --hk: "Hanken Grotesk Variable", system-ui, sans-serif;
+  --pad: 20px;
+  --top: max(60px, calc(env(safe-area-inset-top) + 48px));
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--hk);
+  touch-action: pan-y pinch-zoom;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+.d-stations .t.dragging {
+  cursor: grabbing;
+}
+
+
+.d-stations .sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  margin: 0;
+}
+
+
+.d-stations :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+
+.d-stations a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+
+.d-stations a:hover {
+  text-decoration-thickness: 2px;
+}
+
+
+/* ---------------------------------------------------------------- stage */
+
+.d-stations .stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  container-type: size;
+}
+
+
+.d-stations .noise {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+
+.d-stations .st {
+  position: absolute;
+  inset: 0;
+  padding: var(--top) var(--pad) 38px;
+  opacity: 0;
+  visibility: hidden;
+}
+
+
+.d-stations .st.on {
+  visibility: visible;
+}
+
+
+.d-stations .st p,
+.d-stations .st h2,
+.d-stations .st blockquote {
+  margin: 0;
+}
+
+
+.d-stations .big {
+  font-family: var(--bsd);
+  font-weight: calc(100 + 800 * var(--sw));
+  line-height: 0.84;
+  letter-spacing: -0.005em;
+  will-change: translate;
+}
+
+
+.d-stations .lead {
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 560;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+  max-width: 26em;
+}
+
+
+.d-stations .body {
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 420;
+  max-width: 34em;
+  text-wrap: pretty;
+}
+
+
+.d-stations .what {
+  font-family: var(--bsd);
+  font-size: 19px;
+  font-weight: 650;
+  line-height: 1;
+}
+
+
+/* details print in only once the station is locked */
+.d-stations .det {
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+
+.d-stations .locked .det {
+  opacity: 1;
+}
+
+
+.d-stations .art {
+  image-rendering: pixelated;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+}
+
+
+/* ---------------------------------------------------------------- deck */
+
+.d-stations .deck {
+  position: relative;
+  flex: none;
+  z-index: 4;
+  background: var(--ink);
+  color: var(--field);
+  padding: 0 16px calc(8px + env(safe-area-inset-bottom));
+}
+
+
+.d-stations .edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 1px);
+  width: 100%;
+  height: 40px;
+  pointer-events: none;
+}
+
+
+.d-stations .readout {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  height: 40px;
+  padding-top: 2px;
+}
+
+
+.d-stations .freq {
+  display: inline-flex;
+  font-family: var(--bsd);
+  font-size: 38px;
+  font-weight: calc(300 + 500 * var(--sw));
+  line-height: 1;
+}
+
+
+.d-stations .freq i {
+  font-style: normal;
+  display: inline-block;
+  width: 0.5em;
+  text-align: center;
+}
+
+
+.d-stations .freq i.dot {
+  width: 0.2em;
+}
+
+
+.d-stations .unit {
+  font-family: var(--bsd);
+  font-size: 16px;
+  font-weight: 650;
+}
+
+
+.d-stations .hint {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 500;
+  transition: opacity 0.5s ease;
+}
+
+
+.d-stations .touched .hint {
+  opacity: 0;
+}
+
+
+.d-stations .h-wide {
+  display: none;
+}
+
+
+.d-stations .drum {
+  position: relative;
+  height: 64px;
+  margin: 4px -16px 0;
+  cursor: grab;
+  touch-action: none;
+  background: color-mix(in srgb, var(--field) 9%, var(--ink));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--field) 22%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--field) 22%, transparent);
+}
+
+
+.d-stations .drum canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+
+.d-stations .drum:focus-visible {
+  outline-offset: -3px;
+}
+
+
+.d-stations .presets {
+  display: grid;
+  grid-template-columns: repeat(var(--n, 8), minmax(0, 1fr));
+  gap: 5px;
+}
+
+
+.d-stations .pre {
+  appearance: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  min-height: 46px;
+  padding: 8px 0 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 7px;
+  cursor: pointer;
+  font: 560 14px/1 var(--bsd);
+}
+
+
+.d-stations .pre .sw {
+  height: 8px;
+  border-radius: 1.5px;
+  background: var(--c);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--field) 45%, transparent);
+  transform-origin: 50% 100%;
+  transition: transform 0.45s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+
+.d-stations .pre[aria-current] .sw {
+  transform: scaleY(1.6);
+}
+
+
+.d-stations .pre .lb {
+  text-align: center;
+  white-space: nowrap;
+}
+
+
+.d-stations .pre[aria-current] .lb {
+  font-weight: 850;
+}
+
+
+.d-stations .pre:active .sw {
+  transform: translateY(2px);
+}
+
+
+/* ---------------------------------------------------------------- desktop */
+
+@media (min-width: 960px) {
+  .d-stations .t {
+    --pad: clamp(32px, 4vw, 64px);
+    --top: 56px;
+  }
+
+
+  .d-stations .lead {
+    font-size: 28px;
+    line-height: 1.18;
+  }
+
+
+  .d-stations .body {
+    font-size: 17px;
+  }
+
+
+  .d-stations .what {
+    font-size: 22px;
+  }
+
+
+  .d-stations .st {
+    padding-bottom: 48px;
+  }
+
+
+  /* deck: readout, drum, presets on one line */
+  .d-stations .deck {
+    display: grid;
+    grid-template-columns: 236px minmax(0, 1fr) min(440px, 32vw);
+    align-items: center;
+    column-gap: 28px;
+    padding: 6px var(--pad) calc(14px + env(safe-area-inset-bottom));
+  }
+
+
+  .d-stations .readout {
+    height: auto;
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+
+  .d-stations .freq {
+    font-size: 52px;
+  }
+
+
+  .d-stations .hint {
+    flex-basis: 100%;
+    margin-left: 0;
+    font-size: 13px;
+  }
+
+
+  .d-stations .h-wide {
+    display: inline;
+  }
+
+
+  .d-stations .h-narrow {
+    display: none;
+  }
+
+
+  .d-stations .drum {
+    height: 78px;
+    margin: 0;
+    border-radius: 4px;
+  }
+
+
+  .d-stations .pre {
+    font-size: 15px;
+  }
+
+}
+
+
+@container (max-height: 380px) {
+  .d-stations .st .body,
+  .d-stations .st .what {
+    display: none;
+  }
+
+}
+
+
+/* landscape phones: the deck folds into one row so the broadcast keeps its room */
+@media (max-height: 520px) and (orientation: landscape) and (max-width: 959px) {
+  .d-stations .t {
+    --top: max(16px, env(safe-area-inset-top));
+    --pad: max(20px, env(safe-area-inset-left));
+  }
+
+
+  .d-stations .deck {
+    display: grid;
+    grid-template-columns: 120px minmax(0, 1fr) min(380px, 44vw);
+    column-gap: 16px;
+    align-items: center;
+    padding: 2px max(16px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  }
+
+
+  .d-stations .readout {
+    height: auto;
+  }
+
+
+  .d-stations .hint {
+    display: none;
+  }
+
+
+  .d-stations .drum {
+    margin: 0;
+    height: 56px;
+  }
+
+}
+
+
+/* ---------------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .d-stations .det,
+  .d-stations .hint,
+  .d-stations .pre .sw {
+    transition: none;
+  }
+
+}

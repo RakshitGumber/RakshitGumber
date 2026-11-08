@@ -1,17 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { PixiOverlay } from '@/components/PixiStage'
+import { Stations, type StationSpec } from '@/components/Stations'
 import { Title } from '@/components/Title'
-import { Tuner, type Station } from '@/components/Tuner'
 
-const STATIONS: Station[] = [
-  { id: 'home', title: 'Home' },
-  { id: 'work', title: 'Work' },
-  { id: 'about', title: 'About' },
-  { id: 'notes', title: 'Notes' },
-  { id: 'contact', title: 'Contact' },
-]
-
-const GLITCH_MS = 480
+const sine =
+  (amp = 1, harm = 0.15): StationSpec['wave'] =>
+  (u) =>
+    Math.sin(u) * amp + Math.sin(u * 3) * harm
 
 const PageShell = ({
   title,
@@ -20,135 +14,102 @@ const PageShell = ({
   title: string
   copy: string
 }) => (
-  <section className="flex h-dvh items-end px-[1.5vw] pb-[calc(3rem+100px)]">
-    <div className="max-w-3xl">
-      <p
-        className="mb-3 text-[0.7rem] tracking-[0.32em] text-white/35 uppercase"
-        style={{ fontFamily: 'var(--font-en)' }}
-      >
-        Tuned in
-      </p>
-      <h2
-        className="text-[clamp(2.5rem,8vw,6rem)] leading-none font-bold text-[var(--color-title)]"
-        style={{ fontFamily: 'var(--font-en)' }}
-      >
-        {title}
-      </h2>
-      <p
-        className="mt-5 max-w-xl text-[clamp(1rem,2.2vw,1.25rem)] leading-relaxed text-white/55"
-        style={{ fontFamily: 'var(--font-en)' }}
-      >
-        {copy}
-      </p>
-    </div>
-  </section>
+  <div className="rg-page">
+    <h2 className="big">{title}</h2>
+    <p className="lead det">{copy}</p>
+  </div>
 )
 
 const HomePage = () => (
-  <section className="relative h-dvh overflow-hidden">
-    <div className="absolute inset-0 flex items-center">
-      <div className="relative z-10 w-full">
+  <div className="rg-home" data-own>
+    <div className="rg-home-stage">
+      <div className="rg-home-title">
         <Title />
       </div>
       <PixiOverlay />
     </div>
-  </section>
+  </div>
 )
 
-const PAGES: Record<string, () => ReactNode> = {
-  home: () => <HomePage />,
-  work: () => (
-    <PageShell
-      title="Work"
-      copy="Selected projects and experiments land here as this station settles."
-    />
-  ),
-  about: () => (
-    <PageShell
-      title="About"
-      copy="A short signal about who I am, how I build, and what I care about."
-    />
-  ),
-  notes: () => (
-    <PageShell
-      title="Notes"
-      copy="Fragments, process, and writing — tuned in when this frequency locks."
-    />
-  ),
-  contact: () => (
-    <PageShell
-      title="Contact"
-      copy="Reach out on this channel when you want to start something together."
-    />
-  ),
-}
-
-const App = () => {
-  const [stationIndex, setStationIndex] = useState(0)
-  const [displayIndex, setDisplayIndex] = useState(0)
-  const [glitchKey, setGlitchKey] = useState(0)
-  const [glitching, setGlitching] = useState(false)
-  const timersRef = useRef<number[]>([])
-  const pageRef = useRef<HTMLDivElement>(null)
-
-  const clearTimers = () => {
-    for (const id of timersRef.current) window.clearTimeout(id)
-    timersRef.current = []
-  }
-
-  useEffect(() => () => clearTimers(), [])
-
-  useEffect(() => {
-    const el = pageRef.current
-    if (!glitching || !el) return
-    el.classList.remove('page-glitch')
-    void el.offsetWidth
-    el.classList.add('page-glitch')
-  }, [glitchKey, glitching])
-
-  const handleStationChange = (next: number) => {
-    if (next === stationIndex) return
-    setStationIndex(next)
-    clearTimers()
-    setGlitching(true)
-    setGlitchKey((key) => key + 1)
-
-    timersRef.current.push(
-      window.setTimeout(() => {
-        setDisplayIndex(next)
-      }, Math.floor(GLITCH_MS * 0.35)),
-    )
-    timersRef.current.push(
-      window.setTimeout(() => {
-        setGlitching(false)
-        pageRef.current?.classList.remove('page-glitch')
-      }, GLITCH_MS),
-    )
-  }
-
-  const station = STATIONS[displayIndex]
-  const Page = PAGES[station.id]
-
-  return (
-    <main className="relative h-dvh overflow-hidden bg-[var(--color-bg)]">
-      <div ref={pageRef} className="absolute inset-0">
-        {Page?.()}
-      </div>
-
-      {glitching ? (
-        <>
-          <div key={`overlay-${glitchKey}`} className="page-glitch-overlay" aria-hidden />
-          <div key={`static-${glitchKey}`} className="page-glitch-static" aria-hidden />
-        </>
-      ) : null}
-
-      <Tuner
-        stations={STATIONS}
-        index={stationIndex}
-        onChange={handleStationChange}
+const STATIONS: StationSpec[] = [
+  {
+    id: 'home',
+    label: 'Home',
+    field: '#03040a',
+    ink: '#fffaf2',
+    wave: sine(0.9, 0.12),
+    content: <HomePage />,
+  },
+  {
+    id: 'projects',
+    label: 'Projects',
+    field: '#12261c',
+    ink: '#d9f2e0',
+    wave: sine(1, 0.2),
+    content: (
+      <PageShell
+        title="Projects"
+        copy="Selected projects and experiments land here as this station settles."
       />
-    </main>
-  )
-}
+    ),
+  },
+  {
+    id: 'cases',
+    label: 'Cases',
+    field: '#1a1528',
+    ink: '#efe6ff',
+    wave: (u) => Math.tanh(3.2 * Math.sin(u)) * 0.85,
+    content: (
+      <PageShell
+        title="Case Studies"
+        copy="Deeper looks at how problems were framed, built, and shipped."
+      />
+    ),
+  },
+  {
+    id: 'blogs',
+    label: 'Blogs',
+    field: '#24180c',
+    ink: '#ffe8c7',
+    wave: (u) => Math.sin(u) * 0.7 + Math.sin(u * 5) * 0.25,
+    content: (
+      <PageShell
+        title="Blogs"
+        copy="Fragments, process, and writing — tuned in when this frequency locks."
+      />
+    ),
+  },
+  {
+    id: 'about',
+    label: 'About',
+    field: '#0c1c2a',
+    ink: '#d7ecff',
+    wave: (u) => Math.sin(u * 2) * 0.55 + Math.sin(u) * 0.35,
+    content: (
+      <PageShell
+        title="About"
+        copy="A short signal about who I am, how I build, and what I care about."
+      />
+    ),
+  },
+  {
+    id: 'contact',
+    label: 'Contact',
+    field: '#2a120f',
+    ink: '#ffd7cb',
+    wave: (u) => {
+      const t = ((u / (Math.PI * 2)) % 1) - 0.5
+      return Math.exp(-(t * t) * 40) * 1.4 - 0.4
+    },
+    content: (
+      <PageShell
+        title="Contact"
+        copy="Reach out on this channel when you want to start something together."
+      />
+    ),
+  },
+]
+
+const App = () => <Stations title="Rakshit Gumber" stations={STATIONS} />
 
 export default App
