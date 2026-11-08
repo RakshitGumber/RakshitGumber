@@ -1,15 +1,21 @@
 import { Stations, type StationSpec } from '@/components/Stations'
 import { Title } from '@/components/Title'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
+import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 
 const PageShell = ({
   title,
   copy,
+  fx,
+  accents,
 }: {
   title: string
   copy: string
+  fx: ComicFxVariant
+  accents: [string, string]
 }) => (
   <div className="rg-page">
+    <ComicFx variant={fx} accents={accents} />
     <h2 className="big">{title}</h2>
     <p className="lead det">{copy}</p>
   </div>
@@ -45,6 +51,8 @@ const STATIONS: StationSpec[] = [
       <PageShell
         title="Projects"
         copy="Selected projects and experiments land here as this station settles."
+        fx="radial-burst"
+        accents={['#0f766e', '#2dd4bf']}
       />
     ),
   },
@@ -58,6 +66,8 @@ const STATIONS: StationSpec[] = [
       <PageShell
         title="Case Studies"
         copy="Deeper looks at how problems were framed, built, and shipped."
+        fx="edge-focus"
+        accents={['#1d4ed8', '#60a5fa']}
       />
     ),
   },
@@ -71,6 +81,8 @@ const STATIONS: StationSpec[] = [
       <PageShell
         title="Blogs"
         copy="Fragments, process, and writing — tuned in when this frequency locks."
+        fx="corner-flare"
+        accents={['#ea580c', '#fb923c']}
       />
     ),
   },
@@ -84,6 +96,8 @@ const STATIONS: StationSpec[] = [
       <PageShell
         title="About"
         copy="A short signal about who I am, how I build, and what I care about."
+        fx="speed-streaks"
+        accents={['#ca8a04', '#facc15']}
       />
     ),
   },
@@ -97,6 +111,8 @@ const STATIONS: StationSpec[] = [
       <PageShell
         title="Contact"
         copy="Reach out on this channel when you want to start something together."
+        fx="slash-burst"
+        accents={['#c2410c', '#fb923c']}
       />
     ),
   },
