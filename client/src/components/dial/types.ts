@@ -8,13 +8,13 @@ export type Meta = {
   id: string;
   /** Short name on the drum. */
   label: string;
-  /** The page colour while this station is on air. Also the deck's tick colour. */
+  /** The page colour while this station is on air. */
   field: string;
-  /** The deck's background colour while this station is on air. */
+  /** Page text colour while this station is on air. */
   ink: string;
   /** Bold gradient on the channel badge: [from, to]. */
   glow: [string, string];
-  /** Shape of the waveform drawn along the top of the deck. u is radians. */
+  /** Shape of the triangle edge rising from the deck. u is radians. */
   wave: Wave;
 };
 

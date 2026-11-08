@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #03040a;
+  --color-bg: #000000;
   --color-title: #fffaf2;
   --font-en: "DM Sans", sans-serif;
   --font-block: "Rubik Mono One", monospace;

@@ -231,9 +231,9 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     const m = smooth(0.47, 0.53, q - a);
     field = mix(RGB[a].field, RGB[b].field, m);
     ink = mix(RGB[a].ink, RGB[b].ink, m);
-    // Border tracks the stage; tuner marks track the deck.
+    // Border tracks the stage; tuner is always black so marks stay light.
     const border = contrastOf(field);
-    contrast = contrastOf(ink);
+    contrast = [255, 255, 255];
     // the static is printed from both neighbours' inks: two stations interfering
     const near = q - a < 0.5 ? a : b;
     const far = near === a ? b : a;
@@ -573,21 +573,28 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     const m = q - a;
     const wa = STATIONS[a].wave;
     const wb = STATIONS[b].wave;
-    const base = h * 0.62;
-    const amp = 3.4 + 11 * n + 2 * (1 - sigma);
+    const amp = 10 + 18 * n + 4 * (1 - sigma);
     const ph = rm ? 0 : clock * 1.4;
-    c.fillStyle = css(ink);
+    // Black scalene teeth rising from the tuner into the page.
+    c.fillStyle = "#000";
     c.beginPath();
     c.moveTo(0, h);
-    // drawn as 4px steps: the signal of a pixel artist's radio
-    const PX = 4;
-    for (let x = 0; x <= w + PX; x += PX) {
-      const u = ((x + PX / 2) / 150) * TAU + ph;
+    let x = 0;
+    let i = 0;
+    while (x < w + 8) {
+      // Uneven bases + off-center peaks → sharp scalene triangles.
+      const span = 16 + ((i * 29 + 11) % 23);
+      const lean = 0.18 + ((i * 17 + 5) % 13) / 28;
+      const peakX = x + span * lean;
+      const u = (peakX / 140) * TAU + ph;
       let y = wa(u) * (1 - m) + wb(u) * m;
       if (n > 0.01) y += (Math.random() - 0.5) * 2.2 * n;
-      const yy = Math.round((base - clamp(y, -1.6, 1.6) * amp) / PX) * PX;
-      c.lineTo(x, yy);
-      c.lineTo(x + PX, yy);
+      const peakY = Math.max(1, h - (10 + clamp(y, -1.4, 1.6) * amp + (i % 4) * 2.2));
+      c.lineTo(x, h);
+      c.lineTo(peakX, peakY);
+      c.lineTo(x + span, h);
+      x += span;
+      i++;
     }
     c.lineTo(w, h);
     c.closePath();
