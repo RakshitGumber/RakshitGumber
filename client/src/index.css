@@ -178,9 +178,10 @@ body {
   filter: drop-shadow(0 0 12px color-mix(in srgb, var(--fx-b) 60%, transparent));
 }
 
-.rg-page > *:not(.rg-comic) {
+.rg-page > .lead {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+  max-width: 22em;
 }
 
 .rg-home-title {
@@ -198,6 +199,7 @@ body {
 }
 
 .rg-page {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -206,7 +208,82 @@ body {
   padding-bottom: 0.5rem;
 }
 
-.rg-page .big {
-  font-size: clamp(3rem, 10vw, 7rem);
-  max-width: 12ch;
+/* Titles are the page focus — sit above comic fx. */
+.d-stations .rg-page-title.big {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  pointer-events: none;
+  font-family: var(--font-en);
+  font-weight: 700;
+  font-size: clamp(4.5rem, 20vw, 13rem);
+  line-height: 0.88;
+  letter-spacing: 0.02em;
+}
+
+.d-stations .rg-page-title--left {
+  text-align: left;
+}
+
+.d-stations .rg-page-title--center {
+  text-align: center;
+}
+
+.d-stations .rg-page-title--right {
+  text-align: right;
+}
+
+/* Projects / About — white outline. */
+.d-stations .rg-page-title--hero {
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0.022em #fff;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 40%,
+    rgba(0, 0, 0, 0.55) 72%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 40%,
+    rgba(0, 0, 0, 0.55) 72%,
+    transparent 100%
+  );
+}
+
+/* Cases — dark filled type. */
+.d-stations .rg-page-title--ink {
+  color: #1c1000;
+  -webkit-text-fill-color: #1c1000;
+}
+
+/* Blogs — soft ghost fill. */
+.d-stations .rg-page-title--ghost {
+  color: currentColor;
+  opacity: 0.32;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 45%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 45%,
+    transparent 100%
+  );
+}
+
+/* Contact — solid black type. */
+.d-stations .rg-page-title--solid {
+  color: #000;
+  -webkit-text-fill-color: #000;
 }

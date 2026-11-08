@@ -3,20 +3,29 @@ import { Title } from '@/components/Title'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 
+type TitleAlign = 'left' | 'center' | 'right'
+type TitleStyle = 'hero' | 'ink' | 'ghost' | 'solid'
+
 const PageShell = ({
   title,
   copy,
   fx,
   accents,
+  align,
+  titleStyle,
 }: {
   title: string
   copy: string
   fx: ComicFxVariant
   accents: [string, string]
+  align: TitleAlign
+  titleStyle: TitleStyle
 }) => (
-  <div className="rg-page">
+  <div className={`rg-page rg-page--${titleStyle}`}>
     <ComicFx variant={fx} accents={accents} />
-    <h2 className="big">{title}</h2>
+    <h2 className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}>
+      {title}
+    </h2>
     <p className="lead det">{copy}</p>
   </div>
 )
@@ -53,6 +62,8 @@ const STATIONS: StationSpec[] = [
         copy="Selected projects and experiments land here as this station settles."
         fx="radial-burst"
         accents={['#0f766e', '#2dd4bf']}
+        align="left"
+        titleStyle="hero"
       />
     ),
   },
@@ -64,10 +75,12 @@ const STATIONS: StationSpec[] = [
     glow: ['#1d4ed8', '#60a5fa'],
     content: (
       <PageShell
-        title="Case Studies"
+        title="Research"
         copy="Deeper looks at how problems were framed, built, and shipped."
         fx="edge-focus"
         accents={['#1d4ed8', '#60a5fa']}
+        align="center"
+        titleStyle="ink"
       />
     ),
   },
@@ -83,6 +96,8 @@ const STATIONS: StationSpec[] = [
         copy="Fragments, process, and writing — tuned in when this frequency locks."
         fx="corner-flare"
         accents={['#ea580c', '#fb923c']}
+        align="right"
+        titleStyle="ghost"
       />
     ),
   },
@@ -98,6 +113,8 @@ const STATIONS: StationSpec[] = [
         copy="A short signal about who I am, how I build, and what I care about."
         fx="speed-streaks"
         accents={['#ca8a04', '#facc15']}
+        align="left"
+        titleStyle="hero"
       />
     ),
   },
@@ -113,6 +130,8 @@ const STATIONS: StationSpec[] = [
         copy="Reach out on this channel when you want to start something together."
         fx="slash-burst"
         accents={['#c2410c', '#fb923c']}
+        align="right"
+        titleStyle="solid"
       />
     ),
   },
