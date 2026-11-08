@@ -200,7 +200,7 @@
 
 /* Channel badge sits on the tuner edge, left side. */
 .d-stations .channel {
-  --spin: 16deg;
+  --spin: 0deg;
   position: absolute;
   left: max(12px, env(safe-area-inset-left));
   bottom: calc(100% - 48px);

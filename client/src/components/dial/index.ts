@@ -55,7 +55,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     <main class="stage">${STATIONS.map((s, i) => `<section class="st st-${s.id}" data-i="${i}" aria-label="${esc(s.label)}"></section>`).join("")}<canvas class="noise" aria-hidden="true"></canvas></main>
     <div class="deck">
       <canvas class="edge" aria-hidden="true"></canvas>
-      <div class="channel" aria-hidden="true" style="--spin:16deg">
+      <div class="channel" aria-hidden="true" style="--spin:0deg">
         <svg class="channel-svg" viewBox="0 0 200 200" aria-hidden="true">
           <defs>
             <linearGradient id="channel-glow" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -121,14 +121,22 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     channelFacePath.setAttribute("d", face);
     channelDotsPath.setAttribute("d", face);
   };
-  let channelSpin = 16;
+  let channelSpin = 0;
   const paintChannelBadge = (i: number) => {
     const [a, b] = STATIONS[i].glow;
     channelGlowA.setAttribute("stop-color", a);
     channelGlowB.setAttribute("stop-color", b);
   };
-  const spinChannel = () => {
-    channelSpin += 60;
+  /** Land the hex on one of N equal stops — one stop per station. */
+  const spinChannelTo = (i: number) => {
+    const n = STATIONS.length;
+    const step = 360 / n;
+    const desired = ((i % n) + n) % n * step;
+    const current = ((channelSpin % 360) + 360) % 360;
+    let delta = desired - current;
+    if (delta > 180) delta -= 360;
+    if (delta <= -180) delta += 360;
+    channelSpin += delta;
     channel.style.setProperty("--spin", `${channelSpin}deg`);
   };
   const nctx = noise.getContext("2d")!;
@@ -258,7 +266,6 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   const showSection = (i: number) => {
     if (i === shown) return;
     if (shown >= 0 && bigs[shown]) bigs[shown]!.style.translate = "";
-    const first = shown < 0;
     shown = i;
     lastS = -1;
     secs.forEach((s, j) => {
@@ -274,7 +281,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     t.dataset.s = STATIONS[i].id;
     paintChrome(i);
     paintChannelBadge(i);
-    if (!first) spinChannel();
+    spinChannelTo(i);
     drumDirty = true;
   };
 
