@@ -301,7 +301,7 @@
   right: -48px;
   bottom: calc(100% - 1px);
   z-index: 2;
-  height: 120px;
+  height: 140px;
   pointer-events: none;
   translate: var(--px) var(--py);
   transition: translate 0.9s cubic-bezier(0.16, 1, 0.3, 1);
@@ -322,10 +322,10 @@
   --py: 0px;
   position: absolute;
   left: max(12px, env(safe-area-inset-left));
-  bottom: calc(100% - 48px);
+  bottom: calc(100% - 64px);
   z-index: 5;
-  width: 210px;
-  height: 210px;
+  width: 150px;
+  height: 150px;
   display: grid;
   place-items: center;
   pointer-events: none;
@@ -348,19 +348,21 @@
 
 
 .d-stations .channel-ring-path {
-  fill: var(--hex-border);
+  /* Same printed shade as the ridge shadow, so the badge sits in the tuner. */
+  fill: color-mix(in srgb, var(--field) 42%, #000);
   transition: fill 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 
 .d-stations .channel-face-path {
-  fill: url(#channel-glow);
+  fill: #000;
 }
 
 
 /* Comic Ben-Day dots on the hex fill — denser from bottom-right upward. */
 .d-stations .channel-dots-path {
   fill: url(#channel-benday);
+  opacity: 0.5;
 }
 
 
@@ -368,12 +370,13 @@
   position: relative;
   z-index: 1;
   font-family: var(--bsd);
-  font-size: 42px;
+  font-size: 34px;
   font-weight: calc(700 + 200 * var(--sw));
   line-height: 1;
   letter-spacing: 0.04em;
   transform: rotate(calc(-1 * var(--spin)));
-  color: #000;
+  color: var(--field);
+  transition: color 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
 
@@ -467,13 +470,13 @@
 
   .d-stations .channel {
     left: max(12px, env(safe-area-inset-left));
-    width: min(210px, 42vw);
-    height: min(210px, 42vw);
+    width: min(150px, 34vw);
+    height: min(150px, 34vw);
   }
 
 
   .d-stations .channel-num {
-    font-size: clamp(28px, 8vw, 42px);
+    font-size: clamp(24px, 7vw, 34px);
   }
 
 

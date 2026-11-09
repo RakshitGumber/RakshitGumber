@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-/** Thin ring that follows the pointer, stretches on travel, morphs on panels. */
+/** Thin ring that follows the pointer, stretches on travel, wraps hovered frames. */
 export const CursorRing = () => {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -25,8 +25,9 @@ export const CursorRing = () => {
       if (hot instanceof HTMLElement) hot.classList.remove('is-hot')
       hot = null
       el.classList.remove('is-morph')
-      el.style.removeProperty('--cursor-clip')
       el.style.removeProperty('--cursor-glow')
+      el.style.removeProperty('width')
+      el.style.removeProperty('height')
     }
 
     const onMove = (event: MouseEvent) => {
@@ -45,20 +46,14 @@ export const CursorRing = () => {
       const next = hit?.closest?.('[data-cursor-morph]') ?? null
       if (next === hot) return
 
-      if (hot instanceof HTMLElement) hot.classList.remove('is-hot')
+      clearHot()
       hot = next
 
       if (next instanceof HTMLElement) {
-        const clip = next.dataset.cursorClip
         const glow = next.dataset.cursorGlow || getComputedStyle(next).getPropertyValue('--panel').trim()
         next.classList.add('is-hot')
         el.classList.add('is-morph')
-        if (clip) el.style.setProperty('--cursor-clip', clip)
         if (glow) el.style.setProperty('--cursor-glow', glow)
-      } else {
-        el.classList.remove('is-morph')
-        el.style.removeProperty('--cursor-clip')
-        el.style.removeProperty('--cursor-glow')
       }
     }
 
@@ -69,16 +64,23 @@ export const CursorRing = () => {
     }
 
     const tick = () => {
-      x += (tx - x) * 0.38
-      y += (ty - y) * 0.38
+      // On a frame, glide to its centre and take its size; otherwise trail the pointer.
+      const box = hot instanceof HTMLElement ? hot.getBoundingClientRect() : null
+      const gx = box ? box.left + box.width / 2 : tx
+      const gy = box ? box.top + box.height / 2 : ty
+      x += (gx - x) * 0.38
+      y += (gy - y) * 0.38
 
-      const speed = Math.hypot(vx, vy)
-      const angle = Math.atan2(vy, vx) * (180 / Math.PI)
-      const stretch = el.classList.contains('is-morph')
-        ? Math.min(speed * 0.03, 0.25)
-        : Math.min(speed * 0.065, 0.9)
-
-      el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${angle}deg) scale(${1 + stretch}, ${1 - stretch * 0.5})`
+      if (box) {
+        el.style.width = `${box.width + 14}px`
+        el.style.height = `${box.height + 14}px`
+        el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`
+      } else {
+        const speed = Math.hypot(vx, vy)
+        const angle = Math.atan2(vy, vx) * (180 / Math.PI)
+        const stretch = Math.min(speed * 0.065, 0.9)
+        el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${angle}deg) scale(${1 + stretch}, ${1 - stretch * 0.5})`
+      }
 
       vx *= 0.82
       vy *= 0.82

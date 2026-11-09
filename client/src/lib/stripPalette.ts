@@ -18,18 +18,3 @@ export const BLOG_PALETTE: StripPalette = {
   ink: '#042028',
   paper: '#ffffff',
 }
-
-/**
- * Sharp comic panel silhouettes for cursor morph.
- * Panels themselves stay rectangular so they share gutters.
- */
-export const PANEL_CLIPS = [
-  'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-  'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-  'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-  'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-  'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-  'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-  'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-  'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
-] as const

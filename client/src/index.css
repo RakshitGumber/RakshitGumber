@@ -32,7 +32,6 @@ html.rg-cursor-on * {
 
 .rg-cursor {
   --cursor-glow: #fff;
-  --cursor-clip: circle(50% at 50% 50%);
   position: fixed;
   top: 0;
   left: 0;
@@ -47,7 +46,7 @@ html.rg-cursor-on * {
   /* Inverts against whatever sits under the ring. */
   mix-blend-mode: difference;
   filter: contrast(1.35);
-  will-change: transform, width, height, clip-path, filter;
+  will-change: transform, width, height, filter;
   transition:
     width 160ms ease,
     height 160ms ease,
@@ -59,16 +58,17 @@ html.rg-cursor-on * {
 }
 
 .rg-cursor.is-morph {
-  width: 52px;
-  height: 78px;
+  border-width: 4px;
   border-radius: 0;
-  border-color: color-mix(in srgb, var(--cursor-glow) 80%, #fff);
-  background: color-mix(in srgb, var(--cursor-glow) 32%, transparent);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  border-color: var(--cursor-glow);
+  background: transparent;
   mix-blend-mode: normal;
-  filter: drop-shadow(0 0 10px color-mix(in srgb, var(--cursor-glow) 75%, transparent))
-    drop-shadow(0 0 22px color-mix(in srgb, var(--cursor-glow) 45%, transparent));
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, #fff 55%, transparent);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--cursor-glow) 70%, transparent));
+  transition:
+    width 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-radius 160ms ease,
+    border-color 160ms ease;
 }
 
 .rg-home,
@@ -261,337 +261,379 @@ html.rg-cursor-on * {
   max-width: 22em;
 }
 
-/* A4 comic page — wide centered paper, white margins + gutters. */
-.rg-strip-stack {
+/* Comic book page — A4 sheet, 80vw wide, frames laid out per count (1–8). */
+.rg-book-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding-bottom: clamp(7rem, 22vh, 12rem);
+  padding: 1rem 0 clamp(9rem, 26vh, 15rem);
 }
 
-.rg-strip-page {
+.rg-book {
   --paper: #ffffff;
-  --margin: clamp(0.7rem, 1.6vw, 1.15rem);
-  --gutter: clamp(0.45rem, 1vw, 0.7rem);
+  --shadow-off: clamp(16px, 2.6vw, 40px);
   position: relative;
+  width: 80vw;
+  aspect-ratio: 210 / 297;
+  margin-inline: auto;
+}
+
+/* Offset print shadow — same darkened field + Ben-Day dots as the tuner ridge. */
+.rg-book::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  translate: var(--shadow-off) var(--shadow-off);
+  background-color: color-mix(in srgb, var(--field) 42%, #000);
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.34) 3.1px, transparent 3.3px);
+  background-size: 14px 14px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.rg-sheet {
+  --margin: clamp(1.25rem, 5.5vw, 5rem);
+  --gutter: clamp(0.6rem, 1.4vw, 1.3rem);
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  width: min(100%, 80vw);
-  max-width: 56rem;
-  margin-inline: auto;
+  height: 100%;
   padding: var(--margin);
-  background: var(--paper);
-  color: var(--panel-ink, #1a1020);
-  border: none;
-  border-radius: 0;
-  /* A4 portrait */
-  aspect-ratio: 210 / 297;
-  min-height: 28rem;
-  box-shadow:
-    0 1px 0 color-mix(in srgb, #000 6%, transparent),
-    0 18px 40px color-mix(in srgb, #000 16%, transparent),
-    0 0 0 1px color-mix(in srgb, #000 8%, transparent);
   box-sizing: border-box;
-  overflow: hidden;
+  background: var(--paper);
+  color: #111;
+  transform-origin: left center;
+  animation: rg-sheet-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.rg-strip {
+@keyframes rg-sheet-in {
+  from {
+    opacity: 0;
+    transform: perspective(1800px) rotateY(-18deg) translateX(-3%);
+  }
+}
+
+.rg-folio {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--margin) * 0.35);
+  translate: -50% 0;
+  font-family: var(--font-block);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  opacity: 0.55;
+}
+
+.rg-frames {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  gap: var(--gutter);
   margin: 0;
   padding: 0;
   list-style: none;
-  display: grid;
-  gap: var(--gutter);
-  flex: 1 1 auto;
-  min-height: 0;
-  width: 100%;
-  background: var(--paper);
-  box-sizing: border-box;
 }
 
-.rg-strip-page-foot {
-  flex: 0 0 auto;
-  margin-top: var(--gutter);
-  padding-top: var(--gutter);
-  border-top: var(--gutter) solid var(--paper);
-  background: var(--paper);
+.rg-frame:nth-child(1) { grid-area: a; }
+.rg-frame:nth-child(2) { grid-area: b; }
+.rg-frame:nth-child(3) { grid-area: c; }
+.rg-frame:nth-child(4) { grid-area: d; }
+.rg-frame:nth-child(5) { grid-area: e; }
+.rg-frame:nth-child(6) { grid-area: f; }
+.rg-frame:nth-child(7) { grid-area: g; }
+.rg-frame:nth-child(8) { grid-area: h; }
+
+/* The first frame is always the splash. */
+.rg-frames--1 {
+  grid-template: "a" 1fr / 1fr;
 }
 
-.rg-strip-panel {
+.rg-frames--2 {
+  grid-template: "a" 3fr "b" 2fr / 1fr;
+}
+
+.rg-frames--3 {
+  grid-template: "a a" 3fr "b c" 2fr / 1fr 1fr;
+}
+
+.rg-frames--4 {
+  grid-template: "a a" 1.6fr "b c" 1fr "d d" 1fr / 1.2fr 1fr;
+}
+
+.rg-frames--5 {
+  grid-template: "a a b" 1fr "a a c" 1fr "d e e" 1fr / 1fr 1fr 1fr;
+}
+
+.rg-frames--6 {
+  grid-template: "a a b" 1.1fr "a a c" 1.1fr "d e f" 1fr / 1fr 1fr 1fr;
+}
+
+.rg-frames--7 {
+  grid-template: "a a b" 1fr "a a c" 1fr "d e e" 0.9fr "f f g" 0.9fr / 1fr 1fr 1fr;
+}
+
+/* Three alternating designs for full 8-frame pages. */
+.rg-frames--8-1 {
+  grid-template: "a a b" 1fr "a a c" 1fr "d e f" 1fr "g h h" 1fr / 1fr 1fr 1fr;
+}
+
+.rg-frames--8-2 {
+  grid-template: "a a a" 1.5fr "b c d" 1fr "e e f" 1fr "g h h" 1fr / 1fr 1fr 1fr;
+}
+
+.rg-frames--8-3 {
+  grid-template: "b a a a" 1fr "c a a a" 1fr "d d e e" 1fr "f g h h" 1fr / 1fr 1fr 1fr 1fr;
+}
+
+.rg-frame {
   position: relative;
   min-width: 0;
   min-height: 0;
-  background: transparent;
-  box-sizing: border-box;
-  transition: filter 160ms ease;
+  container-type: size;
+  transition:
+    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 200ms ease;
 }
 
-.rg-strip-panel.is-hot {
+/* Hand-inked frame border — wobbles through the sketch filter. */
+.rg-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 3px solid #111;
+  filter: url(#rg-sketch);
+  pointer-events: none;
+}
+
+.rg-frame:hover,
+.rg-frame.is-hot {
   z-index: 2;
-  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--panel) 75%, transparent))
-    drop-shadow(0 0 28px color-mix(in srgb, var(--panel) 42%, transparent));
+  transform: translate(-5px, -5px) rotate(-0.5deg);
+  filter: drop-shadow(9px 9px 0 #111);
 }
 
-.rg-strip-hit {
-  position: relative;
+.d-stations .rg-frame-hit {
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 0.55rem;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
+  justify-content: flex-end;
   margin: 0;
-  padding: 0.95rem 0.95rem 0.85rem;
+  padding: clamp(0.55rem, 6cqmin, 1.5rem);
   border: none;
-  border-radius: 0;
-  background:
-    linear-gradient(
-      160deg,
-      color-mix(in srgb, var(--panel) 90%, #fff) 0%,
-      color-mix(in srgb, var(--panel) 74%, #fff4ea) 100%
-    );
-  color: var(--panel-ink, #1a1020);
+  background: #fff;
+  color: #111;
   font: inherit;
   text-align: left;
   text-decoration: none;
-  box-sizing: border-box;
   overflow: hidden;
   isolation: isolate;
-  transition: filter 160ms ease, background 160ms ease;
 }
 
-.rg-strip-hit:hover,
-.rg-strip-panel.is-hot .rg-strip-hit {
-  background:
-    linear-gradient(
-      160deg,
-      color-mix(in srgb, var(--panel) 96%, #fff) 0%,
-      color-mix(in srgb, var(--panel) 80%, #fff) 100%
-    );
-}
-
-.rg-strip-dither,
-.rg-strip-dots {
+/* Pencil sketch by default — the frame's colour inks in on hover. */
+.rg-frame-art {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   z-index: 0;
-}
-
-/* Soft Bayer-ish diagonal dither. */
-.rg-strip-dither {
-  opacity: 0.28;
-  mix-blend-mode: multiply;
   background:
-    repeating-linear-gradient(
-      -22deg,
-      transparent 0 3px,
-      color-mix(in srgb, var(--panel-ink, #1a1020) 18%, transparent) 3px 4px
-    ),
-    repeating-linear-gradient(
-      68deg,
-      transparent 0 5px,
-      color-mix(in srgb, #fff 35%, transparent) 5px 6px
+    radial-gradient(circle, rgba(0, 0, 0, 0.5) 1px, transparent 1.4px) 0 0 / 6px 6px,
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 7px),
+    repeating-conic-gradient(
+      from 0deg at var(--burst-x) var(--burst-y),
+      var(--panel) 0deg 4deg,
+      color-mix(in srgb, var(--panel) 40%, #fff) 4deg 10deg
     );
+  filter: grayscale(1) contrast(1.5) brightness(1.15);
+  opacity: 0.5;
+  transition:
+    filter 350ms ease,
+    opacity 350ms ease;
 }
 
-/* Halftone dots. */
-.rg-strip-dots {
-  opacity: 0.34;
-  mix-blend-mode: soft-light;
-  background-image: radial-gradient(
-    circle at center,
-    color-mix(in srgb, var(--panel-ink, #1a1020) 55%, transparent) 0 1.1px,
-    transparent 1.25px
-  );
-  background-size: 7px 7px;
-  background-position: 0 0;
-  -webkit-mask-image: linear-gradient(135deg, #000 20%, transparent 78%);
-  mask-image: linear-gradient(135deg, #000 20%, transparent 78%);
+.rg-frame:hover .rg-frame-art,
+.rg-frame.is-hot .rg-frame-art {
+  filter: none;
+  opacity: 1;
 }
 
-.rg-strip-title,
-.rg-strip-copy,
-.rg-strip-foot {
+.rg-frame-num {
+  position: absolute;
+  top: clamp(0.55rem, 6cqmin, 1.5rem);
+  left: clamp(0.55rem, 6cqmin, 1.5rem);
+  z-index: 1;
+  padding: 0.2em 0.5em;
+  background: #111;
+  color: #fff;
+  font-family: var(--font-block);
+  font-size: clamp(0.65rem, 6cqmin, 1.1rem);
+  rotate: -3deg;
+}
+
+.rg-frame-text {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.35rem, 3cqmin, 0.8rem);
 }
 
-.rg-strip-title {
+.rg-frame-title {
   margin: 0;
+  max-width: 100%;
+  padding: 0.15em 0.35em;
+  border: 2.5px solid #111;
+  background: #fff;
+  box-shadow: 4px 4px 0 #111;
   font-family: var(--font-block);
-  font-size: clamp(1.05rem, 2.4vw, 1.55rem);
+  font-size: clamp(0.8rem, 9cqi, 3.4rem);
   font-weight: 400;
   line-height: 1.05;
-  letter-spacing: 0.01em;
-  text-wrap: balance;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
-.rg-strip-copy {
+.rg-frame-copy {
   margin: 0;
-  flex: 1 1 auto;
-  font-family: var(--font-en);
-  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
-  line-height: 1.35;
-  color: color-mix(in srgb, var(--panel-ink, #1a1020) 82%, transparent);
+  max-width: 32ch;
+  padding: 0.4em 0.6em;
+  border: 2px solid #111;
+  background: #fff;
+  font-family: var(--hk);
+  font-size: clamp(0.72rem, 4.4cqi, 1.15rem);
+  font-weight: 600;
+  line-height: 1.3;
 }
 
-.rg-strip-foot {
+.rg-frame-foot {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.4rem 0.85rem;
+  gap: 0.3rem;
 }
 
-.rg-strip-meta {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  opacity: 0.72;
-}
-
-.rg-strip-turn {
-  appearance: none;
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-  margin: 0;
-  padding: 0.85rem 1rem 0.8rem;
-  border: none;
-  border-radius: 0;
-  background: color-mix(in srgb, var(--field) 18%, #fff);
-  color: var(--panel-ink, #1a1020);
-  font: inherit;
-  text-align: left;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 8%, transparent);
-  transition: background 140ms ease, filter 140ms ease;
-}
-
-.rg-strip-turn:hover {
-  background: color-mix(in srgb, var(--field) 28%, #fff);
-  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--field) 35%, transparent));
-}
-
-.rg-strip-turn:active {
-  background: color-mix(in srgb, var(--field) 34%, #fff);
-}
-
-.rg-strip-turn-label {
-  font-family: var(--font-block);
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.rg-strip-turn-hint {
-  font-family: var(--font-en);
-  font-size: 0.85rem;
+.rg-frame-tag,
+.rg-frame-meta {
+  padding: 0.2em 0.5em;
+  background: #111;
+  color: #fff;
+  font-family: var(--hk);
+  font-size: clamp(0.6rem, 3.2cqi, 0.75rem);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  opacity: 0.7;
-  white-space: nowrap;
 }
 
-/* Manga-style tall page grids — panels share ink gutters. */
-.rg-strip--1 {
-  grid-template-columns: 1fr;
-  grid-template-rows: 1fr;
+.rg-frame-meta {
+  background: #fff;
+  color: #111;
+  box-shadow: inset 0 0 0 1.5px #111;
 }
 
-.rg-strip--2 {
-  grid-template-columns: 1fr;
-  grid-template-rows: 1.15fr 1fr;
+@container (max-height: 11rem) {
+  .rg-frame-foot {
+    display: none;
+  }
 }
 
-.rg-strip--3 {
-  grid-template-columns: 1.2fr 0.8fr;
-  grid-template-rows: 1.2fr 1fr;
+@container (max-height: 8rem) {
+  .rg-frame-copy {
+    display: none;
+  }
 }
 
-.rg-strip--3 .rg-strip-panel:nth-child(1) {
-  grid-column: 1 / 2;
-  grid-row: 1 / 3;
+/* Die-cut sticker slapped over the bottom edge of the page. */
+.rg-sticker {
+  position: absolute;
+  right: clamp(1rem, 7vw, 6rem);
+  bottom: calc(-1 * clamp(2.5rem, 4.5vw, 4rem));
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.1em;
+  width: clamp(6.5rem, 12vw, 9.5rem);
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.55), transparent 38%),
+    radial-gradient(circle, rgba(0, 0, 0, 0.14) 1.2px, transparent 1.5px) 0 0 / 7px 7px,
+    #ffd23f;
+  color: #111;
+  font-family: var(--font-block);
+  font-size: clamp(0.72rem, 1.3vw, 1rem);
+  line-height: 1.05;
+  text-align: center;
+  box-shadow:
+    0 0 0 1.5px rgba(0, 0, 0, 0.12),
+    0 10px 22px rgba(0, 0, 0, 0.32);
+  rotate: -9deg;
+  transition:
+    rotate 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    scale 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.rg-strip--4 {
-  grid-template-columns: 1.15fr 0.85fr;
-  grid-template-rows: 1.2fr 1fr;
+/* Peeling edge — the sticker lifts a little at the lower right. */
+.rg-sticker::after {
+  content: "";
+  position: absolute;
+  right: 2%;
+  bottom: 2%;
+  width: 30%;
+  height: 30%;
+  border-radius: 0 0 100% 0;
+  background: linear-gradient(135deg, transparent 49%, #d9d9d9 50%, #fff 72%, #ececec 100%);
+  box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.18);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  transition: width 220ms ease, height 220ms ease;
 }
 
-.rg-strip--5 {
-  grid-template-columns: 1.3fr 1fr 1fr;
-  grid-template-rows: 1.35fr 1fr;
+.rg-sticker:not(:disabled):hover {
+  rotate: -3deg;
+  scale: 1.07;
 }
 
-.rg-strip--5 .rg-strip-panel:nth-child(1) {
-  grid-column: 1 / 2;
-  grid-row: 1 / 3;
+.rg-sticker:not(:disabled):hover::after {
+  width: 40%;
+  height: 40%;
 }
 
-.rg-strip--5 .rg-strip-panel:nth-child(2) {
-  grid-column: 2 / 4;
+.rg-sticker-label {
+  max-width: 5.5em;
 }
 
-.rg-strip--6 {
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1.15fr 1fr 1.05fr;
-}
-
-.rg-strip--7 {
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: 1.2fr 1fr 1.15fr;
-}
-
-.rg-strip--7 .rg-strip-panel:nth-child(1) {
-  grid-column: 1 / 4;
-}
-
-.rg-strip--7 .rg-strip-panel:nth-child(2) {
-  grid-column: 4 / 7;
-}
-
-.rg-strip--7 .rg-strip-panel:nth-child(3) {
-  grid-column: 1 / 3;
-}
-
-.rg-strip--7 .rg-strip-panel:nth-child(4) {
-  grid-column: 3 / 5;
-}
-
-.rg-strip--7 .rg-strip-panel:nth-child(5) {
-  grid-column: 5 / 7;
-}
-
-.rg-strip--7 .rg-strip-panel:nth-child(6) {
-  grid-column: 1 / 4;
-}
-
-.rg-strip--7 .rg-strip-panel:nth-child(7) {
-  grid-column: 4 / 7;
-}
-
-.rg-strip--8 {
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(4, 1fr);
+.rg-sticker-arrow {
+  font-size: 1.5em;
+  line-height: 1;
 }
 
 @media (max-width: 720px) {
-  .rg-strip-page {
-    width: min(100%, 92vw);
+  .rg-book {
+    width: 92vw;
     aspect-ratio: auto;
-    min-height: min(70vh, 40rem);
   }
 
-  .rg-strip-turn {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
+  .rg-book .rg-frames {
+    grid-template: none;
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(13rem, auto);
+  }
+
+  .rg-frames .rg-frame {
+    grid-area: auto;
+  }
+
+  .rg-frames .rg-frame:first-child {
+    min-height: 20rem;
+  }
+
+  .rg-sheet {
+    padding-bottom: calc(var(--margin) * 2.5);
   }
 }
 

@@ -66,7 +66,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
               <stop class="channel-glow-b" offset="100%" />
             </linearGradient>
             <pattern id="channel-benday" width="14" height="14" patternUnits="userSpaceOnUse">
-              <circle cx="7" cy="7" r="3.4" fill="#000" fill-opacity="0.22" />
+              <circle cx="7" cy="7" r="2.4" fill="#fff" fill-opacity="0.12" />
             </pattern>
             <linearGradient id="channel-dot-fade" x1="100%" y1="100%" x2="0%" y2="0%">
               <stop offset="0%" stop-color="#fff" />
@@ -684,17 +684,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     c.fill();
   };
 
-  // Comic dramatic stops by station.
-  // 0 jagged action teeth · 1 Lichtenstein swell · 2 torn/stepped break · -1 flat
-  const edgeKind = (i: number) => {
-    const id = STATIONS[i]?.id;
-    if (id === "projects" || id === "about") return 0;
-    if (id === "cases" || id === "contact") return 1;
-    if (id === "blogs") return 2;
-    return -1;
-  };
-
-  // Comic Ben-Day tile — reused for the shadow wave print texture.
+  // Comic Ben-Day tile — reused for the shadow print texture.
   let benday: CanvasPattern | null = null;
   const bendayPattern = () => {
     if (benday) return benday;
@@ -710,12 +700,33 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     return benday;
   };
 
-  // Stable pseudo-random for edge layouts (doesn't flicker each frame).
+  // Stable pseudo-random so the ridge doesn't flicker each frame.
   const edgeRnd = (i: number) => {
     let x = Math.imul(i ^ 0x9e3779b9, 0x85ebca6b);
     x ^= x >>> 13;
     x = Math.imul(x, 0xc2b2ae35);
     return ((x ^ (x >>> 16)) >>> 0) / 4294967296;
+  };
+
+  // Value noise: smooth (cosine) for the swell, linear for the jagged teeth.
+  const vnoise = (x: number, span: number, seed: number, jag: boolean) => {
+    const u = x / span;
+    const i = Math.floor(u);
+    let f = u - i;
+    if (!jag) f = (1 - Math.cos(f * Math.PI)) / 2;
+    const a = edgeRnd(seed + i * 7919);
+    const b = edgeRnd(seed + (i + 1) * 7919);
+    return a + (b - a) * f;
+  };
+
+  // One random torn ridge per station: a slow swell, jagged teeth and fine grit.
+  const ridgeAt = (station: number, x: number) => {
+    const s = station * 1013 + 17;
+    const swell = vnoise(x, Math.max(220, edgeW / 3.4), s, false);
+    const teeth = vnoise(x, 34 + edgeRnd(s) * 26, s + 3, true);
+    const grit = vnoise(x, 9, s + 5, true);
+    const spike = Math.pow(vnoise(x, 61, s + 9, true), 6);
+    return clamp(0.2 + swell * 0.62 + (teeth - 0.5) * 0.46 + (grit - 0.5) * 0.1 + spike * 0.34, 0.04, 1.1);
   };
 
   const drawEdge = (n: number, sigma: number) => {
@@ -728,142 +739,51 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     const q = clamp(p, 0, LAST);
     const a = Math.floor(q);
     const b = Math.min(LAST, a + 1);
-    const m = q - a;
+    const m = smooth(0, 1, q - a);
     const presence = a <= 0 ? m : 1;
     if (presence < 0.001 && n < 0.01) return;
 
-    const amp = (h * 0.78 + 8 * n + 4 * (1 - sigma)) * Math.max(presence, n * 0.35);
-    const step = Math.max(1, Math.round(1.25 / Math.max(dpr, 1)));
-    const ka = edgeKind(a);
-    const kb = edgeKind(b);
+    const amp = (h * 0.8 + 10 * n + 4 * (1 - sigma)) * Math.max(presence, n * 0.35);
+    const step = 2;
+    // Static shakes the ridge a little while tuning between stations.
+    const shake = n > 0.02 ? clock * 40 : 0;
+    const heightAt = (x: number) => {
+      const y = ridgeAt(a, x + shake) * (1 - m) + ridgeAt(b, x + shake) * m;
+      return h - y * amp;
+    };
+    const trace = (dx: number, scale: number) => {
+      c.beginPath();
+      c.moveTo(0, h);
+      for (let x = 0; x <= w + step; x += step) {
+        c.lineTo(x, h - (h - heightAt(x - dx)) * scale);
+      }
+      c.lineTo(w, h);
+      c.closePath();
+    };
+
+    // Offset shadow print — darker field with Ben-Day dots, like a misregistered plate.
     const shade = mix(field, [0, 0, 0], 0.58);
-    const xShift = Math.max(36, w * 0.045);
-    const shadowA = 0.55 * Math.max(presence, 0.2);
+    trace(-Math.max(28, w * 0.03), 1.18);
+    c.globalAlpha = 0.6 * Math.max(presence, 0.2);
+    c.fillStyle = css(shade);
+    c.fill();
     const dots = bendayPattern();
-
-    type Tooth = { x: number; len: number; peak: number; lean: number; foam: number };
-    // Build irregular teeth spanning the viewport (~2–3 major features).
-    const buildTeeth = (xOff: number, seed: number, avg: number) => {
-      const teeth: Tooth[] = [];
-      let x = xOff;
-      let i = 0;
-      const span = (k: number) => avg * (0.55 + edgeRnd(seed + k * 4) * 0.9);
-      while (x > -avg) {
-        i--;
-        x -= span(i);
-      }
-      while (x < w + avg) {
-        const len = span(i);
-        teeth.push({
-          x,
-          len,
-          peak: 0.42 + edgeRnd(seed + i * 4 + 1) * 0.58,
-          lean: 0.22 + edgeRnd(seed + i * 4 + 2) * 0.56,
-          foam: edgeRnd(seed + i * 4 + 3),
-        });
-        x += len;
-        i++;
-      }
-      return teeth;
-    };
-
-    const heightAt = (kind: number, teeth: Tooth[], px: number) => {
-      if (kind < 0) return 0;
-      for (let i = 0; i < teeth.length; i++) {
-        const t = teeth[i];
-        if (px < t.x || px >= t.x + t.len) continue;
-        const u = (px - t.x) / t.len;
-        if (kind === 0) {
-          // Jagged action border — comic tension / lightning teeth.
-          const lean = t.lean;
-          let y = u < lean ? u / lean : (1 - u) / (1 - lean);
-          y *= t.peak;
-          // Occasional secondary notch on the long face for torn energy.
-          if (u > lean && t.foam > 0.55) {
-            const v = (u - lean) / (1 - lean);
-            y *= 1 - 0.35 * Math.sin(v * Math.PI) * (t.foam - 0.55);
-          }
-          return clamp(y, 0, 1.05);
-        }
-        if (kind === 1) {
-          // Lichtenstein swell — big arabesque lobe + foam nubs on the crest.
-          const lobe = Math.pow(Math.sin(u * Math.PI), 0.72) * t.peak;
-          const crest = Math.abs(u - 0.5);
-          const foam =
-            crest < 0.22
-              ? Math.pow(1 - crest / 0.22, 1.6) * (0.12 + t.foam * 0.18) * Math.abs(Math.sin(u * Math.PI * (3 + t.lean * 2)))
-              : 0;
-          return clamp(lobe + foam, 0, 1.08);
-        }
-        // Torn / stepped panel break — hard plateaus with sudden drops.
-        const steps = 3 + Math.floor(t.foam * 3);
-        const idx = Math.min(steps - 1, Math.floor(u * steps));
-        const levels = [0.18, 0.58, 1, 0.36, 0.82, 0.26, 0.7];
-        const lvl = levels[(idx + Math.floor(t.lean * 5) + i * 2) % levels.length]!;
-        // Deep bite on some landings — torn-paper feel.
-        const bite = t.foam > 0.7 && idx === 1 ? 0.22 * t.foam : 0;
-        return clamp((lvl - bite) * (0.7 + t.peak * 0.3), 0, 1.05);
-      }
-      return 0;
-    };
-
-    const paintProfile = (kind: number, xOff: number, ampScale: number, alpha: number, front: boolean) => {
-      if (kind < 0 || alpha < 0.01) return;
-      const avg = kind === 2 ? Math.max(100, w / 3.2) : Math.max(140, w / 2.35);
-      const teeth = buildTeeth(xOff, kind * 97 + 11, avg);
-      const trace = () => {
-        c.beginPath();
-        c.moveTo(0, h);
-        for (let x = 0; x <= w; x += step) {
-          const y = heightAt(kind, teeth, x);
-          c.lineTo(x, h - clamp(y, 0, 1.1) * amp * ampScale);
-        }
-        c.lineTo(w, h);
-        c.closePath();
-      };
-      if (!front) {
-        trace();
-        c.globalAlpha = shadowA * alpha;
-        c.fillStyle = css(shade);
-        c.fill();
-        c.save();
-        trace();
-        c.clip();
-        if (dots) {
-          c.globalAlpha = 0.42 * Math.max(presence, 0.2) * alpha;
-          c.fillStyle = dots;
-          c.fillRect(0, 0, w, h);
-        }
-        c.restore();
-        c.globalAlpha = 1;
-        return;
-      }
-      trace();
-      c.globalAlpha = alpha;
-      c.fillStyle = "#000";
-      c.fill();
-      c.globalAlpha = 1;
-    };
-
-    const alphaFor = (kind: number) => {
-      const onA = ka === kind;
-      const onB = kb === kind;
-      if (onA && onB) return 1;
-      if (onA) return 1 - m;
-      if (onB) return m;
-      return 0;
-    };
-
-    for (const kind of [0, 1, 2]) {
-      const alpha = alphaFor(kind);
-      if (alpha < 0.01) continue;
-      paintProfile(kind, xShift, 0.94, alpha, false);
-      paintProfile(kind, 0, 1, alpha, true);
+    if (dots) {
+      c.save();
+      c.clip();
+      c.globalAlpha = 0.45 * Math.max(presence, 0.2);
+      c.fillStyle = dots;
+      c.fillRect(0, 0, w, h);
+      c.restore();
     }
 
-    // Thin black base — kills field-tint at the foot without eating the teeth.
+    // Solid ink ridge — the tuner's own torn edge.
     c.globalAlpha = 1;
+    trace(0, 1);
     c.fillStyle = "#000";
+    c.fill();
+
+    // Thin black base — kills field-tint at the foot.
     c.fillRect(0, h - 18, w, 18);
   };
 

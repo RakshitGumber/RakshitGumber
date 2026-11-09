@@ -1,15 +1,19 @@
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { useContent } from '@/hooks/useContent'
-import type { Blog, Project } from '@/lib/content'
-import {
-  BLOG_PALETTE,
-  PANEL_CLIPS,
-  PROJECT_PALETTE,
-  type StripPalette,
-} from '@/lib/stripPalette'
+import { BLOG_PALETTE, PROJECT_PALETTE, type StripPalette } from '@/lib/stripPalette'
 
-const PREVIEW_MAX = 5
-const STRIP_MAX = 8
+const PAGE_SIZE = 8
+/** Full pages rotate through three splash layouts. */
+const FULL_PAGE_LAYOUTS = 3
+
+type FrameItem = {
+  id: string
+  title: string
+  description: string
+  tags: string[]
+  meta: string[]
+  href: string | null
+}
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -19,202 +23,126 @@ function formatDate(iso: string) {
   })
 }
 
-function stripCount(length: number) {
-  return Math.max(1, Math.min(STRIP_MAX, length))
+function layoutOf(count: number, page: number) {
+  if (count < PAGE_SIZE) return String(Math.max(1, count))
+  return `8-${(page % FULL_PAGE_LAYOUTS) + 1}`
 }
 
-function panelStyle(palette: StripPalette, index: number): CSSProperties {
-  const color = palette.colors[index % palette.colors.length]
-  return {
-    ['--panel' as string]: color,
-    ['--panel-ink' as string]: palette.ink,
-  }
-}
-
-const ComicStrip = ({
-  count,
-  paper,
-  footer,
-  children,
-}: {
-  count: number
-  paper: string
-  footer: ReactNode
-  children: ReactNode
-}) => (
-  <div className="rg-strip-page" style={{ ['--paper' as string]: paper }}>
-    <ul className={`rg-strip rg-strip--${stripCount(count)}`}>{children}</ul>
-    <div className="rg-strip-page-foot">{footer}</div>
-  </div>
+/** Wobbly-ink filter shared by every frame border. */
+const SketchFilter = () => (
+  <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden>
+    <filter id="rg-sketch">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" />
+      <feDisplacementMap in="SourceGraphic" scale="4" />
+    </filter>
+  </svg>
 )
 
-const TurnOver = ({
-  flipped,
-  onFlip,
-  moreLabel,
-}: {
-  flipped: boolean
-  onFlip: () => void
-  moreLabel: string
-}) => (
-  <button type="button" className="rg-strip-turn" onClick={onFlip}>
-    <span className="rg-strip-turn-label">
-      {flipped ? 'Turn Back' : 'Please Turn Over'}
-    </span>
-    <span className="rg-strip-turn-hint" aria-hidden="true">
-      {flipped ? '‹ preview' : `› ${moreLabel}`}
-    </span>
-  </button>
-)
-
-const ProjectPanel = ({
-  project,
+const Frame = ({
+  item,
   index,
   palette,
 }: {
-  project: Project
+  item: FrameItem
   index: number
   palette: StripPalette
 }) => {
-  const href = project.liveDemoUrl || project.githubUrl || project.repoUrl
-  const clip = PANEL_CLIPS[index % PANEL_CLIPS.length]
   const color = palette.colors[index % palette.colors.length]
-  const className = 'rg-strip-panel'
-  const morph = {
-    'data-cursor-morph': '',
-    'data-cursor-clip': clip,
-    'data-cursor-glow': color,
-  } as const
+  const style = {
+    '--panel': color,
+    '--panel-ink': palette.ink,
+    // Each frame gets its own burst origin so the page doesn't look stamped.
+    '--burst-x': `${20 + ((index * 37) % 60)}%`,
+    '--burst-y': `${15 + ((index * 53) % 55)}%`,
+  } as CSSProperties
 
   const inner = (
     <>
-      <span className="rg-strip-dither" aria-hidden="true" />
-      <span className="rg-strip-dots" aria-hidden="true" />
-      <h3 className="rg-strip-title">{project.title}</h3>
-      <p className="rg-strip-copy">{project.description}</p>
+      <span className="rg-frame-art" aria-hidden="true" />
+      <span className="rg-frame-num">#{String(index + 1).padStart(2, '0')}</span>
+      <span className="rg-frame-text">
+        <h3 className="rg-frame-title">{item.title}</h3>
+        <p className="rg-frame-copy">{item.description}</p>
+        {item.meta.length || item.tags.length ? (
+          <span className="rg-frame-foot">
+            {item.tags.slice(0, 2).map((tag) => (
+              <span key={tag} className="rg-frame-tag">
+                {tag}
+              </span>
+            ))}
+            {item.meta.map((m) => (
+              <span key={m} className="rg-frame-meta">
+                {m}
+              </span>
+            ))}
+          </span>
+        ) : null}
+      </span>
     </>
   )
 
-  if (href) {
-    return (
-      <li className={className} style={panelStyle(palette, index)} {...morph}>
-        <a className="rg-strip-hit" href={href} target="_blank" rel="noreferrer">
+  return (
+    <li className="rg-frame" style={style} data-cursor-morph="" data-cursor-glow={color}>
+      {item.href ? (
+        <a className="rg-frame-hit" href={item.href} target="_blank" rel="noreferrer">
           {inner}
         </a>
-      </li>
-    )
-  }
-
-  return (
-    <li className={className} style={panelStyle(palette, index)} {...morph}>
-      <button type="button" className="rg-strip-hit">
-        {inner}
-      </button>
+      ) : (
+        <button type="button" className="rg-frame-hit">
+          {inner}
+        </button>
+      )}
     </li>
   )
 }
 
-const BlogPanel = ({
-  blog,
-  index,
+const ComicBook = ({
+  items,
   palette,
 }: {
-  blog: Blog
-  index: number
+  items: FrameItem[]
   palette: StripPalette
 }) => {
-  const clip = PANEL_CLIPS[index % PANEL_CLIPS.length]
-  const color = palette.colors[index % palette.colors.length]
+  const [page, setPage] = useState(0)
+  const pages = Math.ceil(items.length / PAGE_SIZE)
+  const shown = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+  const last = page === pages - 1
 
   return (
-    <li
-      className="rg-strip-panel"
-      style={panelStyle(palette, index)}
-      data-cursor-morph=""
-      data-cursor-clip={clip}
-      data-cursor-glow={color}
-    >
-      <button type="button" className="rg-strip-hit">
-        <span className="rg-strip-dither" aria-hidden="true" />
-        <span className="rg-strip-dots" aria-hidden="true" />
-        <h3 className="rg-strip-title">{blog.title}</h3>
-        <p className="rg-strip-copy">{blog.description}</p>
-        <div className="rg-strip-foot">
-          <span className="rg-strip-meta">{formatDate(blog.timestamp)}</span>
-          {blog.readTime != null ? (
-            <span className="rg-strip-meta">{blog.readTime} min</span>
-          ) : null}
-        </div>
-      </button>
-    </li>
-  )
-}
-
-const ProjectItems = ({
-  projects,
-  palette,
-}: {
-  projects: Project[]
-  palette: StripPalette
-}) => {
-  const [flipped, setFlipped] = useState(false)
-  const shown = flipped
-    ? projects.slice(0, STRIP_MAX)
-    : projects.slice(0, PREVIEW_MAX)
-
-  return (
-    <div className="rg-strip-stack">
-      <ComicStrip
-        count={shown.length}
-        paper={palette.paper}
-        footer={
-          <TurnOver
-            flipped={flipped}
-            onFlip={() => setFlipped((v) => !v)}
-            moreLabel="all projects"
-          />
-        }
-      >
-        {shown.map((project, i) => (
-          <ProjectPanel
-            key={project.id}
-            project={project}
-            index={i}
-            palette={palette}
-          />
-        ))}
-      </ComicStrip>
-    </div>
-  )
-}
-
-const BlogItems = ({
-  blogs,
-  palette,
-}: {
-  blogs: Blog[]
-  palette: StripPalette
-}) => {
-  const [flipped, setFlipped] = useState(false)
-  const shown = flipped ? blogs.slice(0, STRIP_MAX) : blogs.slice(0, PREVIEW_MAX)
-
-  return (
-    <div className="rg-strip-stack">
-      <ComicStrip
-        count={shown.length}
-        paper={palette.paper}
-        footer={
-          <TurnOver
-            flipped={flipped}
-            onFlip={() => setFlipped((v) => !v)}
-            moreLabel="all blogs"
-          />
-        }
-      >
-        {shown.map((blog, i) => (
-          <BlogPanel key={blog.id} blog={blog} index={i} palette={palette} />
-        ))}
-      </ComicStrip>
+    <div className="rg-book-stack">
+      <SketchFilter />
+      <div className="rg-book" style={{ ['--paper' as string]: palette.paper }}>
+        <article key={page} className="rg-sheet">
+          <ul className={`rg-frames rg-frames--${layoutOf(shown.length, page)}`}>
+            {shown.map((item, i) => (
+              <Frame
+                key={item.id}
+                item={item}
+                index={page * PAGE_SIZE + i}
+                palette={palette}
+              />
+            ))}
+          </ul>
+          <span className="rg-folio">
+            {page + 1} / {pages}
+          </span>
+        </article>
+        <button
+          type="button"
+          className="rg-sticker"
+          onClick={(e) => {
+            setPage((p) => (last ? 0 : p + 1))
+            // Land on the top of the fresh page, not its bottom edge.
+            e.currentTarget.parentElement?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }}
+          disabled={pages < 2}
+        >
+          <span className="rg-sticker-label">
+            {pages < 2 ? 'The End!' : last ? 'Back to #1' : 'Next Page!'}
+          </span>
+          {pages > 1 ? <span className="rg-sticker-arrow">{last ? '↺' : '→'}</span> : null}
+        </button>
+      </div>
     </div>
   )
 }
@@ -232,9 +160,15 @@ export const ProjectList = () => {
     return <p className="lead det">No projects yet.</p>
   }
 
-  return (
-    <ProjectItems projects={content.data.projects} palette={PROJECT_PALETTE} />
-  )
+  const items = content.data.projects.map((p) => ({
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    tags: p.tags,
+    meta: [],
+    href: p.liveDemoUrl || p.githubUrl || p.repoUrl,
+  }))
+  return <ComicBook items={items} palette={PROJECT_PALETTE} />
 }
 
 export const BlogList = () => {
@@ -250,5 +184,13 @@ export const BlogList = () => {
     return <p className="lead det">No blogs yet.</p>
   }
 
-  return <BlogItems blogs={content.data.blogs} palette={BLOG_PALETTE} />
+  const items = content.data.blogs.map((b) => ({
+    id: b.id,
+    title: b.title,
+    description: b.description,
+    tags: b.tags,
+    meta: [formatDate(b.timestamp), ...(b.readTime != null ? [`${b.readTime} min`] : [])],
+    href: null,
+  }))
+  return <ComicBook items={items} palette={BLOG_PALETTE} />
 }
