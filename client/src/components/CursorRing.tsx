@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-/** Thin ~40px ring that follows the pointer and stretches along travel. */
+/** Thin ring that follows the pointer, stretches on travel, morphs on panels. */
 export const CursorRing = () => {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -19,6 +19,15 @@ export const CursorRing = () => {
     let vy = 0
     let raf = 0
     let visible = false
+    let hot: Element | null = null
+
+    const clearHot = () => {
+      if (hot instanceof HTMLElement) hot.classList.remove('is-hot')
+      hot = null
+      el.classList.remove('is-morph')
+      el.style.removeProperty('--cursor-clip')
+      el.style.removeProperty('--cursor-glow')
+    }
 
     const onMove = (event: MouseEvent) => {
       vx = event.clientX - tx
@@ -31,11 +40,32 @@ export const CursorRing = () => {
         y = ty
         el.style.opacity = '1'
       }
+
+      const hit = document.elementFromPoint(event.clientX, event.clientY)
+      const next = hit?.closest?.('[data-cursor-morph]') ?? null
+      if (next === hot) return
+
+      if (hot instanceof HTMLElement) hot.classList.remove('is-hot')
+      hot = next
+
+      if (next instanceof HTMLElement) {
+        const clip = next.dataset.cursorClip
+        const glow = next.dataset.cursorGlow || getComputedStyle(next).getPropertyValue('--panel').trim()
+        next.classList.add('is-hot')
+        el.classList.add('is-morph')
+        if (clip) el.style.setProperty('--cursor-clip', clip)
+        if (glow) el.style.setProperty('--cursor-glow', glow)
+      } else {
+        el.classList.remove('is-morph')
+        el.style.removeProperty('--cursor-clip')
+        el.style.removeProperty('--cursor-glow')
+      }
     }
 
     const onLeave = () => {
       visible = false
       el.style.opacity = '0'
+      clearHot()
     }
 
     const tick = () => {
@@ -44,7 +74,9 @@ export const CursorRing = () => {
 
       const speed = Math.hypot(vx, vy)
       const angle = Math.atan2(vy, vx) * (180 / Math.PI)
-      const stretch = Math.min(speed * 0.065, 0.9)
+      const stretch = el.classList.contains('is-morph')
+        ? Math.min(speed * 0.03, 0.25)
+        : Math.min(speed * 0.065, 0.9)
 
       el.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) rotate(${angle}deg) scale(${1 + stretch}, ${1 - stretch * 0.5})`
 
@@ -62,6 +94,7 @@ export const CursorRing = () => {
       window.removeEventListener('mousemove', onMove)
       document.documentElement.removeEventListener('mouseleave', onLeave)
       document.documentElement.classList.remove('rg-cursor-on')
+      clearHot()
     }
   }, [])
 
