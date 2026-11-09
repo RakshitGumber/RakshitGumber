@@ -1,7 +1,10 @@
+import { useRef } from 'react'
 import { Stations, type StationSpec } from '@/components/Stations'
 import { Title } from '@/components/Title'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
+import { CursorRing } from '@/components/CursorRing'
+import { useMouseParallax } from '@/hooks/useMouseParallax'
 
 type TitleAlign = 'left' | 'center' | 'right'
 type TitleStyle = 'hero' | 'ink' | 'ghost' | 'solid'
@@ -20,15 +23,23 @@ const PageShell = ({
   accents: [string, string]
   align: TitleAlign
   titleStyle: TitleStyle
-}) => (
-  <div className={`rg-page rg-page--${titleStyle}`}>
-    <ComicFx variant={fx} accents={accents} />
-    <h2 className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}>
-      {title}
-    </h2>
-    <p className="lead det">{copy}</p>
-  </div>
-)
+}) => {
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  useMouseParallax(titleRef, { duration: 0.22 })
+
+  return (
+    <div className={`rg-page rg-page--${titleStyle}`}>
+      <ComicFx variant={fx} accents={accents} />
+      <h2
+        ref={titleRef}
+        className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}
+      >
+        {title}
+      </h2>
+      <p className="lead det">{copy}</p>
+    </div>
+  )
+}
 
 const HomePage = () => (
   <div className="rg-home" data-own>
@@ -137,6 +148,11 @@ const STATIONS: StationSpec[] = [
   },
 ]
 
-const App = () => <Stations title="Rakshit Gumber" stations={STATIONS} />
+const App = () => (
+  <>
+    <CursorRing />
+    <Stations title="Rakshit Gumber" stations={STATIONS} />
+  </>
+)
 
 export default App

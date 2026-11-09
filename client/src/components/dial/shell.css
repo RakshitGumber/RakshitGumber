@@ -87,8 +87,8 @@
   --grad-a: #111;
   --grad-b: #333;
   --grad-c: #111;
-  --dot: rgba(0, 0, 0, 0.1);
-  --dot-hi: rgba(255, 255, 255, 0.07);
+  --dot: rgba(0, 0, 0, 0.055);
+  --dot-hi: rgba(255, 255, 255, 0.035);
   position: absolute;
   inset: 0;
   padding: var(--top) var(--pad) 38px;
@@ -102,12 +102,12 @@
     repeating-linear-gradient(
       0deg,
       transparent 0 2px,
-      rgba(0, 0, 0, 0.045) 2px 4px
+      rgba(0, 0, 0, 0.02) 2px 4px
     ),
     repeating-linear-gradient(
       90deg,
       transparent 0 2px,
-      rgba(0, 0, 0, 0.045) 2px 4px
+      rgba(0, 0, 0, 0.02) 2px 4px
     ),
     linear-gradient(158deg, var(--grad-a) 0%, var(--grad-b) 46%, var(--grad-c) 100%);
   background-size:
@@ -145,40 +145,40 @@
   --grad-a: #ff1f5a;
   --grad-b: #ff4d6d;
   --grad-c: #ff8fab;
-  --dot: rgba(80, 0, 20, 0.1);
-  --dot-hi: rgba(255, 255, 255, 0.08);
+  --dot: rgba(80, 0, 20, 0.055);
+  --dot-hi: rgba(255, 255, 255, 0.04);
 }
 
 .d-stations .st-cases {
   --grad-a: #ffe566;
   --grad-b: #ffb703;
   --grad-c: #ff6d00;
-  --dot: rgba(90, 30, 0, 0.1);
-  --dot-hi: rgba(255, 255, 255, 0.08);
+  --dot: rgba(90, 30, 0, 0.055);
+  --dot-hi: rgba(255, 255, 255, 0.04);
 }
 
 .d-stations .st-blogs {
   --grad-a: #2af4c4;
   --grad-b: #00d4ff;
   --grad-c: #0891b2;
-  --dot: rgba(0, 40, 50, 0.1);
-  --dot-hi: rgba(255, 255, 255, 0.08);
+  --dot: rgba(0, 40, 50, 0.055);
+  --dot-hi: rgba(255, 255, 255, 0.04);
 }
 
 .d-stations .st-about {
   --grad-a: #a855f7;
   --grad-b: #7c3aed;
   --grad-c: #d946ef;
-  --dot: rgba(30, 0, 60, 0.1);
-  --dot-hi: rgba(255, 255, 255, 0.08);
+  --dot: rgba(30, 0, 60, 0.055);
+  --dot-hi: rgba(255, 255, 255, 0.04);
 }
 
 .d-stations .st-contact {
   --grad-a: #dbeafe;
   --grad-b: #93c5fd;
   --grad-c: #7dd3fc;
-  --dot: rgba(30, 70, 140, 0.09);
-  --dot-hi: rgba(255, 255, 255, 0.1);
+  --dot: rgba(30, 70, 140, 0.05);
+  --dot-hi: rgba(255, 255, 255, 0.045);
 }
 
 
@@ -272,20 +272,45 @@
 }
 
 
-.d-stations .edge {
+/* Black bridge on the tuner lip — stays put while waves slide. */
+.d-stations .edge-seam {
   position: absolute;
   left: 0;
   right: 0;
+  bottom: calc(100% - 2px);
+  z-index: 1;
+  height: 24px;
+  background: #000;
+  pointer-events: none;
+}
+
+.d-stations .edge-wrap {
+  --px: 0px;
+  --py: 0px;
+  position: absolute;
+  left: -48px;
+  right: -48px;
   bottom: calc(100% - 1px);
-  width: 100%;
+  z-index: 2;
   height: 120px;
   pointer-events: none;
+  translate: var(--px) var(--py);
+  transition: translate 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: translate;
+}
+
+.d-stations .edge {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 
 /* Channel badge sits on the tuner edge, left side. */
 .d-stations .channel {
   --spin: 45deg;
+  --px: 0px;
+  --py: 0px;
   position: absolute;
   left: max(12px, env(safe-area-inset-left));
   bottom: calc(100% - 48px);
@@ -295,8 +320,12 @@
   display: grid;
   place-items: center;
   pointer-events: none;
+  translate: var(--px) var(--py);
   transform: rotate(var(--spin));
-  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition:
+    transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+    translate 1.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: translate, transform;
 }
 
 

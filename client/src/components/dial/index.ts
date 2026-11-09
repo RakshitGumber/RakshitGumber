@@ -54,7 +54,10 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     <h1 class="sr">${esc(opts.title)}</h1>
     <main class="stage">${STATIONS.map((s, i) => `<section class="st st-${s.id}" data-i="${i}" aria-label="${esc(s.label)}"></section>`).join("")}<canvas class="noise" aria-hidden="true"></canvas></main>
     <div class="deck">
-      <canvas class="edge" aria-hidden="true"></canvas>
+      <div class="edge-seam" aria-hidden="true"></div>
+      <div class="edge-wrap" aria-hidden="true">
+        <canvas class="edge"></canvas>
+      </div>
       <div class="channel" aria-hidden="true" style="--spin:45deg">
         <svg class="channel-svg" viewBox="0 0 200 200" aria-hidden="true">
           <defs>
@@ -96,6 +99,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   // filled once the stations have mounted: their headline shivers under static
   let bigs: (HTMLElement | null)[] = [];
   const noise = $<HTMLCanvasElement>(".noise");
+  const edgeWrap = $<HTMLDivElement>(".edge-wrap");
   const edge = $<HTMLCanvasElement>(".edge");
   const drum = $<HTMLDivElement>(".drum");
   const drumCv = drum.querySelector("canvas")!;
@@ -199,6 +203,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   let dpr = 1;
   let drumW = 0;
   let drumH = 0;
+  let edgeW = 0;
   let edgeH = 0;
   let nW = 0;
   let nH = 0;
@@ -214,8 +219,9 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     drumCv.height = Math.round(drumH * dpr);
     pps = clamp(drumW * 0.3, 104, 168);
     R = drumW * 0.54;
+    edgeW = edge.clientWidth;
     edgeH = edge.clientHeight;
-    edge.width = Math.round(W * dpr);
+    edge.width = Math.round(edgeW * dpr);
     edge.height = Math.round(edgeH * dpr);
     nW = Math.max(1, Math.ceil(stage.clientWidth / 4));
     nH = Math.max(1, Math.ceil(stage.clientHeight / 4));
@@ -604,7 +610,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
 
   const drawEdge = (n: number, sigma: number) => {
     const c = ectx;
-    const w = W;
+    const w = edgeW;
     const h = edgeH;
     if (!w || !h) return;
     c.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -744,6 +750,11 @@ export function mount(root: HTMLElement, opts: MountOptions) {
       paintProfile(kind, xShift, 0.94, alpha, false);
       paintProfile(kind, 0, 1, alpha, true);
     }
+
+    // Thin black base — kills field-tint at the foot without eating the teeth.
+    c.globalAlpha = 1;
+    c.fillStyle = "#000";
+    c.fillRect(0, h - 18, w, 18);
   };
 
   let seed = 0x9e3779b9;
@@ -915,12 +926,26 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     wake();
   };
 
+  // Depth layers: titles (fast) → waves (x-only, stays sealed to tuner) → hex (slowest).
+  const WAVE_PX = 18;
+  const HEX_PX = 10;
+  const HEX_PY = 7;
+  const onDeckParallax = (e: MouseEvent) => {
+    const nx = e.clientX / window.innerWidth - 0.5;
+    const ny = e.clientY / window.innerHeight - 0.5;
+    edgeWrap.style.setProperty("--px", `${(-nx * 2 * WAVE_PX).toFixed(1)}px`);
+    edgeWrap.style.setProperty("--py", "0px");
+    channel.style.setProperty("--px", `${(-nx * 2 * HEX_PX).toFixed(1)}px`);
+    channel.style.setProperty("--py", `${(-ny * 2 * HEX_PY).toFixed(1)}px`);
+  };
+
   t.addEventListener("pointerdown", onDown);
   t.addEventListener("pointermove", onMove);
   t.addEventListener("pointerup", onUp);
   t.addEventListener("pointercancel", onUp);
   t.addEventListener("click", onClickCapture, true);
   t.addEventListener("wheel", onWheel, { passive: false });
+  window.addEventListener("mousemove", onDeckParallax);
   window.addEventListener("keydown", onKey);
   window.addEventListener("popstate", onPop);
   reduce.addEventListener("change", onReduce);
@@ -950,6 +975,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     t.removeEventListener("pointercancel", onUp);
     t.removeEventListener("click", onClickCapture, true);
     t.removeEventListener("wheel", onWheel);
+    window.removeEventListener("mousemove", onDeckParallax);
     window.removeEventListener("keydown", onKey);
     window.removeEventListener("popstate", onPop);
     reduce.removeEventListener("change", onReduce);

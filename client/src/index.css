@@ -24,6 +24,30 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Custom thin cursor ring — hide native pointer on fine devices. */
+html.rg-cursor-on,
+html.rg-cursor-on * {
+  cursor: none !important;
+}
+
+.rg-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  /* Inverts against whatever sits under the ring. */
+  mix-blend-mode: difference;
+  filter: contrast(1.35);
+  will-change: transform;
+}
+
 /* Home fills the stage edge-to-edge above the dial. */
 .d-stations .st-home {
   padding: 0;
@@ -46,6 +70,21 @@ body {
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  /* Keep FX out of the title band and copy band. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 22%,
+    #000 52%,
+    transparent 82%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 22%,
+    #000 52%,
+    transparent 82%
+  );
 }
 
 .rg-comic-svg {
@@ -80,7 +119,7 @@ body {
     #000 55%,
     transparent 92%
   );
-  opacity: 0.72;
+  opacity: 0.42;
   mix-blend-mode: soft-light;
 }
 
@@ -110,7 +149,7 @@ body {
     #000 58%,
     transparent 88%
   );
-  opacity: 0.78;
+  opacity: 0.4;
   mix-blend-mode: soft-light;
 }
 
@@ -138,7 +177,7 @@ body {
     #000 58%,
     transparent 88%
   );
-  opacity: 0.28;
+  opacity: 0.16;
   mix-blend-mode: multiply;
 }
 
@@ -168,14 +207,14 @@ body {
     #000 58%,
     transparent 88%
   );
-  opacity: 0.8;
+  opacity: 0.4;
   mix-blend-mode: soft-light;
 }
 
 .rg-comic--speed-streaks {
   mix-blend-mode: screen;
-  opacity: 0.85;
-  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--fx-b) 60%, transparent));
+  opacity: 0.4;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--fx-b) 40%, transparent));
 }
 
 .rg-page > .lead {
@@ -208,6 +247,39 @@ body {
   padding-bottom: 0.5rem;
 }
 
+/* Soft field washes so title + copy stay readable over noise. */
+.rg-page::before,
+.rg-page::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.rg-page::before {
+  top: -6%;
+  height: 42%;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--field) 78%, transparent) 0%,
+    color-mix(in srgb, var(--field) 42%, transparent) 55%,
+    transparent 100%
+  );
+}
+
+.rg-page::after {
+  bottom: -4%;
+  height: 38%;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--field) 88%, transparent) 0%,
+    color-mix(in srgb, var(--field) 48%, transparent) 55%,
+    transparent 100%
+  );
+}
+
 /* Titles are the page focus — sit above comic fx. */
 .d-stations .rg-page-title.big {
   position: absolute;
@@ -224,6 +296,7 @@ body {
   font-size: clamp(4.5rem, 20vw, 13rem);
   line-height: 0.88;
   letter-spacing: 0.02em;
+  will-change: transform;
 }
 
 .d-stations .rg-page-title--left {
