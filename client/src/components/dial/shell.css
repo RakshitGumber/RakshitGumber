@@ -91,7 +91,8 @@
   --dot-hi: rgba(255, 255, 255, 0.035);
   position: absolute;
   inset: 0;
-  padding: var(--top) var(--pad) 38px;
+  /* Full-bleed stage — content insets live on the page body, not here. */
+  padding: 0;
   opacity: 0;
   visibility: hidden;
   /* Comic print: Ben-Day dots + fine dither over a bright gradient. */
@@ -422,11 +423,6 @@
 
   .d-stations .what {
     font-size: 22px;
-  }
-
-
-  .d-stations .st {
-    padding-bottom: 48px;
   }
 
 

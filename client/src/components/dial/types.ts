@@ -40,8 +40,8 @@ export type Station = {
   meta: Meta;
   /**
    * Fill the section. The section is absolutely positioned over the whole
-   * stage (above the deck) and is a size container (cqw/cqh work). It starts
-   * with padding var(--top) var(--pad); override it if the world is full bleed.
+   * stage (above the deck) and is a size container (cqw/cqh work). It is
+   * full-bleed (no padding); inset copy with --top / --pad on the page body.
    *
    * Pointer drags anywhere on the stage tune the dial. Put data-own on any
    * element that needs its own drags or arrow keys (a game board, a canvas).

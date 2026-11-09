@@ -48,11 +48,6 @@ html.rg-cursor-on * {
   will-change: transform;
 }
 
-/* Home fills the stage edge-to-edge above the dial. */
-.d-stations .st-home {
-  padding: 0;
-}
-
 .rg-home,
 .rg-home-stage {
   position: relative;
@@ -227,7 +222,8 @@ html.rg-cursor-on * {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 0 0 1.5rem;
+  box-sizing: border-box;
+  padding: var(--top, 56px) var(--pad, 20px) 1.5rem;
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   scrollbar-width: none; /* Firefox */
@@ -325,7 +321,7 @@ html.rg-cursor-on * {
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  padding-bottom: 0.5rem;
+  overflow: hidden;
 }
 
 /* Soft field washes so title + copy stay readable over noise. */
