@@ -217,10 +217,92 @@ html.rg-cursor-on * {
   filter: drop-shadow(0 0 12px color-mix(in srgb, var(--fx-b) 40%, transparent));
 }
 
-.rg-page > .lead {
+.rg-page-body {
   position: relative;
   z-index: 2;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 0 1.5rem;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+
+.rg-page-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+.rg-page-body .lead {
   max-width: 22em;
+}
+
+.rg-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.rg-square {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.15rem 1.2rem 1.05rem;
+  border: 3px solid currentColor;
+  background: color-mix(in srgb, var(--field) 55%, transparent);
+  box-sizing: border-box;
+}
+
+.rg-square-title {
+  margin: 0;
+  font-family: var(--font-en);
+  font-size: clamp(1.35rem, 3.4vw, 2rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+}
+
+.rg-square-copy {
+  margin: 0;
+  flex: 1 1 auto;
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  line-height: 1.35;
+  opacity: 0.9;
+}
+
+.rg-square-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+
+.rg-square-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.rg-square-links a {
+  color: inherit;
+  text-underline-offset: 0.15em;
+}
+
+.rg-square-meta {
+  font-size: 0.8rem;
+  opacity: 0.7;
 }
 
 .rg-home-title {
@@ -241,9 +323,8 @@ html.rg-cursor-on * {
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 1.25rem;
   height: 100%;
+  min-height: 0;
   padding-bottom: 0.5rem;
 }
 
@@ -280,14 +361,11 @@ html.rg-cursor-on * {
   );
 }
 
-/* Titles are the page focus — sit above comic fx. */
+/* Titles scroll with the page — sit above comic fx in normal flow. */
 .d-stations .rg-page-title.big {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   z-index: 3;
-  margin: 0;
+  margin: 0 0 1.25rem;
   width: 100%;
   max-width: none;
   pointer-events: none;

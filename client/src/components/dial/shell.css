@@ -269,6 +269,14 @@
   background: #000;
   color: var(--contrast);
   padding: 4px 16px calc(6px + env(safe-area-inset-bottom));
+  transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.2, 1);
+  will-change: transform;
+}
+
+/* Slide the tuner under the fold while page content is scrolling. */
+.d-stations .t.deck-away .deck {
+  transform: translateY(115%);
+  pointer-events: none;
 }
 
 
@@ -484,6 +492,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .d-stations .det {
+    transition: none;
+  }
+
+  .d-stations .deck {
     transition: none;
   }
 

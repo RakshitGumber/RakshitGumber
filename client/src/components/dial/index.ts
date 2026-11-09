@@ -197,7 +197,6 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   const WHEEL_STEP = 90; // px of scroll it takes to change station
 
   // geometry
-  let W = 0;
   let pps = 110; // px per station on the drum face
   let R = 200;
   let dpr = 1;
@@ -212,7 +211,6 @@ export function mount(root: HTMLElement, opts: MountOptions) {
 
   const measure = () => {
     dpr = Math.min(2, window.devicePixelRatio || 1);
-    W = t.clientWidth;
     drumW = drum.clientWidth;
     drumH = drum.clientHeight;
     drumCv.width = Math.round(drumW * dpr);
@@ -270,8 +268,31 @@ export function mount(root: HTMLElement, opts: MountOptions) {
 
   /* ---- section visibility ---- */
   let lastS = -1;
+  const pageBodyOf = (i: number) => secs[i]?.querySelector<HTMLElement>(".rg-page-body");
+  const atPageEnd = (host: HTMLElement) =>
+    host.scrollTop + host.clientHeight >= host.scrollHeight - 1;
+
+  // Tuner ducks while content scrolls, then pops back on idle or page end.
+  let deckTimer = 0;
+  const revealDeck = () => {
+    clearTimeout(deckTimer);
+    deckTimer = 0;
+    t.classList.remove("deck-away");
+  };
+  const noteContentScroll = () => {
+    const host = shown >= 0 ? pageBodyOf(shown) : null;
+    if (host && atPageEnd(host)) {
+      revealDeck();
+      return;
+    }
+    t.classList.add("deck-away");
+    clearTimeout(deckTimer);
+    deckTimer = window.setTimeout(revealDeck, 220);
+  };
+
   const showSection = (i: number) => {
     if (i === shown) return;
+    const prev = shown;
     if (shown >= 0 && bigs[shown]) bigs[shown]!.style.translate = "";
     shown = i;
     lastS = -1;
@@ -285,6 +306,12 @@ export function mount(root: HTMLElement, opts: MountOptions) {
         s.classList.remove("locked");
       }
     });
+    // Always land at the top of the page body when a station comes into focus.
+    if (prev >= 0) {
+      const body = pageBodyOf(i);
+      if (body) body.scrollTop = 0;
+    }
+    revealDeck();
     t.dataset.s = STATIONS[i].id;
     paintChrome(i);
     paintChannelBadge(i);
@@ -406,22 +433,40 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     }
   };
 
-  const onWheel = (e: WheelEvent) => {
-    if (e.ctrlKey) return;
-    e.preventDefault();
+  /** Active page body when it can actually scroll. */
+  const scrollHost = () => {
+    const body = shown >= 0 ? pageBodyOf(shown) : null;
+    if (body && body.scrollHeight > body.clientHeight + 1) return body;
+    return null;
+  };
+
+  const clearContentScrollLean = () => {
+    if (mode === "wheel") {
+      mode = "spring";
+      target = Math.round(clamp(p, 0, LAST));
+      wake();
+    }
+    wheelAcc = 0;
+    wheelStepped = false;
+  };
+
+  /** True when this delta still has room to move inside the page body. */
+  const canScrollContent = (dl: number) => {
+    const host = scrollHost();
+    if (!host) return false;
+    const top = host.scrollTop <= 0;
+    const bottom = atPageEnd(host);
+    return (dl < 0 && !top) || (dl > 0 && !bottom);
+  };
+
+  /** Shared station advance from a scroll gesture (wheel or touch). */
+  const advanceFromScroll = (dl: number, raw: number, deltaMode: number) => {
     touch();
-    const raw = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-    if (!raw) return;
-    const dl = e.deltaMode === 1 ? raw * 40 : e.deltaMode === 2 ? raw * 800 : raw;
-    // One gesture, one station. A trackpad flick keeps sending momentum for a
-    // second after the finger lifts; all of it belongs to the station it moved.
     const now = performance.now();
     const fresh = now - wheelLast > 240;
     wheelLast = now;
-    // A mouse wheel clicks in whole notches; a trackpad sends fractions.
     const ab = Math.abs(raw);
-    const notched = e.deltaMode !== 0 || (Number.isInteger(raw) && ab >= 100 && (ab % 100 === 0 || ab % 120 === 0));
-    // Momentum only ever decays. A delta that jumps up is a new push.
+    const notched = deltaMode !== 0 || (Number.isInteger(raw) && ab >= 100 && (ab % 100 === 0 || ab % 120 === 0));
     const push = Math.abs(dl) > wheelPrev * 1.6 && Math.abs(dl) > 6;
     wheelPrev = Math.abs(dl);
     clearTimeout(wheelTimer);
@@ -436,7 +481,6 @@ export function mount(root: HTMLElement, opts: MountOptions) {
       wheelBase = mode === "spring" || mode === "rest" ? target : Math.round(p);
     }
     if (wheelStepped) {
-      // a spun wheel or a fresh push may move on, never the momentum tail
       const again = notched ? now - wheelStepAt > 320 : push && now - wheelStepAt > 450;
       if (!again) return;
       wheelStepped = false;
@@ -450,11 +494,77 @@ export function mount(root: HTMLElement, opts: MountOptions) {
       go(wheelBase + Math.sign(wheelAcc), 0);
       return;
     }
-    // before the step: the needle leans toward the next station
     mode = "wheel";
     v = 0;
     p = clamp(wheelBase + (wheelAcc / WHEEL_STEP) * 0.2, -0.25, LAST + 0.25);
     wake();
+  };
+
+  const onWheel = (e: WheelEvent) => {
+    if (e.ctrlKey) return;
+    const dominantY = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+    const raw = dominantY ? e.deltaY : e.deltaX;
+    if (!raw) return;
+    const dl = e.deltaMode === 1 ? raw * 40 : e.deltaMode === 2 ? raw * 800 : raw;
+
+    // Laptop / trackpad: scroll page content first (works even over the title).
+    if (dominantY && canScrollContent(dl)) {
+      e.preventDefault();
+      const host = scrollHost();
+      if (host) host.scrollTop += dl;
+      clearContentScrollLean();
+      noteContentScroll();
+      return;
+    }
+
+    e.preventDefault();
+    revealDeck();
+    advanceFromScroll(dl, raw, e.deltaMode);
+  };
+
+  // Mobile: native content scroll while inside the page; edge pull changes station.
+  type Finger = { id: number; x: number; y: number; axis: "none" | "x" | "y" };
+  let finger: Finger | null = null;
+  const onTouchStart = (e: TouchEvent) => {
+    if (e.touches.length !== 1) {
+      finger = null;
+      return;
+    }
+    if (drum.contains(e.target as Node)) return;
+    const th = e.touches[0];
+    finger = { id: th.identifier, x: th.clientX, y: th.clientY, axis: "none" };
+  };
+  const onTouchMove = (e: TouchEvent) => {
+    if (!finger) return;
+    const th = [...e.touches].find((x) => x.identifier === finger!.id);
+    if (!th) return;
+    const dx = th.clientX - finger.x;
+    const dy = th.clientY - finger.y;
+    if (finger.axis === "none") {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      finger.axis = Math.abs(dy) >= Math.abs(dx) * 1.05 ? "y" : "x";
+    }
+    if (finger.axis !== "y") return;
+
+    // Finger up → positive delta (same sign as wheel deltaY / scroll down).
+    const dl = finger.y - th.clientY;
+    finger.x = th.clientX;
+    finger.y = th.clientY;
+
+    if (canScrollContent(dl)) {
+      clearContentScrollLean();
+      noteContentScroll();
+      return;
+    }
+
+    e.preventDefault();
+    revealDeck();
+    advanceFromScroll(dl, dl, 0);
+  };
+  const onTouchEnd = (e: TouchEvent) => {
+    if (!finger) return;
+    if ([...e.touches].some((x) => x.identifier === finger!.id)) return;
+    finger = null;
   };
 
   const onKey = (e: KeyboardEvent) => {
@@ -895,7 +1005,22 @@ export function mount(root: HTMLElement, opts: MountOptions) {
       return {};
     }
   });
-  bigs = secs.map((s) => s.querySelector<HTMLElement>(".big"));
+  // React may commit station content a frame later — keep titles + scroll hosts fresh.
+  const pageBodies: HTMLElement[] = [];
+  const bindPageBodies = () => {
+    bigs = secs.map((s) => s.querySelector<HTMLElement>(".big"));
+    secs.forEach((s) => {
+      const body = s.querySelector<HTMLElement>(".rg-page-body");
+      if (!body || pageBodies.includes(body)) return;
+      pageBodies.push(body);
+      body.addEventListener("scroll", noteContentScroll, { passive: true });
+    });
+  };
+  bindPageBodies();
+  requestAnimationFrame(() => {
+    bindPageBodies();
+    requestAnimationFrame(bindPageBodies);
+  });
 
   /* ---- wire up ---- */
   const ro = new ResizeObserver(() => {
@@ -945,6 +1070,10 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   t.addEventListener("pointercancel", onUp);
   t.addEventListener("click", onClickCapture, true);
   t.addEventListener("wheel", onWheel, { passive: false });
+  t.addEventListener("touchstart", onTouchStart, { passive: true });
+  t.addEventListener("touchmove", onTouchMove, { passive: false });
+  t.addEventListener("touchend", onTouchEnd);
+  t.addEventListener("touchcancel", onTouchEnd);
   window.addEventListener("mousemove", onDeckParallax);
   window.addEventListener("keydown", onKey);
   window.addEventListener("popstate", onPop);
@@ -968,6 +1097,8 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     cancelAnimationFrame(raf);
     raf = 0;
     clearTimeout(wheelTimer);
+    clearTimeout(deckTimer);
+    pageBodies.forEach((body) => body.removeEventListener("scroll", noteContentScroll));
     ro.disconnect();
     t.removeEventListener("pointerdown", onDown);
     t.removeEventListener("pointermove", onMove);
@@ -975,6 +1106,10 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     t.removeEventListener("pointercancel", onUp);
     t.removeEventListener("click", onClickCapture, true);
     t.removeEventListener("wheel", onWheel);
+    t.removeEventListener("touchstart", onTouchStart);
+    t.removeEventListener("touchmove", onTouchMove);
+    t.removeEventListener("touchend", onTouchEnd);
+    t.removeEventListener("touchcancel", onTouchEnd);
     window.removeEventListener("mousemove", onDeckParallax);
     window.removeEventListener("keydown", onKey);
     window.removeEventListener("popstate", onPop);

@@ -1,9 +1,10 @@
-import { useRef } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { Stations, type StationSpec } from '@/components/Stations'
 import { Title } from '@/components/Title'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 import { CursorRing } from '@/components/CursorRing'
+import { BlogList, ProjectList } from '@/components/ContentList'
 import { useMouseParallax } from '@/hooks/useMouseParallax'
 
 type TitleAlign = 'left' | 'center' | 'right'
@@ -11,18 +12,18 @@ type TitleStyle = 'hero' | 'ink' | 'ghost' | 'solid'
 
 const PageShell = ({
   title,
-  copy,
   fx,
   accents,
   align,
   titleStyle,
+  children,
 }: {
   title: string
-  copy: string
   fx: ComicFxVariant
   accents: [string, string]
   align: TitleAlign
   titleStyle: TitleStyle
+  children?: ReactNode
 }) => {
   const titleRef = useRef<HTMLHeadingElement>(null)
   useMouseParallax(titleRef, { duration: 0.22 })
@@ -30,13 +31,15 @@ const PageShell = ({
   return (
     <div className={`rg-page rg-page--${titleStyle}`}>
       <ComicFx variant={fx} accents={accents} />
-      <h2
-        ref={titleRef}
-        className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}
-      >
-        {title}
-      </h2>
-      <p className="lead det">{copy}</p>
+      <div className="rg-page-body det" data-own>
+        <h2
+          ref={titleRef}
+          className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}
+        >
+          {title}
+        </h2>
+        {children}
+      </div>
     </div>
   )
 }
@@ -70,12 +73,13 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Projects"
-        copy="Selected projects and experiments land here as this station settles."
         fx="radial-burst"
         accents={['#0f766e', '#2dd4bf']}
         align="left"
         titleStyle="hero"
-      />
+      >
+        <ProjectList />
+      </PageShell>
     ),
   },
   {
@@ -86,8 +90,7 @@ const STATIONS: StationSpec[] = [
     glow: ['#1d4ed8', '#60a5fa'],
     content: (
       <PageShell
-        title="Research"
-        copy="Deeper looks at how problems were framed, built, and shipped."
+        title="Case Study"
         fx="edge-focus"
         accents={['#1d4ed8', '#60a5fa']}
         align="center"
@@ -104,12 +107,13 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Blogs"
-        copy="Fragments, process, and writing — tuned in when this frequency locks."
         fx="corner-flare"
         accents={['#ea580c', '#fb923c']}
         align="right"
         titleStyle="ghost"
-      />
+      >
+        <BlogList />
+      </PageShell>
     ),
   },
   {
@@ -121,7 +125,6 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="About"
-        copy="A short signal about who I am, how I build, and what I care about."
         fx="speed-streaks"
         accents={['#ca8a04', '#facc15']}
         align="left"
@@ -138,7 +141,6 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Contact"
-        copy="Reach out on this channel when you want to start something together."
         fx="slash-burst"
         accents={['#c2410c', '#fb923c']}
         align="right"
