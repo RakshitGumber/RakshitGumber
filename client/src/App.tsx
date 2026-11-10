@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Stations, type StationSpec } from '@/components/Stations'
-import { Title } from '@/components/Title'
+import { HomePage } from '@/components/HomePage'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 import { CursorRing } from '@/components/CursorRing'
@@ -14,7 +14,6 @@ import {
   type ArchiveKind,
 } from '@/components/ArchivePage'
 import { useMouseParallax } from '@/hooks/useMouseParallax'
-import { HomeCutouts, PageCutout, type CutoutKind } from '@/components/Cutouts'
 
 type TitleAlign = 'left' | 'center' | 'right'
 type TitleStyle = 'hero' | 'ink' | 'ghost' | 'solid'
@@ -38,7 +37,6 @@ const PageShell = ({
   accents,
   align,
   titleStyle,
-  cutout,
   children,
 }: {
   title: string
@@ -46,7 +44,6 @@ const PageShell = ({
   accents: [string, string]
   align: TitleAlign
   titleStyle: TitleStyle
-  cutout: CutoutKind
   children?: ReactNode
 }) => {
   const titleRef = useRef<HTMLHeadingElement>(null)
@@ -57,7 +54,6 @@ const PageShell = ({
       <ComicFx variant={fx} accents={accents} />
       <div className="rg-page-body det" data-own>
         <div className="rg-page-scroll">
-          <PageCutout kind={cutout} />
           <h2
             ref={titleRef}
             className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}
@@ -70,18 +66,6 @@ const PageShell = ({
     </div>
   )
 }
-
-const HomePage = () => (
-  <div className="rg-home" data-own>
-    <div className="rg-home-stage">
-      <div className="rg-home-title">
-        <Title />
-      </div>
-      <HomeCutouts />
-      <PetalOverlay />
-    </div>
-  </div>
-)
 
 const STATIONS: StationSpec[] = [
   {
@@ -101,7 +85,6 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Projects"
-        cutout="projects"
         fx="radial-burst"
         accents={['#0f766e', '#2dd4bf']}
         align="center"
@@ -120,7 +103,6 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Research"
-        cutout="cases"
         fx="edge-focus"
         accents={['#1d4ed8', '#60a5fa']}
         align="center"
@@ -139,7 +121,6 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Blogs"
-        cutout="blogs"
         fx="corner-flare"
         accents={['#ea580c', '#fb923c']}
         align="center"
@@ -158,7 +139,6 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="About"
-        cutout="about"
         fx="speed-streaks"
         accents={['#ca8a04', '#facc15']}
         align="center"
@@ -175,7 +155,6 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Contact"
-        cutout="contact"
         fx="slash-burst"
         accents={['#c2410c', '#fb923c']}
         align="center"
@@ -204,15 +183,20 @@ const App = () => {
   }, [])
 
   const projectSlug = projectSlugOf(path)
-  if (projectSlug) return <ProjectPost slug={projectSlug} />
-
   const archive = ARCHIVE_PATHS[path]
-  if (archive) return <ArchivePage kind={archive} />
-
   const blogSlug = blogSlugOf(path)
-  if (blogSlug) return <BlogPost slug={blogSlug} />
 
-  return <DialApp />
+  let page: ReactNode = <DialApp />
+  if (projectSlug) page = <ProjectPost slug={projectSlug} />
+  else if (archive) page = <ArchivePage kind={archive} />
+  else if (blogSlug) page = <BlogPost slug={blogSlug} />
+
+  return (
+    <>
+      <PetalOverlay />
+      {page}
+    </>
+  )
 }
 
 export default App

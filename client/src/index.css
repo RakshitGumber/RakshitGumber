@@ -75,12 +75,207 @@ html.rg-cursor-on * {
     border-color 160ms ease;
 }
 
+/* Global petal field — above dial content, never steals clicks. */
+.rg-petals {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Home — name on black, tiny comic ink only. */
 .rg-home,
 .rg-home-stage {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+/* Soft corner focus lines — barely there. */
+.rg-home-ink {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 48%, transparent 42%, rgba(0, 0, 0, 0.55) 100%),
+    repeating-conic-gradient(
+      from -6deg at 50% 48%,
+      transparent 0deg 14deg,
+      rgba(255, 250, 242, 0.045) 14deg 14.7deg
+    );
+  opacity: 0.9;
+}
+
+.rg-home-title {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.rg-home-title > * {
+  pointer-events: auto;
+}
+
+/* Same horizontal span as the English Title letter row. */
+.rg-home-stack {
+  --home-aside: clamp(1.85rem, 5.8vw, 3.25rem);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(3rem, 9vw, 6rem);
+  width: 100%;
+  padding-inline: clamp(1.75rem, 7vw, 5.5rem);
+  box-sizing: border-box;
+}
+
+.rg-home-head {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(3rem, 9vw, 6rem);
+  width: 100%;
+}
+
+.rg-home-stack h1 {
+  padding-inline: 0;
+}
+
+.rg-home-lead,
+.rg-home-chips li {
+  color: #fff;
+  font-family: var(--hk, var(--font-en));
+  font-size: var(--home-aside);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.rg-home-lead {
+  margin: 0;
+  font-size: clamp(2.75rem, 9vw, 5.5rem);
+  text-align: left;
+  will-change: transform;
+}
+
+.rg-home-chips {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
+}
+
+.rg-home-chips li {
+  flex: 1 1 0;
+  padding: 0;
+  font-weight: 600;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+.rg-home-chips li:first-child {
+  text-align: left;
+}
+
+.rg-home-chips li:last-child {
+  text-align: right;
+}
+
+@media (max-width: 720px) {
+  .rg-home-title {
+    align-items: stretch;
+  }
+
+  .rg-home-stack {
+    height: 100%;
+    gap: 0;
+    padding-bottom: 0.5rem;
+  }
+
+  .rg-home-head {
+    flex: 1 1 50%;
+    justify-content: flex-end;
+    min-height: 0;
+    gap: 0;
+    padding-bottom: clamp(0.35rem, 1.5vw, 0.75rem);
+  }
+
+  .rg-home-lead {
+    padding-bottom: clamp(1.75rem, 7vw, 3rem);
+  }
+
+  .rg-home-chips {
+    flex: 1 1 50%;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    min-height: 0;
+  }
+
+  .rg-home-chips li,
+  .rg-home-chips li:first-child,
+  .rg-home-chips li:last-child {
+    flex: 0 0 auto;
+    width: auto;
+    text-align: left;
+  }
+}
+
+.rg-home-mark {
+  position: absolute;
+  top: max(1.1rem, env(safe-area-inset-top));
+  right: clamp(1rem, 3vw, 1.75rem);
+  z-index: 2;
+  margin: 0;
+  color: color-mix(in srgb, var(--color-title) 55%, transparent);
+  font-family: var(--font-block);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.rg-home-hint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(0.65rem, 2vh, 1.15rem);
+  z-index: 3;
+  margin: 0;
+  color: color-mix(in srgb, var(--color-title) 70%, transparent);
+  font-family: var(--hk, var(--font-en));
+  font-size: clamp(0.68rem, 1.6vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.rg-home-hint span {
+  display: inline-block;
+  margin-left: 0.2em;
+  animation: rg-home-hint-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes rg-home-hint-bob {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
 }
 
 /* Comic motion overlays — colored rays / speed marks behind copy. */
@@ -671,24 +866,6 @@ html.rg-cursor-on * {
     left: auto;
     translate: none;
   }
-
-  .rg-home-title {
-    justify-content: center;
-  }
-}
-
-.rg-home-title {
-  position: absolute;
-  inset: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  pointer-events: none;
-}
-
-.rg-home-title > * {
-  pointer-events: auto;
 }
 
 .rg-page {
@@ -1260,160 +1437,3 @@ html.rg-cursor-on * {
   }
 }
 
-/* ---- Vintage paper cutouts (home collage + one per page) ---- */
-/* Collage sits under the title (z 10) and petals (z 20). */
-.rg-cuts {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  pointer-events: none;
-}
-
-.rg-cut {
-  --size: 28vw;
-  --rot: 0deg;
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: var(--size);
-  rotate: var(--rot);
-  text-decoration: none;
-  pointer-events: auto;
-  transition:
-    rotate 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    scale 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-a.rg-cut:hover,
-a.rg-cut:focus-visible {
-  z-index: 1;
-  rotate: calc(var(--rot) * 0.3);
-  scale: 1.05;
-  outline: none;
-}
-
-/* White paper edge traced around the PNG's alpha, then a lifted shadow. */
-.rg-cut-art {
-  display: block;
-  width: 100%;
-  height: auto;
-  user-select: none;
-  filter: drop-shadow(4px 0 0 #fbf4e4) drop-shadow(-4px 0 0 #fbf4e4)
-    drop-shadow(0 4px 0 #fbf4e4) drop-shadow(0 -4px 0 #fbf4e4)
-    drop-shadow(8px 14px 14px rgb(0 0 0 / 0.55)) saturate(1.15) contrast(1.05);
-}
-
-.rg-cut-label {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px 0.35em;
-  margin-top: -1.2em;
-  font-family: var(--font-block);
-  font-size: clamp(12px, calc(var(--size) * 0.07), 28px);
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.rg-cut-word {
-  display: flex;
-  gap: 2px;
-  white-space: nowrap;
-}
-
-.rg-cut-word > span {
-  padding: 0.18em 0.2em 0.14em;
-  background: #fbf4e4;
-  color: #231f20;
-  box-shadow: 2px 3px 0 rgb(0 0 0 / 0.35);
-  rotate: -4deg;
-}
-
-.rg-cut-word > span:nth-child(3n + 2) {
-  background: #f2b134;
-  rotate: 5deg;
-  translate: 0 2px;
-}
-
-.rg-cut-word > span:nth-child(4n + 3) {
-  background: #231f20;
-  color: #fbf4e4;
-  rotate: -2deg;
-  translate: 0 -2px;
-}
-
-.rg-cut-word > span:nth-child(5n + 4) {
-  background: #ff6f91;
-  rotate: 3deg;
-}
-
-/* Home collage — big, overlapping, bleeding off the edges. Widths follow each image's shape. */
-.rg-cut--about { --size: 5.5vw; left: 5%; top: -18%; --rot: 4deg; }
-.rg-cut--cases { --size: 14vw; left: 16%; top: 0%; --rot: -8deg; }
-.rg-cut--blogs { --size: 34vw; left: 58%; top: 2%; --rot: 6deg; }
-.rg-cut--projects { --size: 25vw; left: 7%; top: 48%; --rot: -5deg; }
-.rg-cut--contact { --size: 40vw; left: 50%; top: 47%; --rot: -7deg; }
-
-@media (max-width: 640px) {
-  .rg-cut--about { --size: 13vw; left: 2%; top: -6%; }
-  .rg-cut--cases { --size: 36vw; left: 60%; top: 12%; }
-  .rg-cut--blogs { --size: 58vw; left: 18%; top: 2%; }
-  .rg-cut--projects { --size: 46vw; left: -2%; top: 60%; }
-  .rg-cut--contact { --size: 70vw; left: 34%; top: 58%; }
-}
-
-/* On its own page the cutout is pinned beside the title and scrolls with it. */
-.rg-page-scroll {
-  position: relative;
-}
-
-.rg-cut.rg-cut--page {
-  --size: clamp(120px, 13vw, 200px);
-  width: auto;
-  left: auto;
-  right: clamp(0rem, 1vw, 1.5rem);
-  top: 0;
-  z-index: 4;
-}
-
-/* Page cutouts are sized by height so tall and wide images feel equal. */
-.rg-cut--page .rg-cut-art {
-  width: auto;
-  max-width: 17vw;
-  height: calc(var(--size) * 0.85);
-  object-fit: contain;
-}
-
-.rg-cut--page.rg-cut--about,
-.rg-cut--page.rg-cut--blogs { --rot: 8deg; }
-.rg-cut--page.rg-cut--projects,
-.rg-cut--page.rg-cut--cases,
-.rg-cut--page.rg-cut--contact { --rot: -7deg; }
-
-@media (max-width: 640px) {
-  .rg-cut.rg-cut--page {
-    --size: 80px;
-    right: 0.25rem;
-    top: -3rem;
-  }
-
-  .rg-cut--page .rg-cut-art {
-    max-width: 30vw;
-  }
-
-  .rg-cut--page .rg-cut-label {
-    display: none;
-  }
-}
-
-.rg-site-heading {
-  position: relative;
-}
-
-.rg-site-heading .rg-cut.rg-cut--page {
-  --size: clamp(76px, 10vw, 120px);
-  top: 50%;
-  right: 0;
-  translate: 0 -50%;
-}
