@@ -4,7 +4,7 @@ import { Title } from '@/components/Title'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 import { CursorRing } from '@/components/CursorRing'
-import { BlogList, CaseList, ProjectList } from '@/components/ContentList'
+import { BlogList, CaseList, ContactList, ProjectList } from '@/components/ContentList'
 import { ArchivePage, type ArchiveKind } from '@/components/ArchivePage'
 import { useMouseParallax } from '@/hooks/useMouseParallax'
 
@@ -160,7 +160,9 @@ const STATIONS: StationSpec[] = [
         accents={['#c2410c', '#fb923c']}
         align="center"
         titleStyle="solid"
-      />
+      >
+        <ContactList />
+      </PageShell>
     ),
   },
 ]

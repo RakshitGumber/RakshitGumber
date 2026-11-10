@@ -1,7 +1,13 @@
 import { useRef, type CSSProperties } from 'react'
 import { useContent } from '@/hooks/useContent'
 import { useHotFrame } from '@/hooks/useHotFrame'
-import { BLOG_PALETTE, PROJECT_PALETTE, type StripPalette } from '@/lib/stripPalette'
+import { CONTACT } from '@/lib/contact'
+import {
+  BLOG_PALETTE,
+  CONTACT_PALETTE,
+  PROJECT_PALETTE,
+  type StripPalette,
+} from '@/lib/stripPalette'
 
 const PAGE_SIZE = 8
 
@@ -80,10 +86,16 @@ const Frame = ({
     </>
   )
 
+  const external = item.href?.startsWith('http')
+
   return (
     <li className="rg-frame" style={style} data-cursor-morph="" data-cursor-glow={color}>
       {item.href ? (
-        <a className="rg-frame-hit" href={item.href} target="_blank" rel="noreferrer">
+        <a
+          className="rg-frame-hit"
+          href={item.href}
+          {...(external ? { target: '_blank', rel: 'noreferrer' } : {})}
+        >
           {inner}
         </a>
       ) : (
@@ -199,3 +211,64 @@ export const CaseList = () => (
     </div>
   </div>
 )
+
+/** Four-panel contact strip — email, X, LinkedIn, mobile. */
+export const ContactList = () => {
+  const bookRef = useRef<HTMLDivElement>(null)
+  useHotFrame(bookRef, 0)
+
+  const items: FrameItem[] = [
+    {
+      id: 'email',
+      title: 'Email',
+      description: CONTACT.email,
+      tags: ['Write'],
+      meta: [],
+      href: `mailto:${CONTACT.email}`,
+    },
+    {
+      id: 'twitter',
+      title: 'Twitter',
+      description: CONTACT.twitter.handle,
+      tags: ['Yell'],
+      meta: [],
+      href: CONTACT.twitter.url,
+    },
+    {
+      id: 'linkedin',
+      title: 'LinkedIn',
+      description: CONTACT.linkedin.handle,
+      tags: ['Connect'],
+      meta: [],
+      href: CONTACT.linkedin.url,
+    },
+    {
+      id: 'mobile',
+      title: 'Mobile',
+      description: CONTACT.mobile,
+      tags: ['Call'],
+      meta: [],
+      href: `tel:${CONTACT.mobile.replace(/\s+/g, '')}`,
+    },
+  ]
+
+  return (
+    <div className="rg-book-stack">
+      <SketchFilter />
+      <div
+        ref={bookRef}
+        className="rg-book"
+        style={{ ['--paper' as string]: CONTACT_PALETTE.paper }}
+      >
+        <article className="rg-sheet">
+          <ul className="rg-frames rg-frames--4">
+            {items.map((item, i) => (
+              <Frame key={item.id} item={item} index={i} palette={CONTACT_PALETTE} />
+            ))}
+          </ul>
+          <span className="rg-folio">1 / 1</span>
+        </article>
+      </div>
+    </div>
+  )
+}

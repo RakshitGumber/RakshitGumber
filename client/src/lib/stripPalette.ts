@@ -18,3 +18,10 @@ export const BLOG_PALETTE: StripPalette = {
   ink: '#042028',
   paper: '#ffffff',
 }
+
+export const CONTACT_PALETTE: StripPalette = {
+  // Field #93c5fd → 215° / 305° / 35° / 125°
+  colors: ['#7eb8ff', '#c4a1ff', '#ff9b6a', '#7ee0a8'],
+  ink: '#0c1a3a',
+  paper: '#ffffff',
+}
