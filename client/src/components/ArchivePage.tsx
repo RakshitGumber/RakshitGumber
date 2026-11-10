@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { useContent } from '@/hooks/useContent'
 import type { Blog, Project } from '@/lib/content'
+import { PageCutout } from '@/components/Cutouts'
 
 export type ArchiveKind = 'projects' | 'blogs' | 'cases'
 
@@ -180,6 +181,7 @@ export const ArchivePage = ({ kind }: { kind: ArchiveKind }) => {
         <BackLink href={copy.dial} />
         <div className="rg-site-heading">
           <h1>{copy.title}</h1>
+          <PageCutout kind={kind} />
         </div>
         {body}
       </section>

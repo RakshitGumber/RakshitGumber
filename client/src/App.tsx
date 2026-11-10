@@ -14,6 +14,7 @@ import {
   type ArchiveKind,
 } from '@/components/ArchivePage'
 import { useMouseParallax } from '@/hooks/useMouseParallax'
+import { HomeCutouts, PageCutout, type CutoutKind } from '@/components/Cutouts'
 
 type TitleAlign = 'left' | 'center' | 'right'
 type TitleStyle = 'hero' | 'ink' | 'ghost' | 'solid'
@@ -37,6 +38,7 @@ const PageShell = ({
   accents,
   align,
   titleStyle,
+  cutout,
   children,
 }: {
   title: string
@@ -44,6 +46,7 @@ const PageShell = ({
   accents: [string, string]
   align: TitleAlign
   titleStyle: TitleStyle
+  cutout: CutoutKind
   children?: ReactNode
 }) => {
   const titleRef = useRef<HTMLHeadingElement>(null)
@@ -54,6 +57,7 @@ const PageShell = ({
       <ComicFx variant={fx} accents={accents} />
       <div className="rg-page-body det" data-own>
         <div className="rg-page-scroll">
+          <PageCutout kind={cutout} />
           <h2
             ref={titleRef}
             className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}
@@ -73,6 +77,7 @@ const HomePage = () => (
       <div className="rg-home-title">
         <Title />
       </div>
+      <HomeCutouts />
       <PetalOverlay />
     </div>
   </div>
@@ -96,6 +101,7 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Projects"
+        cutout="projects"
         fx="radial-burst"
         accents={['#0f766e', '#2dd4bf']}
         align="center"
@@ -114,6 +120,7 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Research"
+        cutout="cases"
         fx="edge-focus"
         accents={['#1d4ed8', '#60a5fa']}
         align="center"
@@ -132,6 +139,7 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Blogs"
+        cutout="blogs"
         fx="corner-flare"
         accents={['#ea580c', '#fb923c']}
         align="center"
@@ -150,6 +158,7 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="About"
+        cutout="about"
         fx="speed-streaks"
         accents={['#ca8a04', '#facc15']}
         align="center"
@@ -166,6 +175,7 @@ const STATIONS: StationSpec[] = [
     content: (
       <PageShell
         title="Contact"
+        cutout="contact"
         fx="slash-burst"
         accents={['#c2410c', '#fb923c']}
         align="center"
