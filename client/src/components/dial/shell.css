@@ -11,6 +11,7 @@
   --top: max(60px, calc(env(safe-area-inset-top) + 48px));
   position: fixed;
   inset: 0;
+  z-index: 0;
   height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -22,6 +23,8 @@
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  /* Keep cursor/deck z-index comparisons inside this shell. */
+  isolation: isolate;
 }
 
 /* Black plate behind Android's gesture nav — stays put even when the deck ducks. */

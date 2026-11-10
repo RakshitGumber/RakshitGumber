@@ -58,6 +58,8 @@ html.rg-cursor-on * {
 }
 
 .rg-cursor.is-morph {
+  /* Below .deck (z-index: 4) — ring is mounted inside .t so this stacks correctly. */
+  z-index: 3;
   border-width: 4px;
   border-radius: 0;
   border-color: var(--cursor-glow);

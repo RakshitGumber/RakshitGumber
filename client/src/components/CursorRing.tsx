@@ -21,6 +21,17 @@ export const CursorRing = () => {
     let visible = false
     let hot: Element | null = null
 
+    // Live under the station shell, before the deck, so morph can stack behind the tuner.
+    const homeInShell = () => {
+      const shell = document.querySelector('.d-stations .t')
+      const deck = shell?.querySelector('.deck')
+      if (!shell || !deck || el.parentElement === shell) return
+      shell.insertBefore(el, deck)
+    }
+    homeInShell()
+    const mo = new MutationObserver(homeInShell)
+    mo.observe(document.body, { childList: true, subtree: true })
+
     const clearHot = () => {
       if (hot instanceof HTMLElement) hot.classList.remove('is-hot')
       hot = null
@@ -92,6 +103,7 @@ export const CursorRing = () => {
     raf = requestAnimationFrame(tick)
 
     return () => {
+      mo.disconnect()
       cancelAnimationFrame(raf)
       window.removeEventListener('mousemove', onMove)
       document.documentElement.removeEventListener('mouseleave', onLeave)
