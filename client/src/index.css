@@ -351,8 +351,9 @@ html.rg-cursor-on * {
 .rg-frame:nth-child(8) { grid-area: h; }
 
 /* The first frame is always the splash. */
+/* Solo frame — top third only, leave the rest of the sheet open. */
 .rg-frames--1 {
-  grid-template: "a" 1fr / 1fr;
+  grid-template: "a" 1fr "." 2fr / 1fr;
 }
 
 .rg-frames--2 {
@@ -649,6 +650,12 @@ html.rg-cursor-on * {
 
   .rg-frames .rg-frame:first-child {
     min-height: 20rem;
+  }
+
+  /* Solo frame stays compact on stacked mobile sheets too. */
+  .rg-frames--1 .rg-frame:first-child {
+    min-height: 12rem;
+    max-height: 14rem;
   }
 
   .rg-sheet {
