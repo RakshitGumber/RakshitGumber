@@ -4,7 +4,13 @@ import { HomePage } from '@/components/HomePage'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 import { CursorRing } from '@/components/CursorRing'
-import { BlogList, CaseList, ContactList, ProjectList } from '@/components/ContentList'
+import {
+  AboutList,
+  BlogList,
+  CaseList,
+  ContactList,
+  ProjectList,
+} from '@/components/ContentList'
 import {
   ArchivePage,
   BlogPost,
@@ -143,7 +149,9 @@ const STATIONS: StationSpec[] = [
         accents={['#ca8a04', '#facc15']}
         align="center"
         titleStyle="hero"
-      />
+      >
+        <AboutList />
+      </PageShell>
     ),
   },
   {

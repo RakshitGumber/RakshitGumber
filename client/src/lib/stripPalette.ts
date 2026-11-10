@@ -25,3 +25,10 @@ export const CONTACT_PALETTE: StripPalette = {
   ink: '#0c1a3a',
   paper: '#ffffff',
 }
+
+export const ABOUT_PALETTE: StripPalette = {
+  // Field #7c3aed → 265° / 355° / 85° / 175°
+  colors: ['#a78bfa', '#f472b6', '#facc15', '#2dd4bf'],
+  ink: '#1e1033',
+  paper: '#ffffff',
+}

@@ -5,6 +5,7 @@ import { ProjectFlyer } from '@/components/ProjectFlyer'
 import { CONTACT } from '@/lib/contact'
 import type { Project } from '@/lib/content'
 import {
+  ABOUT_PALETTE,
   BLOG_PALETTE,
   CONTACT_PALETTE,
   PROJECT_PALETTE,
@@ -101,10 +102,12 @@ const Frame = ({
         >
           {inner}
         </a>
-      ) : (
+      ) : item.onOpen ? (
         <button type="button" className="rg-frame-hit" onClick={item.onOpen}>
           {inner}
         </button>
+      ) : (
+        <div className="rg-frame-hit">{inner}</div>
       )}
     </li>
   )
@@ -230,6 +233,101 @@ export const CaseList = () => (
     </div>
   </div>
 )
+
+/** About strip — framed panels drawn from the root README. */
+export const AboutList = () => {
+  const bookRef = useRef<HTMLDivElement>(null)
+  useHotFrame(bookRef, 0)
+
+  const items: FrameItem[] = [
+    {
+      id: 'intro',
+      title: 'Rakshit Gumber',
+      description:
+        'Earth · Verified human by captcha · Can fix your printer · Cries when AI breaks my code',
+      tags: ['Human'],
+      meta: ['Hi'],
+      href: null,
+    },
+    {
+      id: 'status',
+      title: 'Status',
+      description: 'Building Autterly. Mood: filling the gaps.',
+      tags: ['Now'],
+      meta: ['Active'],
+      href: null,
+    },
+    {
+      id: 'domains',
+      title: 'Across Domains',
+      description: 'Curiosity pulls me everywhere.',
+      tags: ['Work'],
+      meta: [],
+      href: null,
+    },
+    {
+      id: 'learn',
+      title: 'Learning Fast',
+      description: 'I close knowledge gaps aggressively.',
+      tags: ['Learn'],
+      meta: [],
+      href: null,
+    },
+    {
+      id: 'ship',
+      title: 'Shipping',
+      description: 'I build and deliver.',
+      tags: ['Ship'],
+      meta: [],
+      href: null,
+    },
+    {
+      id: 'roadmap',
+      title: 'Roadmap',
+      description:
+        'Becoming both a quant engineer and an exceptional product builder. Building Autterly, Curaly, Tickerly and more.',
+      tags: ['Focus'],
+      meta: [],
+      href: null,
+    },
+    {
+      id: 'quote',
+      title: 'Note',
+      description: 'You may feel lost, so be it and find the way out.',
+      tags: ['Quote'],
+      meta: [],
+      href: null,
+    },
+    {
+      id: 'tune',
+      title: 'Stay Tuned',
+      description: 'There is no prime for me — I will keep evolving.',
+      tags: ['Live'],
+      meta: [],
+      href: 'https://github.com/RakshitGumber',
+    },
+  ]
+
+  return (
+    <div className="rg-book-stack">
+      <SketchFilter />
+      <div
+        ref={bookRef}
+        className="rg-book"
+        style={{ ['--paper' as string]: ABOUT_PALETTE.paper }}
+      >
+        <article className="rg-sheet">
+          <ul className={`rg-frames rg-frames--${layoutOf(items.length)}`}>
+            {items.map((item, i) => (
+              <Frame key={item.id} item={item} index={i} palette={ABOUT_PALETTE} />
+            ))}
+          </ul>
+          <span className="rg-folio">1 / 1</span>
+        </article>
+      </div>
+    </div>
+  )
+}
 
 /** Four-panel contact strip — email, X, LinkedIn, mobile. */
 export const ContactList = () => {
