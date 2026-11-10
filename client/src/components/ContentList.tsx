@@ -1,12 +1,9 @@
-import { useRef, useState, type CSSProperties } from 'react'
+import { useRef, type CSSProperties } from 'react'
 import { useContent } from '@/hooks/useContent'
 import { useHotFrame } from '@/hooks/useHotFrame'
-import { scrollPageTo } from '@/lib/pageScroll'
 import { BLOG_PALETTE, PROJECT_PALETTE, type StripPalette } from '@/lib/stripPalette'
 
 const PAGE_SIZE = 8
-/** Full pages rotate through three splash layouts. */
-const FULL_PAGE_LAYOUTS = 3
 
 type FrameItem = {
   id: string
@@ -25,9 +22,9 @@ function formatDate(iso: string) {
   })
 }
 
-function layoutOf(count: number, page: number) {
+function layoutOf(count: number) {
   if (count < PAGE_SIZE) return String(Math.max(1, count))
-  return `8-${(page % FULL_PAGE_LAYOUTS) + 1}`
+  return `8-1`
 }
 
 /** Wobbly-ink filter shared by every frame border. */
@@ -101,17 +98,16 @@ const Frame = ({
 const ComicBook = ({
   items,
   palette,
+  moreHref,
 }: {
   items: FrameItem[]
   palette: StripPalette
+  moreHref: string
 }) => {
-  const [page, setPage] = useState(0)
   const bookRef = useRef<HTMLDivElement>(null)
-  const pages = Math.ceil(items.length / PAGE_SIZE)
-  const shown = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
-  const last = page === pages - 1
+  const shown = items.slice(0, PAGE_SIZE)
 
-  useHotFrame(bookRef, page)
+  useHotFrame(bookRef, 0)
 
   return (
     <div className="rg-book-stack">
@@ -121,39 +117,18 @@ const ComicBook = ({
         className="rg-book"
         style={{ ['--paper' as string]: palette.paper }}
       >
-        <article key={page} className="rg-sheet">
-          <ul className={`rg-frames rg-frames--${layoutOf(shown.length, page)}`}>
+        <article className="rg-sheet">
+          <ul className={`rg-frames rg-frames--${layoutOf(shown.length)}`}>
             {shown.map((item, i) => (
-              <Frame
-                key={item.id}
-                item={item}
-                index={page * PAGE_SIZE + i}
-                palette={palette}
-              />
+              <Frame key={item.id} item={item} index={i} palette={palette} />
             ))}
           </ul>
-          <span className="rg-folio">
-            {page + 1} / {pages}
-          </span>
+          <span className="rg-folio">1 / 1</span>
         </article>
-        <button
-          type="button"
-          className="rg-sticker"
-          onClick={(e) => {
-            setPage((p) => (last ? 0 : p + 1))
-            // Land on the top of the fresh page, not its bottom edge.
-            const stack = e.currentTarget.parentElement
-            const body = stack?.closest('.rg-page-body')
-            if (stack && body instanceof HTMLElement) scrollPageTo(body, stack)
-            else stack?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }}
-          disabled={pages < 2}
-        >
-          <span className="rg-sticker-label">
-            {pages < 2 ? 'The End!' : last ? 'Back to #1' : 'Next Page!'}
-          </span>
-          {pages > 1 ? <span className="rg-sticker-arrow">{last ? '↺' : '→'}</span> : null}
-        </button>
+        <a className="rg-sticker" href={moreHref}>
+          <span className="rg-sticker-label">Next Page!</span>
+          <span className="rg-sticker-arrow">→</span>
+        </a>
       </div>
     </div>
   )
@@ -180,7 +155,7 @@ export const ProjectList = () => {
     meta: [],
     href: p.liveDemoUrl || p.githubUrl || p.repoUrl,
   }))
-  return <ComicBook items={items} palette={PROJECT_PALETTE} />
+  return <ComicBook items={items} palette={PROJECT_PALETTE} moreHref="/projects" />
 }
 
 export const BlogList = () => {
@@ -204,5 +179,23 @@ export const BlogList = () => {
     meta: [formatDate(b.timestamp), ...(b.readTime != null ? [`${b.readTime} min`] : [])],
     href: null,
   }))
-  return <ComicBook items={items} palette={BLOG_PALETTE} />
+  return <ComicBook items={items} palette={BLOG_PALETTE} moreHref="/blogs" />
 }
+
+/** Cases dial preview — sticker opens the white archive. */
+export const CaseList = () => (
+  <div className="rg-book-stack">
+    <div className="rg-book" style={{ ['--paper' as string]: '#ffffff' }}>
+      <article className="rg-sheet">
+        <p className="lead det" style={{ margin: 'auto', textAlign: 'center' }}>
+          Case studies live on the next page.
+        </p>
+        <span className="rg-folio">1 / 1</span>
+      </article>
+      <a className="rg-sticker" href="/cases">
+        <span className="rg-sticker-label">Next Page!</span>
+        <span className="rg-sticker-arrow">→</span>
+      </a>
+    </div>
+  </div>
+)

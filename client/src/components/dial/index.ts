@@ -161,10 +161,12 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   };
   html.style.overscrollBehavior = "none";
   document.body.style.overflow = "hidden";
-  const paintChrome = (i: number) => {
-    html.style.background = STATIONS[i].field;
-    document.body.style.background = STATIONS[i].field;
-    if (meta) meta.content = STATIONS[i].field;
+  const paintChrome = (_i: number) => {
+    // Keep the root black so Android's gesture nav doesn't flash station colour.
+    // Station field still paints on `.t` via --field.
+    html.style.background = "#000";
+    document.body.style.background = "#000";
+    if (meta) meta.content = "#000000";
   };
 
   /* ---- state ---- */
@@ -339,12 +341,58 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     const base = mode === "spring" || mode === "rest" ? target : Math.round(p);
     go(base + dir);
   };
+  let audioCtx: AudioContext | null = null;
+  const ensureAudio = () => {
+    if (!audioCtx) {
+      const AC = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AC) return null;
+      audioCtx = new AC();
+    }
+    if (audioCtx.state === "suspended") void audioCtx.resume();
+    return audioCtx;
+  };
+  /** Soft tuner detent — tiny click when a station locks in. */
+  const playStationTick = () => {
+    const ctx = ensureAudio();
+    if (!ctx) return;
+    const t0 = ctx.currentTime;
+    const master = ctx.createGain();
+    master.gain.value = 0.11;
+    master.connect(ctx.destination);
+
+    const click = ctx.createOscillator();
+    const clickGain = ctx.createGain();
+    click.type = "triangle";
+    click.frequency.setValueAtTime(520, t0);
+    click.frequency.exponentialRampToValueAtTime(180, t0 + 0.05);
+    clickGain.gain.setValueAtTime(0.0001, t0);
+    clickGain.gain.exponentialRampToValueAtTime(1, t0 + 0.008);
+    clickGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.07);
+    click.connect(clickGain);
+    clickGain.connect(master);
+    click.start(t0);
+    click.stop(t0 + 0.08);
+
+    const tick = ctx.createOscillator();
+    const tickGain = ctx.createGain();
+    tick.type = "sine";
+    tick.frequency.value = 1400;
+    tickGain.gain.setValueAtTime(0.0001, t0);
+    tickGain.gain.exponentialRampToValueAtTime(0.45, t0 + 0.004);
+    tickGain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.03);
+    tick.connect(tickGain);
+    tickGain.connect(master);
+    tick.start(t0);
+    tick.stop(t0 + 0.035);
+  };
+
   const touch = () => {
     fromPop = false;
     if (!interacted) {
       interacted = true;
       t.classList.add("touched");
     }
+    ensureAudio();
   };
 
   // pointer: drag horizontally anywhere; the drum takes any drag immediately
@@ -616,14 +664,19 @@ export function mount(root: HTMLElement, opts: MountOptions) {
       committed = i;
       if (!fromPop) {
         const u = new URL(location.href);
-        u.searchParams.set("s", STATIONS[i].id);
+        u.pathname = "/";
+        if (STATIONS[i].id === "home") u.searchParams.delete("s");
+        else u.searchParams.set("s", STATIONS[i].id);
         history.pushState(null, "", u);
       }
-      if (interacted && "vibrate" in navigator) {
-        try {
-          navigator.vibrate(8);
-        } catch {
-          /* not allowed here */
+      if (interacted) {
+        playStationTick();
+        if ("vibrate" in navigator) {
+          try {
+            navigator.vibrate(8);
+          } catch {
+            /* not allowed here */
+          }
         }
       }
     }
@@ -1053,6 +1106,10 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     document.body.style.background = prev.bodyBg;
     document.body.style.overflow = prev.bodyOverflow;
     if (meta && prev.theme !== null) meta.content = prev.theme;
+    if (audioCtx) {
+      void audioCtx.close();
+      audioCtx = null;
+    }
     root.classList.remove("d-stations");
   };
 }

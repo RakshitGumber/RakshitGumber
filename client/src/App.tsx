@@ -1,14 +1,25 @@
-import { useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Stations, type StationSpec } from '@/components/Stations'
 import { Title } from '@/components/Title'
 import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 import { CursorRing } from '@/components/CursorRing'
-import { BlogList, ProjectList } from '@/components/ContentList'
+import { BlogList, CaseList, ProjectList } from '@/components/ContentList'
+import { ArchivePage, type ArchiveKind } from '@/components/ArchivePage'
 import { useMouseParallax } from '@/hooks/useMouseParallax'
 
 type TitleAlign = 'left' | 'center' | 'right'
 type TitleStyle = 'hero' | 'ink' | 'ghost' | 'solid'
+
+const ARCHIVE_PATHS: Record<string, ArchiveKind> = {
+  '/projects': 'projects',
+  '/blogs': 'blogs',
+  '/cases': 'cases',
+}
+
+function pathOf() {
+  return location.pathname.replace(/\/+$/, '') || '/'
+}
 
 const PageShell = ({
   title,
@@ -97,7 +108,9 @@ const STATIONS: StationSpec[] = [
         accents={['#1d4ed8', '#60a5fa']}
         align="center"
         titleStyle="ink"
-      />
+      >
+        <CaseList />
+      </PageShell>
     ),
   },
   {
@@ -152,11 +165,25 @@ const STATIONS: StationSpec[] = [
   },
 ]
 
-const App = () => (
+const DialApp = () => (
   <>
     <CursorRing />
     <Stations title="Rakshit Gumber" stations={STATIONS} />
   </>
 )
+
+const App = () => {
+  const [path, setPath] = useState(pathOf)
+
+  useEffect(() => {
+    const onPop = () => setPath(pathOf())
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  const archive = ARCHIVE_PATHS[path]
+  if (archive) return <ArchivePage kind={archive} />
+  return <DialApp />
+}
 
 export default App

@@ -24,6 +24,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Black plate behind Android's gesture nav — stays put even when the deck ducks. */
+.d-stations .t::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* 48px covers typical gesture bars when safe-area insets report 0. */
+  height: max(48px, env(safe-area-inset-bottom, 0px));
+  background: #000;
+  pointer-events: none;
+  z-index: 3;
+}
+
 
 .d-stations .t.dragging {
   cursor: grabbing;
@@ -268,6 +282,8 @@
   flex-direction: column;
   align-items: center;
   background: #000;
+  /* Cover the 1px mobile hairline under the tuner (field colour bleed). */
+  box-shadow: 0 1px 0 #000, 0 12px 0 #000;
   color: var(--contrast);
   padding: 4px 16px calc(6px + env(safe-area-inset-bottom));
   transition: transform 0.42s cubic-bezier(0.2, 0.85, 0.2, 1);
