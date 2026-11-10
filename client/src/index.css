@@ -1,0 +1,1439 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #000000;
+  --color-title: #fffaf2;
+  --font-en: "DM Sans", sans-serif;
+  --font-heading: "Montserrat", ui-sans-serif, sans-serif;
+  --font-content: "Mulish", ui-sans-serif, sans-serif;
+  --font-block: "Rubik Mono One", monospace;
+  --font-hi: "Tiro Devanagari Marathi", serif;
+  --font-ja: "UoqMunThenKhung", serif;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-title);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Custom thin cursor ring — hide native pointer on fine devices. */
+html.rg-cursor-on,
+html.rg-cursor-on * {
+  cursor: none !important;
+}
+
+.rg-cursor {
+  --cursor-glow: #fff;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  /* Inverts against whatever sits under the ring. */
+  mix-blend-mode: difference;
+  filter: contrast(1.35);
+  will-change: transform, width, height, filter;
+  transition:
+    width 160ms ease,
+    height 160ms ease,
+    border-radius 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    filter 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.rg-cursor.is-morph {
+  /* Below .deck (z-index: 4) — ring is mounted inside .t so this stacks correctly. */
+  z-index: 3;
+  border-width: 4px;
+  border-radius: 0;
+  border-color: var(--cursor-glow);
+  background: transparent;
+  mix-blend-mode: normal;
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--cursor-glow) 70%, transparent));
+  transition:
+    width 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-radius 160ms ease,
+    border-color 160ms ease;
+}
+
+/* Global petal field — above dial content, never steals clicks. */
+.rg-petals {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Home — name on black, tiny comic ink only. */
+.rg-home,
+.rg-home-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Soft corner focus lines — barely there. */
+.rg-home-ink {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 55% at 50% 48%, transparent 42%, rgba(0, 0, 0, 0.55) 100%),
+    repeating-conic-gradient(
+      from -6deg at 50% 48%,
+      transparent 0deg 14deg,
+      rgba(255, 250, 242, 0.045) 14deg 14.7deg
+    );
+  opacity: 0.9;
+}
+
+.rg-home-title {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.rg-home-title > * {
+  pointer-events: auto;
+}
+
+/* Same horizontal span as the English Title letter row. */
+.rg-home-stack {
+  --home-aside: clamp(1.85rem, 5.8vw, 3.25rem);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(3rem, 9vw, 6rem);
+  width: 100%;
+  padding-inline: clamp(1.75rem, 7vw, 5.5rem);
+  box-sizing: border-box;
+}
+
+.rg-home-head {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(3rem, 9vw, 6rem);
+  width: 100%;
+}
+
+.rg-home-stack h1 {
+  padding-inline: 0;
+}
+
+.rg-home-lead,
+.rg-home-chips li {
+  color: #fff;
+  font-family: var(--hk, var(--font-en));
+  font-size: var(--home-aside);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.rg-home-lead {
+  margin: 0;
+  font-size: clamp(2.75rem, 9vw, 5.5rem);
+  text-align: left;
+  will-change: transform;
+}
+
+.rg-home-chips {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
+}
+
+.rg-home-chips li {
+  flex: 1 1 0;
+  padding: 0;
+  font-weight: 600;
+  text-align: center;
+  text-transform: lowercase;
+}
+
+.rg-home-chips li:first-child {
+  text-align: left;
+}
+
+.rg-home-chips li:last-child {
+  text-align: right;
+}
+
+@media (max-width: 720px) {
+  .rg-home-title {
+    align-items: stretch;
+  }
+
+  .rg-home-stack {
+    height: 100%;
+    gap: 0;
+    padding-bottom: 0.5rem;
+  }
+
+  .rg-home-head {
+    flex: 1 1 50%;
+    justify-content: flex-end;
+    min-height: 0;
+    gap: 0;
+    padding-bottom: clamp(0.35rem, 1.5vw, 0.75rem);
+  }
+
+  .rg-home-lead {
+    padding-bottom: clamp(1.75rem, 7vw, 3rem);
+  }
+
+  .rg-home-chips {
+    flex: 1 1 50%;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    min-height: 0;
+  }
+
+  .rg-home-chips li,
+  .rg-home-chips li:first-child,
+  .rg-home-chips li:last-child {
+    flex: 0 0 auto;
+    width: auto;
+    text-align: left;
+  }
+}
+
+.rg-home-mark {
+  position: absolute;
+  top: max(1.1rem, env(safe-area-inset-top));
+  right: clamp(1rem, 3vw, 1.75rem);
+  z-index: 2;
+  margin: 0;
+  color: color-mix(in srgb, var(--color-title) 55%, transparent);
+  font-family: var(--font-block);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.rg-home-hint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(0.65rem, 2vh, 1.15rem);
+  z-index: 3;
+  margin: 0;
+  color: color-mix(in srgb, var(--color-title) 70%, transparent);
+  font-family: var(--hk, var(--font-en));
+  font-size: clamp(0.68rem, 1.6vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.rg-home-hint span {
+  display: inline-block;
+  margin-left: 0.2em;
+  animation: rg-home-hint-bob 1.6s ease-in-out infinite;
+}
+
+@keyframes rg-home-hint-bob {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+/* Comic motion overlays — colored rays / speed marks behind copy. */
+.rg-comic {
+  --fx-a: #fff;
+  --fx-b: #fff;
+  position: absolute;
+  inset: -2% -4%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  /* Keep FX out of the title band and copy band. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 22%,
+    #000 52%,
+    transparent 82%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 22%,
+    #000 52%,
+    transparent 82%
+  );
+}
+
+.rg-comic-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Pivot sunburst — classic comic impact rays. */
+.rg-comic--radial-burst {
+  background:
+    repeating-conic-gradient(
+      from -8deg at 72% 28%,
+      transparent 0deg 3.2deg,
+      color-mix(in srgb, var(--fx-a) 70%, #fff) 3.2deg 4.4deg,
+      transparent 4.4deg 7.5deg,
+      color-mix(in srgb, var(--fx-b) 85%, #fff) 7.5deg 8.2deg,
+      transparent 8.2deg 11deg,
+      #fff 11deg 11.55deg
+    );
+  -webkit-mask-image: radial-gradient(
+    ellipse 95% 90% at 72% 28%,
+    transparent 6%,
+    #000 22%,
+    #000 55%,
+    transparent 92%
+  );
+  mask-image: radial-gradient(
+    ellipse 95% 90% at 72% 28%,
+    transparent 6%,
+    #000 22%,
+    #000 55%,
+    transparent 92%
+  );
+  opacity: 0.42;
+  mix-blend-mode: soft-light;
+}
+
+/* Corner flare — rays erupting from one corner. */
+.rg-comic--corner-flare {
+  background:
+    repeating-conic-gradient(
+      from 198deg at 0% 100%,
+      transparent 0deg 2.8deg,
+      color-mix(in srgb, var(--fx-a) 80%, #fff) 2.8deg 4deg,
+      transparent 4deg 6.5deg,
+      #fff 6.5deg 7.1deg,
+      transparent 7.1deg 9.8deg,
+      color-mix(in srgb, var(--fx-b) 90%, #fff) 9.8deg 11.2deg
+    );
+  -webkit-mask-image: radial-gradient(
+    ellipse 120% 110% at 0% 100%,
+    transparent 4%,
+    #000 18%,
+    #000 58%,
+    transparent 88%
+  );
+  mask-image: radial-gradient(
+    ellipse 120% 110% at 0% 100%,
+    transparent 4%,
+    #000 18%,
+    #000 58%,
+    transparent 88%
+  );
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
+}
+
+/* Center focus lines — soft, sparse burst (Cases). */
+.rg-comic--edge-focus {
+  background:
+    repeating-conic-gradient(
+      from 4deg at 52% 38%,
+      transparent 0deg 5.5deg,
+      color-mix(in srgb, var(--fx-a) 35%, transparent) 5.5deg 6.2deg,
+      transparent 6.2deg 11deg,
+      color-mix(in srgb, var(--fx-b) 28%, transparent) 11deg 11.45deg
+    );
+  -webkit-mask-image: radial-gradient(
+    ellipse 100% 95% at 52% 38%,
+    transparent 18%,
+    #000 40%,
+    #000 58%,
+    transparent 88%
+  );
+  mask-image: radial-gradient(
+    ellipse 100% 95% at 52% 38%,
+    transparent 18%,
+    #000 40%,
+    #000 58%,
+    transparent 88%
+  );
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+}
+
+/* Side flare — speed erupting from the right edge (Contact). */
+.rg-comic--slash-burst {
+  background:
+    repeating-conic-gradient(
+      from 140deg at 100% 42%,
+      transparent 0deg 2.6deg,
+      color-mix(in srgb, var(--fx-a) 75%, #fff) 2.6deg 3.8deg,
+      transparent 3.8deg 6.2deg,
+      #fff 6.2deg 6.8deg,
+      transparent 6.8deg 9.4deg,
+      color-mix(in srgb, var(--fx-b) 85%, #fff) 9.4deg 10.8deg
+    );
+  -webkit-mask-image: radial-gradient(
+    ellipse 125% 105% at 100% 42%,
+    transparent 4%,
+    #000 16%,
+    #000 58%,
+    transparent 88%
+  );
+  mask-image: radial-gradient(
+    ellipse 125% 105% at 100% 42%,
+    transparent 4%,
+    #000 16%,
+    #000 58%,
+    transparent 88%
+  );
+  opacity: 0.4;
+  mix-blend-mode: soft-light;
+}
+
+.rg-comic--speed-streaks {
+  mix-blend-mode: screen;
+  opacity: 0.4;
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--fx-b) 40%, transparent));
+}
+
+.rg-page-body {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  box-sizing: border-box;
+  padding: var(--top, 56px) var(--pad, 20px) 1.5rem;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+
+.rg-page-body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* Lenis content root — one child so the scroller can measure cleanly. */
+.rg-page-scroll {
+  min-height: 100%;
+}
+
+.rg-page-body .lead {
+  max-width: 22em;
+}
+
+/* Comic book page — A4 sheet, 80vw wide, frames laid out per count (1–8). */
+.rg-book-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 0 clamp(9rem, 26vh, 15rem);
+}
+
+.rg-book {
+  --paper: #ffffff;
+  --shadow-off: clamp(16px, 2.6vw, 40px);
+  position: relative;
+  width: 80vw;
+  aspect-ratio: 210 / 297;
+  margin-inline: auto;
+}
+
+/* Offset print shadow — same darkened field + Ben-Day dots as the tuner ridge. */
+.rg-book::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  translate: var(--shadow-off) var(--shadow-off);
+  background-color: color-mix(in srgb, var(--field) 42%, #000);
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.34) 3.1px, transparent 3.3px);
+  background-size: 14px 14px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.rg-sheet {
+  --margin: clamp(1.25rem, 5.5vw, 5rem);
+  --gutter: clamp(0.6rem, 1.4vw, 1.3rem);
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--margin);
+  box-sizing: border-box;
+  background: var(--paper);
+  color: #111;
+  transform-origin: left center;
+  animation: rg-sheet-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes rg-sheet-in {
+  from {
+    opacity: 0;
+    transform: perspective(1800px) rotateY(-18deg) translateX(-3%);
+  }
+}
+
+.rg-folio {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--margin) * 0.35);
+  translate: -50% 0;
+  font-family: var(--font-block);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  opacity: 0.55;
+}
+
+.rg-frames {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  gap: var(--gutter);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rg-frame:nth-child(1) { grid-area: a; }
+.rg-frame:nth-child(2) { grid-area: b; }
+.rg-frame:nth-child(3) { grid-area: c; }
+.rg-frame:nth-child(4) { grid-area: d; }
+.rg-frame:nth-child(5) { grid-area: e; }
+.rg-frame:nth-child(6) { grid-area: f; }
+.rg-frame:nth-child(7) { grid-area: g; }
+.rg-frame:nth-child(8) { grid-area: h; }
+
+/* The first frame is always the splash. */
+/* Solo frame — top third only, leave the rest of the sheet open. */
+.rg-frames--1 {
+  grid-template: "a" 1fr "." 2fr / 1fr;
+}
+
+.rg-frames--2 {
+  grid-template: "a" 3fr "b" 2fr / 1fr;
+}
+
+.rg-frames--3 {
+  grid-template: "a a" 3fr "b c" 2fr / 1fr 1fr;
+}
+
+.rg-frames--4 {
+  grid-template: "a a" 1.6fr "b c" 1fr "d d" 1fr / 1.2fr 1fr;
+}
+
+.rg-frames--5 {
+  grid-template: "a a b" 1fr "a a c" 1fr "d e e" 1fr / 1fr 1fr 1fr;
+}
+
+.rg-frames--6 {
+  grid-template: "a a b" 1.1fr "a a c" 1.1fr "d e f" 1fr / 1fr 1fr 1fr;
+}
+
+.rg-frames--7 {
+  grid-template: "a a b" 1fr "a a c" 1fr "d e e" 0.9fr "f f g" 0.9fr / 1fr 1fr 1fr;
+}
+
+/* Three alternating designs for full 8-frame pages. */
+.rg-frames--8-1 {
+  grid-template: "a a b" 1fr "a a c" 1fr "d e f" 1fr "g h h" 1fr / 1fr 1fr 1fr;
+}
+
+.rg-frames--8-2 {
+  grid-template: "a a a" 1.5fr "b c d" 1fr "e e f" 1fr "g h h" 1fr / 1fr 1fr 1fr;
+}
+
+.rg-frames--8-3 {
+  grid-template: "b a a a" 1fr "c a a a" 1fr "d d e e" 1fr "f g h h" 1fr / 1fr 1fr 1fr 1fr;
+}
+
+.rg-frame {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  container-type: size;
+  transition:
+    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 200ms ease;
+}
+
+/* Hand-inked frame border — wobbles through the sketch filter. */
+.rg-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 3px solid #111;
+  filter: url(#rg-sketch);
+  pointer-events: none;
+}
+
+.rg-frame:hover,
+.rg-frame.is-hot {
+  z-index: 2;
+  transform: translate(-5px, -5px) rotate(-0.5deg);
+  filter: drop-shadow(9px 9px 0 #111);
+}
+
+.d-stations .rg-frame-hit {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 0;
+  padding: clamp(0.55rem, 6cqmin, 1.5rem);
+  border: none;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Pencil sketch by default — the frame's colour inks in on hover. */
+.rg-frame-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle, rgba(0, 0, 0, 0.5) 1px, transparent 1.4px) 0 0 / 6px 6px,
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 7px),
+    repeating-conic-gradient(
+      from 0deg at var(--burst-x) var(--burst-y),
+      var(--panel) 0deg 4deg,
+      color-mix(in srgb, var(--panel) 40%, #fff) 4deg 10deg
+    );
+  filter: grayscale(1) contrast(1.5) brightness(1.15);
+  opacity: 0.5;
+  transition:
+    filter 350ms ease,
+    opacity 350ms ease;
+}
+
+.rg-frame:hover .rg-frame-art,
+.rg-frame.is-hot .rg-frame-art {
+  filter: none;
+  opacity: 1;
+}
+
+.rg-frame-num {
+  position: absolute;
+  top: clamp(0.55rem, 6cqmin, 1.5rem);
+  left: clamp(0.55rem, 6cqmin, 1.5rem);
+  z-index: 1;
+  padding: 0.2em 0.5em;
+  background: #111;
+  color: #fff;
+  font-family: var(--font-block);
+  font-size: clamp(0.65rem, 6cqmin, 1.1rem);
+  rotate: -3deg;
+}
+
+.rg-frame-text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.35rem, 3cqmin, 0.8rem);
+}
+
+.rg-frame-title {
+  margin: 0;
+  max-width: 100%;
+  padding: 0.15em 0.35em;
+  border: 2.5px solid #111;
+  background: #fff;
+  box-shadow: 4px 4px 0 #111;
+  font-family: var(--font-block);
+  font-size: clamp(0.8rem, 9cqi, 3.4rem);
+  font-weight: 400;
+  line-height: 1.05;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.rg-frame-copy {
+  margin: 0;
+  max-width: 32ch;
+  padding: 0.4em 0.6em;
+  border: 2px solid #111;
+  background: #fff;
+  font-family: var(--hk);
+  font-size: clamp(0.72rem, 4.4cqi, 1.15rem);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.rg-frame-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.rg-frame-tag,
+.rg-frame-meta {
+  padding: 0.2em 0.5em;
+  background: #111;
+  color: #fff;
+  font-family: var(--hk);
+  font-size: clamp(0.6rem, 3.2cqi, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rg-frame-meta {
+  background: #fff;
+  color: #111;
+  box-shadow: inset 0 0 0 1.5px #111;
+}
+
+@container (max-height: 11rem) {
+  .rg-frame-foot {
+    display: none;
+  }
+}
+
+@container (max-height: 8rem) {
+  .rg-frame-copy {
+    display: none;
+  }
+}
+
+/* Die-cut sticker slapped over the bottom edge of the page. */
+.d-stations a.rg-sticker,
+.rg-sticker {
+  position: absolute;
+  right: clamp(1rem, 7vw, 6rem);
+  bottom: calc(-1 * clamp(2.5rem, 4.5vw, 4rem));
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.1em;
+  width: clamp(6.5rem, 12vw, 9.5rem);
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.55), transparent 38%),
+    radial-gradient(circle, rgba(0, 0, 0, 0.14) 1.2px, transparent 1.5px) 0 0 / 7px 7px,
+    #ffd23f;
+  color: #111;
+  font-family: var(--font-block);
+  font-size: clamp(0.72rem, 1.3vw, 1rem);
+  line-height: 1.05;
+  text-align: center;
+  text-decoration: none;
+  box-shadow:
+    0 0 0 1.5px rgba(0, 0, 0, 0.12),
+    0 10px 22px rgba(0, 0, 0, 0.32);
+  rotate: -9deg;
+  transition:
+    rotate 220ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    scale 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.d-stations a.rg-sticker:hover {
+  color: #111;
+  text-decoration: none;
+}
+
+/* Peeling edge — the sticker lifts a little at the lower right. */
+.rg-sticker::after {
+  content: "";
+  position: absolute;
+  right: 2%;
+  bottom: 2%;
+  width: 30%;
+  height: 30%;
+  border-radius: 0 0 100% 0;
+  background: linear-gradient(135deg, transparent 49%, #d9d9d9 50%, #fff 72%, #ececec 100%);
+  box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.18);
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  transition: width 220ms ease, height 220ms ease;
+}
+
+.rg-sticker:hover {
+  rotate: -3deg;
+  scale: 1.07;
+}
+
+.rg-sticker:hover::after {
+  width: 40%;
+  height: 40%;
+}
+
+.rg-sticker-label {
+  max-width: 5.5em;
+}
+
+.rg-sticker-arrow {
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+@media (max-width: 720px) {
+  .rg-page-body .lead {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  /* Fit sheet + print shadow inside the padded page body so it stays centered. */
+  .rg-book {
+    --shadow-off: 10px;
+    width: calc(100% - var(--shadow-off));
+    aspect-ratio: auto;
+  }
+
+  .rg-book .rg-frames {
+    grid-template: none;
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(13rem, auto);
+  }
+
+  .rg-frames .rg-frame {
+    grid-area: auto;
+  }
+
+  .rg-frames .rg-frame:first-child {
+    min-height: 20rem;
+  }
+
+  /* Solo frame stays compact on stacked mobile sheets too. */
+  .rg-frames--1 .rg-frame:first-child {
+    min-height: 12rem;
+    max-height: 14rem;
+  }
+
+  .rg-sheet {
+    padding-bottom: calc(var(--margin) * 2.5);
+  }
+
+  .rg-sticker {
+    right: clamp(0.75rem, 4vw, 2rem);
+    left: auto;
+    translate: none;
+  }
+}
+
+.rg-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Soft field washes so title + copy stay readable over noise. */
+.rg-page::before,
+.rg-page::after {
+  content: "";
+  position: absolute;
+  left: -8%;
+  right: -8%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.rg-page::before {
+  top: -6%;
+  height: 42%;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--field) 78%, transparent) 0%,
+    color-mix(in srgb, var(--field) 42%, transparent) 55%,
+    transparent 100%
+  );
+}
+
+.rg-page::after {
+  bottom: -4%;
+  height: 38%;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--field) 88%, transparent) 0%,
+    color-mix(in srgb, var(--field) 48%, transparent) 55%,
+    transparent 100%
+  );
+}
+
+/* Titles scroll with the page — sit above comic fx in normal flow. */
+.d-stations .rg-page-title.big {
+  position: relative;
+  z-index: 3;
+  margin: 0 0 clamp(2rem, 5vw, 3.5rem);
+  width: 100%;
+  max-width: none;
+  pointer-events: none;
+  font-family: var(--font-en);
+  font-weight: 700;
+  font-size: clamp(4.5rem, 20vw, 13rem);
+  line-height: 0.88;
+  letter-spacing: 0.02em;
+  text-align: center;
+  will-change: transform;
+}
+
+/* Left / right title aligns only on desktop — mobile stays centered. */
+@media (min-width: 721px) {
+  .d-stations .rg-page-title--left {
+    text-align: left;
+  }
+
+  .d-stations .rg-page-title--right {
+    text-align: right;
+  }
+}
+
+/* Projects / About — white outline. */
+.d-stations .rg-page-title--hero {
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0.022em #fff;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 40%,
+    rgba(0, 0, 0, 0.55) 72%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 40%,
+    rgba(0, 0, 0, 0.55) 72%,
+    transparent 100%
+  );
+}
+
+/* Cases — dark filled type. */
+.d-stations .rg-page-title--ink {
+  color: #1c1000;
+  -webkit-text-fill-color: #1c1000;
+}
+
+/* Blogs — soft ghost fill. */
+.d-stations .rg-page-title--ghost {
+  color: currentColor;
+  opacity: 0.32;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 45%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 45%,
+    transparent 100%
+  );
+}
+
+/* Contact — solid black type. */
+.d-stations .rg-page-title--solid {
+  color: #000;
+  -webkit-text-fill-color: #000;
+}
+
+/* Site pages — web/ layout, dark theme like the dial app. */
+.rg-site {
+  --site-bg: #11111b;
+  --site-title: #F4F6FF;
+  --site-text: #898ba7;
+  --site-accent: #ff133e;
+  --site-muted: #636687;
+  box-sizing: border-box;
+  min-height: 100dvh;
+  background: var(--site-bg);
+  color: var(--site-text);
+  font-family: var(--font-content);
+}
+
+.rg-site-section {
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  padding: 1rem 1rem 4rem;
+}
+
+@media (min-width: 640px) {
+  .rg-site-section {
+    padding: 1rem 3rem 5rem;
+  }
+}
+
+.rg-site-back {
+  display: inline-flex;
+  margin-bottom: 1.5rem;
+  color: var(--site-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 200ms ease;
+}
+
+.rg-site-back:hover {
+  color: var(--site-title);
+}
+
+.rg-site-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0 4rem;
+}
+
+.rg-site-heading h1 {
+  margin: 0;
+  color: var(--site-title);
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 6vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rg-site-note {
+  margin: 0;
+  color: var(--site-muted);
+  font-size: 1.05rem;
+}
+
+.rg-site-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rg-snippet {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.rg-snippet-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .rg-snippet-top {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+}
+
+.rg-snippet-title {
+  display: inline-flex;
+  width: fit-content;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--site-title);
+  font-family: var(--font-content);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.rg-snippet-title:hover {
+  color: var(--site-title);
+  text-decoration: underline;
+  text-decoration-color: var(--site-accent);
+  text-underline-offset: 4px;
+}
+
+.rg-snippet-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rg-snippet-actions a,
+.rg-site-crumbs a {
+  color: var(--site-text);
+  font-weight: 500;
+  text-decoration: none;
+  text-underline-offset: 4px;
+  transition: color 200ms ease, text-decoration-color 200ms ease;
+}
+
+.rg-snippet-actions a:hover,
+.rg-site-crumbs a:hover {
+  color: var(--site-title);
+  text-decoration: underline;
+  text-decoration-color: var(--site-accent);
+}
+
+.rg-snippet-copy {
+  margin: 0;
+  color: var(--site-text);
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+.rg-snippet-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--site-muted);
+  font-size: 0.95rem;
+}
+
+.rg-site-crumbs {
+  margin-bottom: 2.5rem;
+}
+
+.rg-site-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--site-muted);
+  font-size: 0.875rem;
+}
+
+.rg-site-crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rg-site-crumbs [aria-current="page"] {
+  color: var(--site-title);
+}
+
+.rg-post-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0 4rem;
+}
+
+.rg-post-title {
+  margin: 0;
+  color: var(--site-title);
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.rg-prose {
+  color: var(--site-text);
+  font-family: var(--font-content);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.rg-prose p {
+  margin: 0 0 1.25rem;
+}
+
+.rg-prose a {
+  color: var(--site-accent);
+  text-decoration: none;
+}
+
+.rg-prose a:hover {
+  text-decoration: underline;
+}
+
+.rg-post-sign {
+  margin: 2rem 0 0;
+  padding-top: 2rem;
+  color: var(--site-text);
+}
+
+/* Project flyer — comic ad poster over a black/80 scrim.
+   Sit above the deck (z-index: 4) but below the cursor ring (z-index: 10000). */
+.rg-flyer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  box-sizing: border-box;
+}
+
+.rg-flyer-scrim {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+}
+
+.rg-flyer-page {
+  --panel: #ff7b93;
+  position: relative;
+  z-index: 1;
+  width: min(100%, 34rem);
+  max-height: min(92dvh, 52rem);
+  overflow: auto;
+  border: 4px solid #111;
+  background: #fff;
+  color: #111;
+  box-shadow:
+    10px 10px 0 #111,
+    0 24px 60px rgba(0, 0, 0, 0.45);
+  animation: rg-flyer-in 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes rg-flyer-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) rotate(-1.5deg) scale(0.96);
+  }
+}
+
+.rg-flyer-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(0, 0, 0, 0.45) 1px, transparent 1.4px) 0 0 / 7px 7px,
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 8px),
+    repeating-conic-gradient(
+      from -12deg at var(--burst-x) var(--burst-y),
+      var(--panel) 0deg 5deg,
+      color-mix(in srgb, var(--panel) 35%, #fff) 5deg 12deg
+    );
+  opacity: 0.92;
+}
+
+.rg-flyer-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.85rem, 2.5vw, 1.35rem);
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+}
+
+.rg-flyer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.rg-flyer-kicker {
+  padding: 0.25em 0.55em;
+  border: 2.5px solid #111;
+  background: #ffd23f;
+  font-family: var(--font-block);
+  font-size: clamp(0.7rem, 2.4vw, 0.85rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  rotate: -3deg;
+  box-shadow: 3px 3px 0 #111;
+}
+
+.rg-flyer-num {
+  padding: 0.2em 0.5em;
+  background: #111;
+  color: #fff;
+  font-family: var(--font-block);
+  font-size: clamp(0.7rem, 2.4vw, 0.95rem);
+  rotate: 2deg;
+}
+
+.rg-flyer-title {
+  margin: 0;
+  max-width: 14ch;
+  padding: 0.2em 0.4em;
+  border: 3px solid #111;
+  background: #fff;
+  box-shadow: 5px 5px 0 #111;
+  font-family: var(--font-block);
+  font-size: clamp(1.75rem, 7vw, 3.1rem);
+  font-weight: 400;
+  line-height: 0.98;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.rg-flyer-tagline {
+  margin: 0;
+  max-width: 34ch;
+  padding: 0.55em 0.7em;
+  border: 2.5px solid #111;
+  background: #fff;
+  font-family: var(--hk, var(--font-en));
+  font-size: clamp(1rem, 2.8vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.rg-flyer-body {
+  margin: 0;
+  max-width: 42ch;
+  padding: 0.7em 0.85em;
+  border: 2px solid #111;
+  background: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-en);
+  font-size: clamp(0.92rem, 2.2vw, 1.05rem);
+  line-height: 1.55;
+}
+
+.rg-flyer-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rg-flyer-tags li {
+  padding: 0.25em 0.55em;
+  background: #111;
+  color: #fff;
+  font-family: var(--hk, var(--font-en));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.rg-flyer-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.rg-flyer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.7em 1em;
+  border: 3px solid #111;
+  color: #111;
+  font-family: var(--font-block);
+  font-size: clamp(0.78rem, 2.2vw, 0.95rem);
+  letter-spacing: 0.02em;
+  text-decoration: none !important;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #111;
+  transition:
+    transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 160ms ease;
+}
+
+.rg-flyer-cta--live {
+  background: #b6ef45;
+}
+
+.rg-flyer-cta--git {
+  background: #fff;
+}
+
+.rg-flyer-cta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #111;
+}
+
+.rg-flyer-close {
+  align-self: flex-start;
+  margin: 0.35rem 0 0;
+  padding: 0.35em 0.7em;
+  border: 2px solid #111;
+  background: #fff;
+  color: #111;
+  font-family: var(--hk, var(--font-en));
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.rg-flyer-close:hover {
+  background: #111;
+  color: #fff;
+}
+
+@media (max-width: 520px) {
+  .rg-flyer-page {
+    width: 100%;
+    max-height: 94dvh;
+    box-shadow: 6px 6px 0 #111;
+  }
+
+  .rg-flyer-ctas {
+    flex-direction: column;
+  }
+
+  .rg-flyer-cta {
+    justify-content: center;
+  }
+}
+

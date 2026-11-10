@@ -4,26 +4,22 @@
 
 **📍 Earth | 🤖 Verified Human by Captcha | 🖨️ Can fix your printer | 🥲 Cries when AI breaks my code**
 
-<img src="https://skillicons.dev/icons?i=ts,js,python,rust" width="150" />
+<img src="https://skillicons.dev/icons?i=ts,js,html,css,python,rust,bun" width="400" />
 
 ```
 Status: Building
-Project: Curiously Randomly Workingly Brainstormingly Thinkinglys
-Mood: Curiously looking for problems to solve
+Project: Autterly
+Mood: Filling the gaps
 ```
-
-<!-- Focus on adding projects nothing else will improve this -->
 
 ## Current Projects
 
 - **📸 [Single Filter](https://github.com/RakshitGumber/snap-tool) | [repo](https://github.com/RakshitGumber/single-filter)** - Photo editing shouldn't require extra skills
 - **📝 [Curaly](https://curaly.app) | private** - Filter the noise and get informed
 - **📝 Rustle | [repo](https://github.com/RakshitGumber/rustle)** - All the news in your terminal
-  <!-- - **👛 [Rusty Personal Budget](https://github.com/RakshitGumber/rust-budget-planner) | [repo](https://github.com/RakshitGumber/rust-budget-planner)** - Personal budget planner made with Rust🦀 -->
+- **📝 [Autterly](https://autterly.com) | private** - AI that can take over all your work.
 
 ---
-
-<!-- add a contribution snake diagram -->
 
 ## What I'm doing
 
@@ -34,11 +30,11 @@ Mood: Curiously looking for problems to solve
 ## My Current Roadmap
 
 ```
-I’m focused on becoming both a quant engineer and an exceptional product builder. I work independently on projects that sharpen my skills in systems, mathematics, finance, and software engineering while simultaneously building products with real-world value.
+I’m focused on becoming both a quant engineer and an exceptional product builder. I work independently on projects.
 
-I document the journey through writing, blogs; Not just to share knowledge, but to create a public record of growth, thinking, and execution.
+I document the journey through writing sometimes.
 
-Over the next five years, my aim is to build a portfolio of meaningful products, develop deep technical expertise, and position myself to operate at the frontier of technology and finance.
+I am currently building Autterly, Curaly, Tickerly and more.
 ```
 
 > "You may feel lost, so be it and find the way out."
@@ -60,5 +56,4 @@ Prime???.... There is no prime for me I will keep evolving
 
 ```
 Made by Rakshit Gumber
-Working on pure serotonin
 ```

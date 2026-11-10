@@ -1,0 +1,68 @@
+{
+  "projects": [
+    {
+      "id": "single-filter",
+      "title": "Single Filter",
+      "description": "Photo editing shouldn't require extra skills",
+      "longDescription": "A post maker with a minimalist core. Every edit requires just a few clicks. No endless tweaking to make elements fit perfectly together. Built for pure speed and simplicity.",
+      "tags": ["open-source", "photo"],
+      "githubUrl": "https://github.com/RakshitGumber/snap-tool",
+      "repoUrl": "https://github.com/RakshitGumber/single-filter",
+      "liveDemoUrl": null,
+      "private": false,
+      "featured": true,
+      "timestamp": "2026-04-14T13:00:03+05:30"
+    },
+    {
+      "id": "curaly",
+      "title": "Curaly",
+      "description": "Filter the noise and get informed",
+      "longDescription": "A curated reading experience that cuts through feed noise so you stay informed without the overwhelm.",
+      "tags": ["product"],
+      "githubUrl": null,
+      "repoUrl": null,
+      "liveDemoUrl": "https://curaly.app",
+      "private": true,
+      "featured": true,
+      "timestamp": "2026-03-01T12:00:00+05:30"
+    },
+    {
+      "id": "rustle",
+      "title": "Rustle",
+      "description": "All the news in your terminal",
+      "longDescription": "A terminal-first news reader — headlines and briefs without leaving the shell.",
+      "tags": ["open-source", "cli"],
+      "githubUrl": "https://github.com/RakshitGumber/rustle",
+      "repoUrl": "https://github.com/RakshitGumber/rustle",
+      "liveDemoUrl": null,
+      "private": false,
+      "featured": true,
+      "timestamp": "2026-02-15T12:00:00+05:30"
+    },
+    {
+      "id": "autterly",
+      "title": "Autterly",
+      "description": "AI that can take over all your work",
+      "longDescription": "An AI agent platform aimed at taking over the busywork so you can focus on the real work.",
+      "tags": ["ai", "product"],
+      "githubUrl": null,
+      "repoUrl": null,
+      "liveDemoUrl": "https://autterly.com",
+      "private": true,
+      "featured": true,
+      "timestamp": "2026-05-01T12:00:00+05:30"
+    }
+  ],
+  "blogs": [
+    {
+      "id": "work-to-progress",
+      "title": "Why I prefer to build even confused?",
+      "description": "This is your sign to work, even if confused. Least you aren't confused with your dreams.",
+      "longDescription": "I am also confused with the future. Every passing day, month; reminds me of not working enough towards where I see myself. But, this shouldn't stop you from actually getting there. Aim for working at get the clear image.",
+      "tags": ["process"],
+      "readTime": 2,
+      "featured": true,
+      "timestamp": "2026-04-12T06:46:03+05:30"
+    }
+  ]
+}
