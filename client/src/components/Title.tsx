@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useMouseParallax } from '@/hooks/useMouseParallax'
 
-const ENGLISH_LEN = 7
 const HOLD_MS = 5000
 const FLIP_OUT = 0.22
 const FLIP_IN = 0.28
@@ -12,16 +11,20 @@ const LOCALES = [
     id: 'en',
     chars: ['R', 'A', 'K', 'S', 'H', 'I', 'T'],
     font: 'DM Sans',
+    /** Spread letters across the full title width. */
+    spread: true,
   },
   {
     id: 'hi',
     chars: ['र', 'क्षि', 'त'],
     font: 'Tiro Devanagari Marathi',
+    spread: false,
   },
   {
     id: 'ja',
     chars: ['ラ', 'ク', 'シ', 'ッ', 'ト'],
     font: 'UoqMunThenKhung',
+    spread: false,
   },
 ] as const
 
@@ -30,7 +33,6 @@ export const Title = () => {
   const titleRef = useRef<HTMLHeadingElement>(null)
   const rowRef = useRef<HTMLDivElement>(null)
   const locale = LOCALES[index]
-  const trackWidth = `${(locale.chars.length / ENGLISH_LEN) * 100}%`
 
   useMouseParallax(titleRef)
 
@@ -75,7 +77,7 @@ export const Title = () => {
   return (
     <h1
       ref={titleRef}
-      className="w-full px-[1.5vw] text-[clamp(3.5rem,16vw,14rem)] font-bold uppercase leading-none text-[var(--color-title)] select-none will-change-transform"
+      className="flex w-full justify-center px-[1.5vw] text-center text-[clamp(3.5rem,16vw,14rem)] font-bold uppercase leading-none text-[var(--color-title)] select-none will-change-transform"
       style={{
         fontFamily: `"${locale.font}", sans-serif`,
         perspective: '900px',
@@ -84,15 +86,23 @@ export const Title = () => {
     >
       <div
         ref={rowRef}
-        className="mx-auto flex justify-between"
-        style={{ width: trackWidth, transformStyle: 'preserve-3d' }}
+        className={
+          locale.spread
+            ? 'flex w-full justify-between'
+            : 'flex w-max justify-center gap-[0.12em]'
+        }
+        style={{ transformStyle: 'preserve-3d' }}
         lang={locale.id}
       >
         {locale.chars.map((char, i) => (
           <span
             key={`${locale.id}-${i}`}
             data-letter
-            className="inline-block will-change-transform"
+            className={
+              locale.spread
+                ? 'inline-flex flex-1 items-center justify-center will-change-transform'
+                : 'inline-block will-change-transform'
+            }
             style={{ transformOrigin: '50% 50%', transformStyle: 'preserve-3d' }}
           >
             {char}

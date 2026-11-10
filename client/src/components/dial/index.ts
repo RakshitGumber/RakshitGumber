@@ -975,6 +975,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   const WAVE_PX = 18;
   const HEX_PX = 10;
   const HEX_PY = 7;
+  const finePointer = window.matchMedia("(pointer: fine)").matches;
   const onDeckParallax = (e: MouseEvent) => {
     const nx = e.clientX / window.innerWidth - 0.5;
     const ny = e.clientY / window.innerHeight - 0.5;
@@ -994,7 +995,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   t.addEventListener("touchmove", onTouchMove, { passive: false });
   t.addEventListener("touchend", onTouchEnd);
   t.addEventListener("touchcancel", onTouchEnd);
-  window.addEventListener("mousemove", onDeckParallax);
+  if (finePointer) window.addEventListener("mousemove", onDeckParallax);
   window.addEventListener("keydown", onKey);
   window.addEventListener("popstate", onPop);
   reduce.addEventListener("change", onReduce);
@@ -1030,7 +1031,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     t.removeEventListener("touchmove", onTouchMove);
     t.removeEventListener("touchend", onTouchEnd);
     t.removeEventListener("touchcancel", onTouchEnd);
-    window.removeEventListener("mousemove", onDeckParallax);
+    if (finePointer) window.removeEventListener("mousemove", onDeckParallax);
     window.removeEventListener("keydown", onKey);
     window.removeEventListener("popstate", onPop);
     reduce.removeEventListener("change", onReduce);

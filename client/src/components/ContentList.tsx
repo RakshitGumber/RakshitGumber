@@ -1,5 +1,6 @@
-import { useState, type CSSProperties } from 'react'
+import { useRef, useState, type CSSProperties } from 'react'
 import { useContent } from '@/hooks/useContent'
+import { useHotFrame } from '@/hooks/useHotFrame'
 import { BLOG_PALETTE, PROJECT_PALETTE, type StripPalette } from '@/lib/stripPalette'
 
 const PAGE_SIZE = 8
@@ -104,14 +105,21 @@ const ComicBook = ({
   palette: StripPalette
 }) => {
   const [page, setPage] = useState(0)
+  const bookRef = useRef<HTMLDivElement>(null)
   const pages = Math.ceil(items.length / PAGE_SIZE)
   const shown = items.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
   const last = page === pages - 1
 
+  useHotFrame(bookRef, page)
+
   return (
     <div className="rg-book-stack">
       <SketchFilter />
-      <div className="rg-book" style={{ ['--paper' as string]: palette.paper }}>
+      <div
+        ref={bookRef}
+        className="rg-book"
+        style={{ ['--paper' as string]: palette.paper }}
+      >
         <article key={page} className="rg-sheet">
           <ul className={`rg-frames rg-frames--${layoutOf(shown.length, page)}`}>
             {shown.map((item, i) => (

@@ -10,6 +10,7 @@ export const usePetalField = (count = PETAL_COUNT) => {
   useEffect(() => {
     const host = hostRef.current
     if (!host) return
+    if (!window.matchMedia('(pointer: fine)').matches) return
 
     const xTo = gsap.quickTo(host, 'x', { duration: 0.55, ease: 'power3.out' })
     const yTo = gsap.quickTo(host, 'y', { duration: 0.55, ease: 'power3.out' })

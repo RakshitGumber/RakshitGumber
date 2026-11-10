@@ -613,8 +613,15 @@ html.rg-cursor-on * {
 }
 
 @media (max-width: 720px) {
+  .rg-page-body .lead {
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  /* Fit sheet + print shadow inside the padded page body so it stays centered. */
   .rg-book {
-    width: 92vw;
+    --shadow-off: 10px;
+    width: calc(100% - var(--shadow-off));
     aspect-ratio: auto;
   }
 
@@ -634,6 +641,16 @@ html.rg-cursor-on * {
 
   .rg-sheet {
     padding-bottom: calc(var(--margin) * 2.5);
+  }
+
+  .rg-sticker {
+    right: auto;
+    left: 50%;
+    translate: -50% 0;
+  }
+
+  .rg-home-title {
+    justify-content: center;
   }
 }
 
@@ -706,19 +723,19 @@ html.rg-cursor-on * {
   font-size: clamp(4.5rem, 20vw, 13rem);
   line-height: 0.88;
   letter-spacing: 0.02em;
+  text-align: center;
   will-change: transform;
 }
 
-.d-stations .rg-page-title--left {
-  text-align: left;
-}
+/* Left / right title aligns only on desktop — mobile stays centered. */
+@media (min-width: 721px) {
+  .d-stations .rg-page-title--left {
+    text-align: left;
+  }
 
-.d-stations .rg-page-title--center {
-  text-align: center;
-}
-
-.d-stations .rg-page-title--right {
-  text-align: right;
+  .d-stations .rg-page-title--right {
+    text-align: right;
+  }
 }
 
 /* Projects / About — white outline. */

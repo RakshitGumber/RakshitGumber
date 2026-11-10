@@ -19,6 +19,8 @@ export const useMouseParallax = (
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    // Touch / coarse pointers synthesize mousemove on tap — skip parallax there.
+    if (!window.matchMedia('(pointer: fine)').matches) return
 
     const xTo = gsap.quickTo(el, 'x', { duration, ease: 'power3.out' })
     const yTo = gsap.quickTo(el, 'y', { duration, ease: 'power3.out' })
