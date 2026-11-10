@@ -1,7 +1,9 @@
-import { useRef, type CSSProperties } from 'react'
+import { useRef, useState, type CSSProperties } from 'react'
 import { useContent } from '@/hooks/useContent'
 import { useHotFrame } from '@/hooks/useHotFrame'
+import { ProjectFlyer } from '@/components/ProjectFlyer'
 import { CONTACT } from '@/lib/contact'
+import type { Project } from '@/lib/content'
 import {
   BLOG_PALETTE,
   CONTACT_PALETTE,
@@ -18,6 +20,7 @@ type FrameItem = {
   tags: string[]
   meta: string[]
   href: string | null
+  onOpen?: () => void
 }
 
 function formatDate(iso: string) {
@@ -99,7 +102,7 @@ const Frame = ({
           {inner}
         </a>
       ) : (
-        <button type="button" className="rg-frame-hit">
+        <button type="button" className="rg-frame-hit" onClick={item.onOpen}>
           {inner}
         </button>
       )}
@@ -148,6 +151,9 @@ const ComicBook = ({
 
 export const ProjectList = () => {
   const content = useContent()
+  const [active, setActive] = useState<{ project: Project; index: number } | null>(
+    null,
+  )
 
   if (content.status === 'loading') {
     return <p className="lead det">Loading projects…</p>
@@ -159,15 +165,28 @@ export const ProjectList = () => {
     return <p className="lead det">No projects yet.</p>
   }
 
-  const items = content.data.projects.map((p) => ({
+  const items = content.data.projects.map((p, i) => ({
     id: p.id,
     title: p.title,
     description: p.description,
     tags: p.tags,
     meta: [],
-    href: p.liveDemoUrl || p.githubUrl || p.repoUrl,
+    href: null,
+    onOpen: () => setActive({ project: p, index: i }),
   }))
-  return <ComicBook items={items} palette={PROJECT_PALETTE} moreHref="/projects" />
+
+  return (
+    <>
+      <ComicBook items={items} palette={PROJECT_PALETTE} moreHref="/projects" />
+      {active ? (
+        <ProjectFlyer
+          project={active.project}
+          index={active.index}
+          onClose={() => setActive(null)}
+        />
+      ) : null}
+    </>
+  )
 }
 
 export const BlogList = () => {
@@ -189,7 +208,7 @@ export const BlogList = () => {
     description: b.description,
     tags: b.tags,
     meta: [formatDate(b.timestamp), ...(b.readTime != null ? [`${b.readTime} min`] : [])],
-    href: null,
+    href: `/blog/${b.id}`,
   }))
   return <ComicBook items={items} palette={BLOG_PALETTE} moreHref="/blogs" />
 }

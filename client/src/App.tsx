@@ -5,7 +5,7 @@ import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 import { CursorRing } from '@/components/CursorRing'
 import { BlogList, CaseList, ContactList, ProjectList } from '@/components/ContentList'
-import { ArchivePage, type ArchiveKind } from '@/components/ArchivePage'
+import { ArchivePage, BlogPost, blogSlugOf, type ArchiveKind } from '@/components/ArchivePage'
 import { useMouseParallax } from '@/hooks/useMouseParallax'
 
 type TitleAlign = 'left' | 'center' | 'right'
@@ -185,6 +185,10 @@ const App = () => {
 
   const archive = ARCHIVE_PATHS[path]
   if (archive) return <ArchivePage kind={archive} />
+
+  const blogSlug = blogSlugOf(path)
+  if (blogSlug) return <BlogPost slug={blogSlug} />
+
   return <DialApp />
 }
 

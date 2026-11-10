@@ -897,3 +897,283 @@ html.rg-cursor-on * {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
+.rg-blog-post {
+  display: grid;
+  gap: 1rem;
+  max-width: 42rem;
+}
+
+.rg-blog-post .rg-archive-title {
+  margin: 0;
+}
+
+.rg-blog-post .rg-archive-item-meta:first-child {
+  margin: 0;
+}
+
+.rg-blog-lead {
+  margin: 0;
+  color: #444;
+  font-size: 1.15rem;
+  line-height: 1.5;
+}
+
+.rg-blog-body {
+  margin-top: 0.5rem;
+  color: #222;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.rg-blog-body p {
+  margin: 0 0 1rem;
+}
+
+.rg-archive-open {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rg-archive-open:hover .rg-archive-item-title {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* Project flyer — comic ad poster over a black/80 scrim.
+   Sit above the deck (z-index: 4) but below the cursor ring (z-index: 10000). */
+.rg-flyer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  box-sizing: border-box;
+}
+
+.rg-flyer-scrim {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+}
+
+.rg-flyer-page {
+  --panel: #ff7b93;
+  position: relative;
+  z-index: 1;
+  width: min(100%, 34rem);
+  max-height: min(92dvh, 52rem);
+  overflow: auto;
+  border: 4px solid #111;
+  background: #fff;
+  color: #111;
+  box-shadow:
+    10px 10px 0 #111,
+    0 24px 60px rgba(0, 0, 0, 0.45);
+  animation: rg-flyer-in 0.38s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes rg-flyer-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) rotate(-1.5deg) scale(0.96);
+  }
+}
+
+.rg-flyer-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(0, 0, 0, 0.45) 1px, transparent 1.4px) 0 0 / 7px 7px,
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 8px),
+    repeating-conic-gradient(
+      from -12deg at var(--burst-x) var(--burst-y),
+      var(--panel) 0deg 5deg,
+      color-mix(in srgb, var(--panel) 35%, #fff) 5deg 12deg
+    );
+  opacity: 0.92;
+}
+
+.rg-flyer-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.85rem, 2.5vw, 1.35rem);
+  padding: clamp(1.25rem, 4vw, 2.25rem);
+}
+
+.rg-flyer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.rg-flyer-kicker {
+  padding: 0.25em 0.55em;
+  border: 2.5px solid #111;
+  background: #ffd23f;
+  font-family: var(--font-block);
+  font-size: clamp(0.7rem, 2.4vw, 0.85rem);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  rotate: -3deg;
+  box-shadow: 3px 3px 0 #111;
+}
+
+.rg-flyer-num {
+  padding: 0.2em 0.5em;
+  background: #111;
+  color: #fff;
+  font-family: var(--font-block);
+  font-size: clamp(0.7rem, 2.4vw, 0.95rem);
+  rotate: 2deg;
+}
+
+.rg-flyer-title {
+  margin: 0;
+  max-width: 14ch;
+  padding: 0.2em 0.4em;
+  border: 3px solid #111;
+  background: #fff;
+  box-shadow: 5px 5px 0 #111;
+  font-family: var(--font-block);
+  font-size: clamp(1.75rem, 7vw, 3.1rem);
+  font-weight: 400;
+  line-height: 0.98;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.rg-flyer-tagline {
+  margin: 0;
+  max-width: 34ch;
+  padding: 0.55em 0.7em;
+  border: 2.5px solid #111;
+  background: #fff;
+  font-family: var(--hk, var(--font-en));
+  font-size: clamp(1rem, 2.8vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.rg-flyer-body {
+  margin: 0;
+  max-width: 42ch;
+  padding: 0.7em 0.85em;
+  border: 2px solid #111;
+  background: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-en);
+  font-size: clamp(0.92rem, 2.2vw, 1.05rem);
+  line-height: 1.55;
+}
+
+.rg-flyer-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rg-flyer-tags li {
+  padding: 0.25em 0.55em;
+  background: #111;
+  color: #fff;
+  font-family: var(--hk, var(--font-en));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.rg-flyer-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.rg-flyer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  padding: 0.7em 1em;
+  border: 3px solid #111;
+  color: #111;
+  font-family: var(--font-block);
+  font-size: clamp(0.78rem, 2.2vw, 0.95rem);
+  letter-spacing: 0.02em;
+  text-decoration: none !important;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #111;
+  transition:
+    transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 160ms ease;
+}
+
+.rg-flyer-cta--live {
+  background: #b6ef45;
+}
+
+.rg-flyer-cta--git {
+  background: #fff;
+}
+
+.rg-flyer-cta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #111;
+}
+
+.rg-flyer-close {
+  align-self: flex-start;
+  margin: 0.35rem 0 0;
+  padding: 0.35em 0.7em;
+  border: 2px solid #111;
+  background: #fff;
+  color: #111;
+  font-family: var(--hk, var(--font-en));
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.rg-flyer-close:hover {
+  background: #111;
+  color: #fff;
+}
+
+@media (max-width: 520px) {
+  .rg-flyer-page {
+    width: 100%;
+    max-height: 94dvh;
+    box-shadow: 6px 6px 0 #111;
+  }
+
+  .rg-flyer-ctas {
+    flex-direction: column;
+  }
+
+  .rg-flyer-cta {
+    justify-content: center;
+  }
+}
