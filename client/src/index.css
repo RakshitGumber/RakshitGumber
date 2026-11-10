@@ -726,7 +726,7 @@ html.rg-cursor-on * {
 .d-stations .rg-page-title.big {
   position: relative;
   z-index: 3;
-  margin: 0 0 1.25rem;
+  margin: 0 0 clamp(2rem, 5vw, 3.5rem);
   width: 100%;
   max-width: none;
   pointer-events: none;

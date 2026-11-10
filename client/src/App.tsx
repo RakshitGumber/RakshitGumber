@@ -88,7 +88,7 @@ const STATIONS: StationSpec[] = [
         title="Projects"
         fx="radial-burst"
         accents={['#0f766e', '#2dd4bf']}
-        align="left"
+        align="center"
         titleStyle="hero"
       >
         <ProjectList />
@@ -103,7 +103,7 @@ const STATIONS: StationSpec[] = [
     glow: ['#1d4ed8', '#60a5fa'],
     content: (
       <PageShell
-        title="Case Study"
+        title="Research"
         fx="edge-focus"
         accents={['#1d4ed8', '#60a5fa']}
         align="center"
@@ -124,7 +124,7 @@ const STATIONS: StationSpec[] = [
         title="Blogs"
         fx="corner-flare"
         accents={['#ea580c', '#fb923c']}
-        align="right"
+        align="center"
         titleStyle="ghost"
       >
         <BlogList />
@@ -142,7 +142,7 @@ const STATIONS: StationSpec[] = [
         title="About"
         fx="speed-streaks"
         accents={['#ca8a04', '#facc15']}
-        align="left"
+        align="center"
         titleStyle="hero"
       />
     ),
@@ -158,7 +158,7 @@ const STATIONS: StationSpec[] = [
         title="Contact"
         fx="slash-burst"
         accents={['#c2410c', '#fb923c']}
-        align="right"
+        align="center"
         titleStyle="solid"
       />
     ),
