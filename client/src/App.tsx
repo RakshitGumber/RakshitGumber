@@ -5,7 +5,14 @@ import { PetalOverlay } from '@/components/petals/PetalOverlay'
 import { ComicFx, type ComicFxVariant } from '@/components/ComicFx'
 import { CursorRing } from '@/components/CursorRing'
 import { BlogList, CaseList, ContactList, ProjectList } from '@/components/ContentList'
-import { ArchivePage, BlogPost, blogSlugOf, type ArchiveKind } from '@/components/ArchivePage'
+import {
+  ArchivePage,
+  BlogPost,
+  ProjectPost,
+  blogSlugOf,
+  projectSlugOf,
+  type ArchiveKind,
+} from '@/components/ArchivePage'
 import { useMouseParallax } from '@/hooks/useMouseParallax'
 
 type TitleAlign = 'left' | 'center' | 'right'
@@ -13,8 +20,11 @@ type TitleStyle = 'hero' | 'ink' | 'ghost' | 'solid'
 
 const ARCHIVE_PATHS: Record<string, ArchiveKind> = {
   '/projects': 'projects',
+  '/project': 'projects',
   '/blogs': 'blogs',
   '/cases': 'cases',
+  '/casestudies': 'cases',
+  '/case-studies': 'cases',
 }
 
 function pathOf() {
@@ -182,6 +192,9 @@ const App = () => {
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [])
+
+  const projectSlug = projectSlugOf(path)
+  if (projectSlug) return <ProjectPost slug={projectSlug} />
 
   const archive = ARCHIVE_PATHS[path]
   if (archive) return <ArchivePage kind={archive} />

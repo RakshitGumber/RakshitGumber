@@ -4,6 +4,8 @@
   --color-bg: #000000;
   --color-title: #fffaf2;
   --font-en: "DM Sans", sans-serif;
+  --font-heading: "Montserrat", ui-sans-serif, sans-serif;
+  --font-content: "Mulish", ui-sans-serif, sans-serif;
   --font-block: "Rubik Mono One", monospace;
   --font-hi: "Tiro Devanagari Marathi", serif;
   --font-ja: "UoqMunThenKhung", serif;
@@ -809,143 +811,223 @@ html.rg-cursor-on * {
   -webkit-text-fill-color: #000;
 }
 
-/* White archive pages — separate from the dial. */
-.rg-archive {
+/* Site pages — web/ layout, dark theme like the dial app. */
+.rg-site {
+  --site-bg: #11111b;
+  --site-title: #F4F6FF;
+  --site-text: #898ba7;
+  --site-accent: #ff133e;
+  --site-muted: #636687;
   box-sizing: border-box;
   min-height: 100dvh;
-  padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 5vw, 4rem) 4rem;
-  background: #fff;
-  color: #111;
-  font-family: var(--font-en);
+  background: var(--site-bg);
+  color: var(--site-text);
+  font-family: var(--font-content);
 }
 
-.rg-archive-head {
-  display: grid;
-  gap: 1.25rem;
-  margin-bottom: clamp(2rem, 5vw, 3.5rem);
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid #e8e8e8;
+.rg-site-section {
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  padding: 1rem 1rem 4rem;
 }
 
-.rg-archive-back {
-  width: fit-content;
-  color: #111;
+@media (min-width: 640px) {
+  .rg-site-section {
+    padding: 1rem 3rem 5rem;
+  }
+}
+
+.rg-site-back {
+  display: inline-flex;
+  margin-bottom: 1.5rem;
+  color: var(--site-muted);
   font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  font-weight: 600;
   text-decoration: none;
+  transition: color 200ms ease;
 }
 
-.rg-archive-back:hover {
-  color: #000;
+.rg-site-back:hover {
+  color: var(--site-title);
 }
 
-.rg-archive-title {
+.rg-site-heading {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0 4rem;
+}
+
+.rg-site-heading h1 {
   margin: 0;
-  font-family: var(--font-block);
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  color: var(--site-title);
+  font-family: var(--font-heading);
+  font-size: clamp(2.25rem, 6vw, 3rem);
+  font-weight: 700;
   line-height: 1;
 }
 
-.rg-archive-note {
+.rg-site-note {
   margin: 0;
-  color: #666;
-  font-size: 1rem;
+  color: var(--site-muted);
+  font-size: 1.05rem;
 }
 
-.rg-archive-list {
-  display: grid;
-  gap: 0;
+.rg-site-list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.rg-archive-item {
-  padding: 1.5rem 0;
-  border-bottom: 1px solid #eee;
+.rg-snippet {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
 }
 
-.rg-archive-item a {
-  color: inherit;
-  text-decoration: none;
+.rg-snippet-top {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-.rg-archive-item-title {
-  margin: 0 0 0.4rem;
-  font-family: var(--font-block);
-  font-size: clamp(1.15rem, 2.5vw, 1.5rem);
-  font-weight: 400;
-  line-height: 1.2;
+@media (min-width: 640px) {
+  .rg-snippet-top {
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+  }
 }
 
-.rg-archive-item-copy {
-  margin: 0;
-  max-width: 62ch;
-  color: #333;
-  font-size: 1rem;
-  line-height: 1.55;
-}
-
-.rg-archive-item-meta {
-  margin: 0.65rem 0 0;
-  color: #888;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.rg-blog-post {
-  display: grid;
-  gap: 1rem;
-  max-width: 42rem;
-}
-
-.rg-blog-post .rg-archive-title {
-  margin: 0;
-}
-
-.rg-blog-post .rg-archive-item-meta:first-child {
-  margin: 0;
-}
-
-.rg-blog-lead {
-  margin: 0;
-  color: #444;
-  font-size: 1.15rem;
-  line-height: 1.5;
-}
-
-.rg-blog-body {
-  margin-top: 0.5rem;
-  color: #222;
-  font-size: 1.05rem;
-  line-height: 1.7;
-}
-
-.rg-blog-body p {
-  margin: 0 0 1rem;
-}
-
-.rg-archive-open {
-  display: block;
-  width: 100%;
+.rg-snippet-title {
+  display: inline-flex;
+  width: fit-content;
   margin: 0;
   padding: 0;
   border: none;
   background: transparent;
-  color: inherit;
-  font: inherit;
+  color: var(--site-title);
+  font-family: var(--font-content);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
+  transition: color 200ms ease;
 }
 
-.rg-archive-open:hover .rg-archive-item-title {
+.rg-snippet-title:hover {
+  color: var(--site-title);
   text-decoration: underline;
-  text-underline-offset: 0.15em;
+  text-decoration-color: var(--site-accent);
+  text-underline-offset: 4px;
+}
+
+.rg-snippet-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rg-snippet-actions a,
+.rg-site-crumbs a {
+  color: var(--site-text);
+  font-weight: 500;
+  text-decoration: none;
+  text-underline-offset: 4px;
+  transition: color 200ms ease, text-decoration-color 200ms ease;
+}
+
+.rg-snippet-actions a:hover,
+.rg-site-crumbs a:hover {
+  color: var(--site-title);
+  text-decoration: underline;
+  text-decoration-color: var(--site-accent);
+}
+
+.rg-snippet-copy {
+  margin: 0;
+  color: var(--site-text);
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+.rg-snippet-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--site-muted);
+  font-size: 0.95rem;
+}
+
+.rg-site-crumbs {
+  margin-bottom: 2.5rem;
+}
+
+.rg-site-crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--site-muted);
+  font-size: 0.875rem;
+}
+
+.rg-site-crumbs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rg-site-crumbs [aria-current="page"] {
+  color: var(--site-title);
+}
+
+.rg-post-head {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2rem 0 4rem;
+}
+
+.rg-post-title {
+  margin: 0;
+  color: var(--site-title);
+  font-family: var(--font-heading);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.rg-prose {
+  color: var(--site-text);
+  font-family: var(--font-content);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.rg-prose p {
+  margin: 0 0 1.25rem;
+}
+
+.rg-prose a {
+  color: var(--site-accent);
+  text-decoration: none;
+}
+
+.rg-prose a:hover {
+  text-decoration: underline;
+}
+
+.rg-post-sign {
+  margin: 2rem 0 0;
+  padding-top: 2rem;
+  color: var(--site-text);
 }
 
 /* Project flyer — comic ad poster over a black/80 scrim.
