@@ -32,13 +32,15 @@ const PageShell = ({
     <div className={`rg-page rg-page--${titleStyle}`}>
       <ComicFx variant={fx} accents={accents} />
       <div className="rg-page-body det" data-own>
-        <h2
-          ref={titleRef}
-          className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}
-        >
-          {title}
-        </h2>
-        {children}
+        <div className="rg-page-scroll">
+          <h2
+            ref={titleRef}
+            className={`big rg-page-title rg-page-title--${align} rg-page-title--${titleStyle}`}
+          >
+            {title}
+          </h2>
+          {children}
+        </div>
       </div>
     </div>
   )

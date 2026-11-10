@@ -257,6 +257,11 @@ html.rg-cursor-on * {
   display: none; /* Chrome, Safari, Edge */
 }
 
+/* Lenis content root — one child so the scroller can measure cleanly. */
+.rg-page-scroll {
+  min-height: 100%;
+}
+
 .rg-page-body .lead {
   max-width: 22em;
 }

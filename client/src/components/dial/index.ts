@@ -1,5 +1,6 @@
 import "@fontsource-variable/big-shoulders-display";
 import "@fontsource-variable/hanken-grotesk";
+import { bindPageScroll, pageLenis, scrollPageBy, scrollPageTo, unbindPageScroll } from "@/lib/pageScroll";
 import "./shell.css";
 import type { Handle, Station } from "./types";
 
@@ -269,11 +270,14 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   /* ---- section visibility ---- */
   let lastS = -1;
   const pageBodyOf = (i: number) => secs[i]?.querySelector<HTMLElement>(".rg-page-body");
-  const atPageEnd = (host: HTMLElement) =>
-    host.scrollTop + host.clientHeight >= host.scrollHeight - 1;
+  const scrollY = (host: HTMLElement) => pageLenis(host)?.targetScroll ?? host.scrollTop;
+  const scrollLimit = (host: HTMLElement) =>
+    pageLenis(host)?.limit ?? Math.max(0, host.scrollHeight - host.clientHeight);
+  const atPageEnd = (host: HTMLElement) => scrollY(host) >= scrollLimit(host) - 1;
 
-  // Tuner ducks while content scrolls, then pops back on idle or page end.
+  // Tuner ducks while content scrolls; rises at page end or after 3s idle.
   let deckTimer = 0;
+  const DECK_IDLE_MS = 3000;
   const revealDeck = () => {
     clearTimeout(deckTimer);
     deckTimer = 0;
@@ -287,7 +291,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     }
     t.classList.add("deck-away");
     clearTimeout(deckTimer);
-    deckTimer = window.setTimeout(revealDeck, 220);
+    deckTimer = window.setTimeout(revealDeck, DECK_IDLE_MS);
   };
 
   const showSection = (i: number) => {
@@ -309,7 +313,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     // Always land at the top of the page body when a station comes into focus.
     if (prev >= 0) {
       const body = pageBodyOf(i);
-      if (body) body.scrollTop = 0;
+      if (body) scrollPageTo(body, 0, { immediate: true });
     }
     revealDeck();
     t.dataset.s = STATIONS[i].id;
@@ -454,8 +458,9 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   const canScrollContent = (dl: number) => {
     const host = scrollHost();
     if (!host) return false;
-    const top = host.scrollTop <= 0;
-    const bottom = atPageEnd(host);
+    const y = scrollY(host);
+    const top = y <= 0;
+    const bottom = y >= scrollLimit(host) - 1;
     return (dl < 0 && !top) || (dl > 0 && !bottom);
   };
 
@@ -511,7 +516,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     if (dominantY && canScrollContent(dl)) {
       e.preventDefault();
       const host = scrollHost();
-      if (host) host.scrollTop += dl;
+      if (host) scrollPageBy(host, dl);
       clearContentScrollLean();
       noteContentScroll();
       return;
@@ -931,9 +936,12 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     bigs = secs.map((s) => s.querySelector<HTMLElement>(".big"));
     secs.forEach((s) => {
       const body = s.querySelector<HTMLElement>(".rg-page-body");
-      if (!body || pageBodies.includes(body)) return;
-      pageBodies.push(body);
-      body.addEventListener("scroll", noteContentScroll, { passive: true });
+      if (!body) return;
+      if (!pageBodies.includes(body)) {
+        pageBodies.push(body);
+        body.addEventListener("scroll", noteContentScroll, { passive: true });
+      }
+      bindPageScroll(body);
     });
   };
   bindPageBodies();
@@ -1019,7 +1027,10 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     raf = 0;
     clearTimeout(wheelTimer);
     clearTimeout(deckTimer);
-    pageBodies.forEach((body) => body.removeEventListener("scroll", noteContentScroll));
+    pageBodies.forEach((body) => {
+      body.removeEventListener("scroll", noteContentScroll);
+      unbindPageScroll(body);
+    });
     ro.disconnect();
     t.removeEventListener("pointerdown", onDown);
     t.removeEventListener("pointermove", onMove);

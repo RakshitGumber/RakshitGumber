@@ -1,6 +1,7 @@
 import { useRef, useState, type CSSProperties } from 'react'
 import { useContent } from '@/hooks/useContent'
 import { useHotFrame } from '@/hooks/useHotFrame'
+import { scrollPageTo } from '@/lib/pageScroll'
 import { BLOG_PALETTE, PROJECT_PALETTE, type StripPalette } from '@/lib/stripPalette'
 
 const PAGE_SIZE = 8
@@ -141,7 +142,10 @@ const ComicBook = ({
           onClick={(e) => {
             setPage((p) => (last ? 0 : p + 1))
             // Land on the top of the fresh page, not its bottom edge.
-            e.currentTarget.parentElement?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            const stack = e.currentTarget.parentElement
+            const body = stack?.closest('.rg-page-body')
+            if (stack && body instanceof HTMLElement) scrollPageTo(body, stack)
+            else stack?.scrollIntoView({ behavior: 'smooth', block: 'start' })
           }}
           disabled={pages < 2}
         >
