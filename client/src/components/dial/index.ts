@@ -196,8 +196,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   let wheelAcc = 0;
   let wheelBase = 0;
   let wheelStepped = false;
-  let wheelPrev = 0;
-  const WHEEL_STEP = 90; // px of scroll it takes to change station
+  const WHEEL_STEP = 60; // px of scroll past a page edge it takes to change station
 
   // geometry
   let pps = 110; // px per station on the drum face
@@ -493,9 +492,10 @@ export function mount(root: HTMLElement, opts: MountOptions) {
   };
 
   const clearContentScrollLean = () => {
+    clearTimeout(wheelTimer);
     if (mode === "wheel") {
       mode = "spring";
-      target = Math.round(clamp(p, 0, LAST));
+      target = clamp(Math.round(wheelBase), 0, LAST);
       wake();
     }
     wheelAcc = 0;
@@ -512,44 +512,58 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     return (dl < 0 && !top) || (dl > 0 && !bottom);
   };
 
+  /**
+   * After a station step, swallow the rest of that gesture (trackpad momentum,
+   * a still-moving finger) so the new page opens — and stays — at its top.
+   * Released by a short pause, or by a mouse wheel still spinning once the
+   * dial has settled.
+   */
+  const holdAfterStep = (raw: number, deltaMode: number) => {
+    if (!wheelStepped) return false;
+    const now = performance.now();
+    const gap = now - wheelLast;
+    const since = now - wheelStepAt;
+    wheelLast = now;
+    const rawAb = Math.abs(raw);
+    const notched =
+      deltaMode !== 0 || (Number.isInteger(raw) && rawAb >= 100 && (rawAb % 100 === 0 || rawAb % 120 === 0));
+    if (gap > 180 || (notched && since > 600)) {
+      wheelStepped = false;
+      return false;
+    }
+    return true;
+  };
+
   /** Shared station advance from a scroll gesture (wheel or touch). */
-  const advanceFromScroll = (dl: number, raw: number, deltaMode: number) => {
+  const advanceFromScroll = (dl: number) => {
     touch();
     const now = performance.now();
-    const fresh = now - wheelLast > 240;
     wheelLast = now;
-    const ab = Math.abs(raw);
-    const notched = deltaMode !== 0 || (Number.isInteger(raw) && ab >= 100 && (ab % 100 === 0 || ab % 120 === 0));
-    const push = Math.abs(dl) > wheelPrev * 1.6 && Math.abs(dl) > 6;
-    wheelPrev = Math.abs(dl);
-    clearTimeout(wheelTimer);
-    wheelTimer = window.setTimeout(() => {
-      if (!wheelStepped) go(wheelBase, 0);
-      wheelStepped = false;
-      wheelAcc = 0;
-    }, 240);
-    if (fresh) {
-      wheelAcc = 0;
-      wheelStepped = false;
-      wheelBase = mode === "spring" || mode === "rest" ? target : Math.round(p);
-    }
-    if (wheelStepped) {
-      const again = notched ? now - wheelStepAt > 320 : push && now - wheelStepAt > 450;
-      if (!again) return;
-      wheelStepped = false;
+    // No lean in progress → start a fresh one from the current station.
+    if (mode !== "wheel") {
       wheelAcc = 0;
       wheelBase = target;
     }
+    clearTimeout(wheelTimer);
+    wheelTimer = window.setTimeout(() => {
+      // Gesture ended short of a step: settle back onto the station.
+      if (mode === "wheel") go(wheelBase, 0);
+      wheelAcc = 0;
+    }, 220);
     wheelAcc += dl;
     if (Math.abs(wheelAcc) >= WHEEL_STEP) {
+      clearTimeout(wheelTimer);
       wheelStepped = true;
       wheelStepAt = now;
       go(wheelBase + Math.sign(wheelAcc), 0);
+      wheelBase = target;
+      wheelAcc = 0;
       return;
     }
+    // Lean the dial toward the next station — static creeps in as a hint.
     mode = "wheel";
     v = 0;
-    p = clamp(wheelBase + (wheelAcc / WHEEL_STEP) * 0.2, -0.25, LAST + 0.25);
+    p = clamp(wheelBase + (wheelAcc / WHEEL_STEP) * 0.25, -0.25, LAST + 0.25);
     wake();
   };
 
@@ -559,6 +573,31 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     const raw = dominantY ? e.deltaY : e.deltaX;
     if (!raw) return;
     const dl = e.deltaMode === 1 ? raw * 40 : e.deltaMode === 2 ? raw * 800 : raw;
+
+    // Tuner/deck: step the station directly — no content scroll, no lean preview.
+    const onDeck = !!(e.target as HTMLElement | null)?.closest?.(".deck");
+    if (onDeck) {
+      e.preventDefault();
+      revealDeck();
+      if (Math.abs(dl) < 4) return;
+      const now = performance.now();
+      if (now - wheelStepAt < 280) return;
+      wheelStepAt = now;
+      wheelLast = now;
+      clearTimeout(wheelTimer);
+      wheelAcc = 0;
+      wheelStepped = true;
+      touch();
+      go(target + Math.sign(dl), 0);
+      wheelBase = target;
+      return;
+    }
+
+    // Rest of a gesture that just changed station — don't scroll the new page.
+    if (holdAfterStep(raw, e.deltaMode)) {
+      e.preventDefault();
+      return;
+    }
 
     // Laptop / trackpad: scroll page content first (works even over the title).
     if (dominantY && canScrollContent(dl)) {
@@ -572,7 +611,7 @@ export function mount(root: HTMLElement, opts: MountOptions) {
 
     e.preventDefault();
     revealDeck();
-    advanceFromScroll(dl, raw, e.deltaMode);
+    advanceFromScroll(dl);
   };
 
   // Mobile: native content scroll while inside the page; edge pull changes station.
@@ -604,6 +643,11 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     finger.x = th.clientX;
     finger.y = th.clientY;
 
+    if (holdAfterStep(0, 0)) {
+      e.preventDefault();
+      return;
+    }
+
     if (canScrollContent(dl)) {
       clearContentScrollLean();
       noteContentScroll();
@@ -612,12 +656,14 @@ export function mount(root: HTMLElement, opts: MountOptions) {
 
     e.preventDefault();
     revealDeck();
-    advanceFromScroll(dl, dl, 0);
+    advanceFromScroll(dl);
   };
   const onTouchEnd = (e: TouchEvent) => {
     if (!finger) return;
     if ([...e.touches].some((x) => x.identifier === finger!.id)) return;
     finger = null;
+    // Lifting the finger ends the swipe; the next one may scroll or step again.
+    wheelStepped = false;
   };
 
   const onKey = (e: KeyboardEvent) => {
@@ -890,8 +936,9 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     if (boot < 1) boot = Math.min(1, boot + dt / 1.1);
 
     if (mode === "spring") {
-      const k = 190;
-      const damp = 2 * Math.sqrt(k) * 0.66;
+      // Quick, barely-overshooting settle: still sweeps through static, no wobble.
+      const k = 210;
+      const damp = 2 * Math.sqrt(k) * 0.8;
       const sub = Math.max(1, Math.ceil(dt * 240));
       const h = dt / sub;
       for (let i = 0; i < sub; i++) {
@@ -906,26 +953,35 @@ export function mount(root: HTMLElement, opts: MountOptions) {
     }
 
     const q = clamp(p, 0, LAST);
-    const nearest = Math.round(q);
+    // Keep the mounted page on the locked/target station during lean + spring;
+    // dial chrome still follows fractional p.
+    const nearest =
+      mode === "wheel"
+        ? clamp(Math.round(wheelBase), 0, LAST)
+        : mode === "spring"
+          ? target
+          : Math.round(q);
     const d = Math.abs(p - nearest);
     const bootE = 1 - (1 - boot) ** 3;
     let sig = (1 - smooth(0.012, 0.42, d)) * bootE;
     let n = Math.max(smooth(0.05, 0.45, d) * 0.9, (1 - bootE) * 0.85);
+    // Page swaps on go() — keep it readable while the dial springs; static still uses sig.
+    const pageSig = mode === "spring" ? 1 : sig;
 
     if (rm) n = 0;
 
     computeColour();
     showSection(nearest);
 
-    const sw = sig * sig;
+    const sw = pageSig * pageSig;
     if (Math.abs(sw - lastSw) > 0.002) {
       lastSw = sw;
       t.style.setProperty("--sw", sw.toFixed(3));
     }
-    if (Math.abs(sig - lastS) > 0.002) {
-      lastS = sig;
-      t.style.setProperty("--s", sig.toFixed(3));
-      secs[nearest].style.opacity = smooth(0, 0.55, sig).toFixed(3);
+    if (Math.abs(pageSig - lastS) > 0.002) {
+      lastS = pageSig;
+      t.style.setProperty("--s", pageSig.toFixed(3));
+      secs[nearest].style.opacity = smooth(0, 0.55, pageSig).toFixed(3);
     }
     const isLocked = sig > 0.985 && (mode === "rest" || (mode === "spring" && Math.abs(v) < 0.4));
     secs[nearest].classList.toggle("locked", isLocked);
